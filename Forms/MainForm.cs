@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Helper = VRC_Color_Changer.Classes.Helper;
 
 namespace VRC_Color_Changer
@@ -327,22 +328,32 @@ namespace VRC_Color_Changer
 
                         if (a == 0) continue; // 透明なピクセルはそのままスキップ
 
-                        // RGB 値を変更
+                        // RGBA 値を変更
                         int newR = r + diffR;
                         int newG = g + diffG;
                         int newB = b + diffB;
+                        var newA = a;
 
                         // 値を 0 ～ 255 にクランプ
                         newR = Math.Max(0, Math.Min(255, newR));
                         newG = Math.Max(0, Math.Min(255, newG));
                         newB = Math.Max(0, Math.Min(255, newB));
 
+                        // 背景部分は緑に変更する。
+                        if (backgroundColor != Color.Empty && backgroundColor.R == r && backgroundColor.G == g && backgroundColor.B == b)
+                        {
+                            newR = 0;
+                            newG = 255;
+                            newB = 0;
+                            newA = 255;
+                        }
+
                         // プレビュー用ビットマップに書き込み
                         int previewIndex = (y * previewData.Stride) + (x * 4);
                         previewPtr[previewIndex + 0] = (byte)newB;
                         previewPtr[previewIndex + 1] = (byte)newG;
                         previewPtr[previewIndex + 2] = (byte)newR;
-                        previewPtr[previewIndex + 3] = a; // アルファ値はそのまま
+                        previewPtr[previewIndex + 3] = newA;
                     }
                 }
 
@@ -408,6 +419,7 @@ namespace VRC_Color_Changer
                 {
                     backgroundColor = color;
                     backgroundColorBox.BackColor = color;
+                    coloredPreviewBox.Image = GenerateColoredPreview(bmp);
                     return;
                 }
 
@@ -452,7 +464,10 @@ namespace VRC_Color_Changer
                     selectedPointsArray = selectedPointsArray.Append(values).ToArray();
                 }
 
+                previousFormTitle = Text;
+                Text = FORM_TITLE + " - プレビュー用の選択エリア作成中...";
                 selectedPointsArrayForPreview = selectedPointsArray.Select(points => Helper.ConvertSelectedAreaToPreviewBox(points, bmp, previewBox)).ToArray();
+                Text = previousFormTitle;
 
                 var totalSelectedPoints = selectedPointsArray.Sum(points => points.Length);
                 Text = FORM_TITLE + $" - {selectedPointsArray.Length} 個の選択エリア (処理予定ピクセル数: {totalSelectedPoints.ToString("N0")})";
@@ -527,6 +542,7 @@ namespace VRC_Color_Changer
 
             previousColor = Color.Empty;
             newColor = Color.Empty;
+            clickedPoint = Point.Empty;
             previousRGBLabel.Text = "";
             newRGBLabel.Text = "";
             calculatedRGBLabel.Text = "";

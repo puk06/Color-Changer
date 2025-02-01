@@ -45,7 +45,6 @@
                 }
             }
 
-            //selectedPointsの外側1pxを消す
             var outerPoints = new HashSet<(int x, int y)>();
             foreach (var (x, y) in selectedPoints)
             {
