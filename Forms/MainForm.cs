@@ -1,11 +1,10 @@
-using System.Linq.Expressions;
-using Helper = VRC_Color_Changer.Classes.Helper;
+using static VRC_Color_Changer.Classes.Helper;
 
 namespace VRC_Color_Changer
 {
     public partial class MainForm : Form
     {
-        private const string CURRENT_VERSION = "v1.0.2";
+        private const string CURRENT_VERSION = "v1.0.3";
         private const string FORM_TITLE = $"VRChat Color Changer {CURRENT_VERSION} by ぷこるふ";
 
         private Color previousColor = Color.Empty;
@@ -437,7 +436,7 @@ namespace VRC_Color_Changer
 
                 var previousFormTitle = Text;
                 Text = FORM_TITLE + " - 選択処理中...";
-                (int x, int y)[] values = Helper.GetSelectedArea(new Point(originalX, originalY), bmp, backgroundColor);
+                (int x, int y)[] values = GetSelectedArea(new Point(originalX, originalY), bmp, backgroundColor);
                 Text = previousFormTitle;
 
                 if (values.Length == 0)
@@ -466,7 +465,7 @@ namespace VRC_Color_Changer
 
                 previousFormTitle = Text;
                 Text = FORM_TITLE + " - プレビュー用の選択エリア作成中...";
-                selectedPointsArrayForPreview = selectedPointsArray.Select(points => Helper.ConvertSelectedAreaToPreviewBox(points, bmp, previewBox)).ToArray();
+                selectedPointsArrayForPreview = selectedPointsArray.Select(points => ConvertSelectedAreaToPreviewBox(points, bmp, previewBox)).ToArray();
                 Text = previousFormTitle;
 
                 var totalSelectedPoints = selectedPointsArray.Sum(points => points.Length);
@@ -573,7 +572,7 @@ namespace VRC_Color_Changer
                 return;
             }
 
-            selectedPointsArrayForPreview = selectedPointsArray.Select(points => Helper.ConvertSelectedAreaToPreviewBox(points, bmp, previewBox)).ToArray();
+            selectedPointsArrayForPreview = selectedPointsArray.Select(points => ConvertSelectedAreaToPreviewBox(points, bmp, previewBox)).ToArray();
 
             var totalSelectedPoints = selectedPointsArray.Sum(points => points.Length);
             if (selectedPointsArray.Length == 0)
