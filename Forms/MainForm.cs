@@ -1,3 +1,4 @@
+using System.Drawing.Imaging;
 using static VRC_Color_Changer.Classes.Helper;
 
 namespace VRC_Color_Changer
@@ -197,11 +198,44 @@ namespace VRC_Color_Changer
 
                 // Bitmap をロックしてピクセルデータに直接アクセス
                 var rect = new Rectangle(0, 0, bitMap.Width, bitMap.Height);
-                var data = bitMap.LockBits(rect, System.Drawing.Imaging.ImageLockMode.ReadWrite, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+
+                // 透過用のビットマップを作成
+                Bitmap? transBitmap = null;
+                BitmapData? transData = null;
+                if (transMode.Checked)
+                {
+                    transBitmap = new Bitmap(bmp.Width, bmp.Height, PixelFormat.Format32bppArgb);
+                    Graphics g = Graphics.FromImage(transBitmap);
+                    g.Clear(Color.Transparent);
+                    g.Dispose();
+                    transData = transBitmap.LockBits(rect, ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);
+                }
+
+                var data = bitMap.LockBits(rect, ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);
+                var skipped = false;
 
                 unsafe
                 {
                     byte* ptr = (byte*)data.Scan0;
+                    byte* transPtr = transData != null ? (byte*)transData.Scan0 : null;
+
+                    void ProcessPixel(int x, int y, byte* targetPtr)
+                    {
+                        int index = (y * data.Stride) + (x * 4);
+                        if (ptr[index + 3] == 0) return; // A チャンネルが 0 ならスキップ
+
+                        int r = Math.Clamp(ptr[index + 2] + diffR, 0, 255); // 赤
+                        int g = Math.Clamp(ptr[index + 1] + diffG, 0, 255); // 緑
+                        int b = Math.Clamp(ptr[index + 0] + diffB, 0, 255); // 青
+
+                        targetPtr[index + 2] = (byte)r;
+                        targetPtr[index + 1] = (byte)g;
+                        targetPtr[index + 0] = (byte)b;
+                        if (targetPtr == transPtr)
+                        {
+                            targetPtr[index + 3] = ptr[index + 3];
+                        }
+                    }
 
                     if (selectedPointsArray != null)
                     {
@@ -209,55 +243,23 @@ namespace VRC_Color_Changer
                         {
                             foreach (var (x, y) in selectedPoints)
                             {
-                                // ピクセルデータのインデックスを計算
-                                int index = (y * data.Stride) + (x * 4);
-
-                                // A チャンネルが 0 ならスキップ
-                                if (ptr[index + 3] == 0) continue;
-
-                                // RGB 値を変更
-                                int r = ptr[index + 2] + diffR; // 赤
-                                int g = ptr[index + 1] + diffG; // 緑
-                                int b = ptr[index + 0] + diffB; // 青
-
-                                // 値を 0 ～ 255 にクランプ
-                                r = Math.Max(0, Math.Min(255, r));
-                                g = Math.Max(0, Math.Min(255, g));
-                                b = Math.Max(0, Math.Min(255, b));
-
-                                // 新しい RGB 値を設定
-                                ptr[index + 2] = (byte)r;
-                                ptr[index + 1] = (byte)g;
-                                ptr[index + 0] = (byte)b;
+                                ProcessPixel(x, y, transMode.Checked && transPtr != null ? transPtr : ptr);
                             }
                         }
                     }
                     else
                     {
+                        if (transMode.Checked)
+                        {
+                            MessageBox.Show("選択エリアがなかったため透過モードはスキップされます。", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            skipped = true;
+                        }
+
                         for (int y = 0; y < bitMap.Height; y++)
                         {
                             for (int x = 0; x < bitMap.Width; x++)
                             {
-                                // ピクセルデータのインデックスを計算
-                                int index = (y * data.Stride) + (x * 4);
-
-                                // A チャンネルが 0 ならスキップ
-                                if (ptr[index + 3] == 0) continue;
-
-                                // RGB 値を変更
-                                int r = ptr[index + 2] + diffR; // 赤
-                                int g = ptr[index + 1] + diffG; // 緑
-                                int b = ptr[index + 0] + diffB; // 青
-
-                                // 値を 0 ～ 255 にクランプ
-                                r = Math.Max(0, Math.Min(255, r));
-                                g = Math.Max(0, Math.Min(255, g));
-                                b = Math.Max(0, Math.Min(255, b));
-
-                                // 新しい RGB 値を設定
-                                ptr[index + 2] = (byte)r;
-                                ptr[index + 1] = (byte)g;
-                                ptr[index + 0] = (byte)b;
+                                ProcessPixel(x, y, ptr);
                             }
                         }
                     }
@@ -265,7 +267,23 @@ namespace VRC_Color_Changer
 
                 // ビットマップのロックを解除
                 bitMap.UnlockBits(data);
-                bitMap.Save(filePath);
+
+                if (transMode.Checked && skipped == false)
+                {
+                    if (transBitmap == null || transData == null)
+                    {
+                        MessageBox.Show("透過用画像が作成できませんでした。", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+
+                    transBitmap.UnlockBits(transData);
+                    transBitmap.Save(filePath);
+                    transBitmap.Dispose();
+                }
+                else
+                {
+                    bitMap.Save(filePath);
+                }
 
                 MessageBox.Show("テクスチャ画像の作成が完了しました。"
                     , "完了", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -290,7 +308,7 @@ namespace VRC_Color_Changer
             float ratioX = (float)rawBitmap.Width / boxWidth;
             float ratioY = (float)rawBitmap.Height / boxHeight;
 
-            Bitmap _previewBitmap = new Bitmap(boxWidth, boxHeight, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+            Bitmap _previewBitmap = new Bitmap(boxWidth, boxHeight, PixelFormat.Format32bppArgb);
 
             int diffR = newColor.R - previousColor.R;
             int diffG = newColor.G - previousColor.G;
@@ -298,11 +316,11 @@ namespace VRC_Color_Changer
 
             // 元のビットマップをロック
             var rawRect = new Rectangle(0, 0, rawBitmap.Width, rawBitmap.Height);
-            var rawData = rawBitmap.LockBits(rawRect, System.Drawing.Imaging.ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+            var rawData = rawBitmap.LockBits(rawRect, ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
 
             // プレビュー用のビットマップをロック
             var previewRect = new Rectangle(0, 0, _previewBitmap.Width, _previewBitmap.Height);
-            var previewData = _previewBitmap.LockBits(previewRect, System.Drawing.Imaging.ImageLockMode.WriteOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+            var previewData = _previewBitmap.LockBits(previewRect, ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
 
             unsafe
             {
@@ -337,15 +355,6 @@ namespace VRC_Color_Changer
                         newR = Math.Max(0, Math.Min(255, newR));
                         newG = Math.Max(0, Math.Min(255, newG));
                         newB = Math.Max(0, Math.Min(255, newB));
-
-                        // 背景部分は緑に変更する。
-                        if (backgroundColor != Color.Empty && backgroundColor.R == r && backgroundColor.G == g && backgroundColor.B == b)
-                        {
-                            newR = 0;
-                            newG = 255;
-                            newB = 0;
-                            newA = 255;
-                        }
 
                         // プレビュー用ビットマップに書き込み
                         int previewIndex = (y * previewData.Stride) + (x * 4);

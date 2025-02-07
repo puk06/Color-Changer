@@ -46,6 +46,7 @@
             backgroundColorBox = new PictureBox();
             backgroundColorLabel = new Label();
             UndoButton = new Button();
+            transMode = new CheckBox();
             ((System.ComponentModel.ISupportInitialize)previewBox).BeginInit();
             ((System.ComponentModel.ISupportInitialize)previousColorBox).BeginInit();
             ((System.ComponentModel.ISupportInitialize)newColorBox).BeginInit();
@@ -239,12 +240,24 @@
             UndoButton.UseVisualStyleBackColor = true;
             UndoButton.Click += UndoButton_Click;
             // 
+            // transMode
+            // 
+            transMode.AutoSize = true;
+            transMode.Font = new Font("Yu Gothic UI", 13F);
+            transMode.Location = new Point(652, 480);
+            transMode.Name = "transMode";
+            transMode.Size = new Size(177, 29);
+            transMode.TabIndex = 28;
+            transMode.Text = "透過画像作成モード";
+            transMode.UseVisualStyleBackColor = true;
+            // 
             // MainForm
             // 
             AllowDrop = true;
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(846, 541);
+            Controls.Add(transMode);
             Controls.Add(UndoButton);
             Controls.Add(backgroundColorLabel);
             Controls.Add(backgroundColorBox);
@@ -298,5 +311,6 @@
         private PictureBox backgroundColorBox;
         private Label backgroundColorLabel;
         private Button UndoButton;
+        private CheckBox transMode;
     }
 }
