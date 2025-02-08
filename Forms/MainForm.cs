@@ -108,7 +108,7 @@ namespace VRC_Color_Changer
                 return;
             }
 
-            ColorPicker colorPicker = new ColorPicker(newColor);
+            ColorPicker colorPicker = new ColorPicker(newColor == Color.Empty ? previousColor : newColor);
             colorPicker.ShowDialog();
             Color color = colorPicker.SelectedColor;
             newColorBox.BackColor = color;
