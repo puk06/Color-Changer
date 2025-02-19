@@ -32,7 +32,6 @@
             ColorPalleteBox = new PictureBox();
             BlueBar = new TrackBar();
             GreenBar = new TrackBar();
-            RGBLabel = new Label();
             previewColorBox = new PictureBox();
             label1 = new Label();
             label2 = new Label();
@@ -42,6 +41,9 @@
             GreenTextBox = new TextBox();
             BlueTextBox = new TextBox();
             label4 = new Label();
+            label5 = new Label();
+            colorCodeTextBox = new TextBox();
+            label6 = new Label();
             ((System.ComponentModel.ISupportInitialize)RedBar).BeginInit();
             ((System.ComponentModel.ISupportInitialize)ColorPalleteBox).BeginInit();
             ((System.ComponentModel.ISupportInitialize)BlueBar).BeginInit();
@@ -95,19 +97,9 @@
             GreenBar.Scroll += sliderChanged;
             GreenBar.MouseUp += sliderEnd;
             // 
-            // RGBLabel
-            // 
-            RGBLabel.AutoSize = true;
-            RGBLabel.Font = new Font("Yu Gothic UI", 13F);
-            RGBLabel.Location = new Point(96, 248);
-            RGBLabel.Name = "RGBLabel";
-            RGBLabel.Size = new Size(107, 25);
-            RGBLabel.TabIndex = 4;
-            RGBLabel.Text = "色のプレビュー";
-            // 
             // previewColorBox
             // 
-            previewColorBox.Location = new Point(222, 233);
+            previewColorBox.Location = new Point(284, 233);
             previewColorBox.Name = "previewColorBox";
             previewColorBox.Size = new Size(55, 55);
             previewColorBox.TabIndex = 5;
@@ -199,11 +191,44 @@
             label4.TabIndex = 13;
             label4.Text = "RGBカラーパレット";
             // 
+            // label5
+            // 
+            label5.AutoSize = true;
+            label5.Font = new Font("Yu Gothic UI", 14F);
+            label5.Location = new Point(64, 231);
+            label5.Name = "label5";
+            label5.Size = new Size(89, 25);
+            label5.TabIndex = 14;
+            label5.Text = "カラーコード";
+            // 
+            // colorCodeTextBox
+            // 
+            colorCodeTextBox.Font = new Font("Yu Gothic UI", 12F);
+            colorCodeTextBox.Location = new Point(50, 259);
+            colorCodeTextBox.Name = "colorCodeTextBox";
+            colorCodeTextBox.Size = new Size(120, 29);
+            colorCodeTextBox.TabIndex = 15;
+            colorCodeTextBox.TextAlign = HorizontalAlignment.Center;
+            colorCodeTextBox.KeyDown += colorCodeTextBox_KeyDown;
+            // 
+            // label6
+            // 
+            label6.AutoSize = true;
+            label6.Font = new Font("Yu Gothic UI", 14F);
+            label6.Location = new Point(202, 249);
+            label6.Name = "label6";
+            label6.Size = new Size(75, 25);
+            label6.TabIndex = 16;
+            label6.Text = "プレビュー";
+            // 
             // ColorPicker
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(370, 506);
+            Controls.Add(label6);
+            Controls.Add(colorCodeTextBox);
+            Controls.Add(label5);
             Controls.Add(label4);
             Controls.Add(BlueTextBox);
             Controls.Add(GreenTextBox);
@@ -213,7 +238,6 @@
             Controls.Add(label2);
             Controls.Add(label1);
             Controls.Add(previewColorBox);
-            Controls.Add(RGBLabel);
             Controls.Add(GreenBar);
             Controls.Add(BlueBar);
             Controls.Add(ColorPalleteBox);
@@ -236,7 +260,6 @@
         private PictureBox ColorPalleteBox;
         private TrackBar BlueBar;
         private TrackBar GreenBar;
-        private Label RGBLabel;
         private PictureBox previewColorBox;
         private Label label1;
         private Label label2;
@@ -246,5 +269,8 @@
         private TextBox GreenTextBox;
         private TextBox BlueTextBox;
         private Label label4;
+        private Label label5;
+        private TextBox colorCodeTextBox;
+        private Label label6;
     }
 }

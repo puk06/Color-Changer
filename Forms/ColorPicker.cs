@@ -116,12 +116,32 @@
             GreenTextBox.Text = color.G.ToString();
             BlueTextBox.Text = color.B.ToString();
 
+            colorCodeTextBox.Text = GetColorCodeFromColor(color);
+
             // Update color palette
             if (ColorPalleteBox.Image is not Bitmap bmp) return;
             if (noMoveMode) return;
             Point closestPoint = GetClosestColorPoint(color, bmp);
             clickedPoint = new Point((int)(closestPoint.X * (float)ColorPalleteBox.Width / bmp.Width), (int)(closestPoint.Y * (float)ColorPalleteBox.Height / bmp.Height));
             ColorPalleteBox.Invalidate();
+        }
+
+        private string GetColorCodeFromColor(Color color)
+        {
+            return $"#{color.R:X2}{color.G:X2}{color.B:X2}";
+        }
+
+        private Color GetColorFromColorCode(string colorCode)
+        {
+            try
+            {
+                if (colorCode.Length != 7) return Color.Empty;
+                return ColorTranslator.FromHtml(colorCode);
+            }
+            catch
+            {
+                return Color.Empty;
+            }
         }
 
         private Point GetClosestColorPoint(Color color, Bitmap bmp)
@@ -150,6 +170,19 @@
             double g = Math.Pow(color1.G - color2.G, 2);
             double b = Math.Pow(color1.B - color2.B, 2);
             return Math.Sqrt(r + g + b);
+        }
+
+        private void colorCodeTextBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (CheckKeyInput(e))
+            {
+                Color color = GetColorFromColorCode(colorCodeTextBox.Text);
+                if (color != Color.Empty)
+                {
+                    UpdateSelectedColor(color);
+                    SelectNextControl((Control)sender, true, true, true, true);
+                }
+            }
         }
     }
 }
