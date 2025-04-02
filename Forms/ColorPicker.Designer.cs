@@ -242,6 +242,9 @@
             Controls.Add(BlueBar);
             Controls.Add(ColorPalleteBox);
             Controls.Add(RedBar);
+            FormBorderStyle = FormBorderStyle.FixedSingle;
+            MaximizeBox = false;
+            MinimizeBox = false;
             Name = "ColorPicker";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "ColorPicker";
