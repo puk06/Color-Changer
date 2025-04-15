@@ -22,8 +22,8 @@
             selectedPoints.Add((clickedLocation.X, clickedLocation.Y));
 
             // 4方向移動用のオフセット
-            int[] dx = { -1, 1, 0, 0 };
-            int[] dy = { 0, 0, -1, 1 };
+            int[] dx = [-1, 1, 0, 0];
+            int[] dy = [0, 0, -1, 1];
 
             while (queue.Count > 0)
             {
@@ -81,6 +81,134 @@
             }
 
             return selectedArea.Except(innerPoints).ToArray();
+        }
+
+        public static double CalculateWeight(double MinDistance, double distance, double graphWeight)
+        {
+            if (MinDistance == -1) return 1; // 交差しない場合は重みを1にする (同じ色のときに現れる)
+            return Math.Pow(1 - (distance / MinDistance), graphWeight);
+        }
+
+        public static double CalculateMinDistance(int base_r, int base_g, int base_b, int target_r, int target_g, int target_b)
+        {
+            // 方向ベクトル
+            int dx = target_r - base_r;
+            int dy = target_g - base_g;
+            int dz = target_b - base_b;
+
+            // 無限線分を RGB 空間の壁に交差する点まで伸ばす（各軸で）
+            List<double> t_values = new List<double>();
+
+            // 各チャンネルの0と255の壁について、t値（ベクトル方向に進むスカラー量）を求める
+            if (dx != 0)
+            {
+                t_values.Add((0 - base_r) / (double)dx);
+                t_values.Add((255 - base_r) / (double)dx);
+            }
+            if (dy != 0)
+            {
+                t_values.Add((0 - base_g) / (double)dy);
+                t_values.Add((255 - base_g) / (double)dy);
+            }
+            if (dz != 0)
+            {
+                t_values.Add((0 - base_b) / (double)dz);
+                t_values.Add((255 - base_b) / (double)dz);
+            }
+
+            // 最小正の t を探す（延長線上、前方方向）
+            double minPositiveT = double.MaxValue;
+            foreach (var t in t_values)
+            {
+                if (t > 0)
+                {
+                    double x = base_r + t * dx;
+                    double y = base_g + t * dy;
+                    double z = base_b + t * dz;
+
+                    // 点がRGB空間内にあるか（各成分が0〜255の間）
+                    if (x >= 0 && x <= 255 && y >= 0 && y <= 255 && z >= 0 && z <= 255)
+                    {
+                        if (t < minPositiveT)
+                            minPositiveT = t;
+                    }
+                }
+            }
+
+            // 最短距離 = ベクトルの長さ * t
+            if (minPositiveT != double.MaxValue)
+            {
+                double length = Math.Sqrt(dx * dx + dy * dy + dz * dz);
+                return minPositiveT * length;
+            }
+
+            // 交差しない場合 (同じ色のときに現れる)
+            return -1;
+        }
+
+        public static bool IsValidCoordinate(Point coords, Size size)
+        {
+            return coords.X >= 0 && coords.X < size.Width && coords.Y >= 0 && coords.Y < size.Height;
+        }
+
+        public static int ParseAndClamp(string value)
+        {
+            return Math.Min(255, Math.Max(0, int.TryParse(value, out int result) ? result : 0));
+        }
+
+
+        public static string GetColorCodeFromColor(Color color)
+        {
+            return $"#{color.R:X2}{color.G:X2}{color.B:X2}";
+        }
+
+        public static Color GetColorFromColorCode(string colorCode)
+        {
+            try
+            {
+                if (colorCode.Length != 7) return Color.Empty;
+                return ColorTranslator.FromHtml(colorCode);
+            }
+            catch
+            {
+                return Color.Empty;
+            }
+        }
+
+        public static Point GetOriginalCoordinates(Point clickedPoint, Size originalSize, Size displaySize)
+        {
+            float ratioX = (float)originalSize.Width / displaySize.Width;
+            float ratioY = (float)originalSize.Height / displaySize.Height;
+
+            return new Point((int)(clickedPoint.X * ratioX), (int)(clickedPoint.Y * ratioY));
+        }
+
+        public static double GetColorDistance(Color color1, Color color2)
+        {
+            double r = Math.Pow(color1.R - color2.R, 2);
+            double g = Math.Pow(color1.G - color2.G, 2);
+            double b = Math.Pow(color1.B - color2.B, 2);
+            return Math.Sqrt(r + g + b);
+        }
+
+        public static Point GetClosestColorPoint(Color color, Bitmap bmp)
+        {
+            Point closestPoint = Point.Empty;
+            double closestDistance = double.MaxValue;
+            for (int x = 0; x < bmp.Width; x++)
+            {
+                for (int y = 0; y < bmp.Height; y++)
+                {
+                    Color currentColor = bmp.GetPixel(x, y);
+                    double distance = GetColorDistance(color, currentColor);
+                    if (distance < closestDistance)
+                    {
+                        closestDistance = distance;
+                        closestPoint = new Point(x, y);
+                    }
+                }
+            }
+            return closestPoint;
         }
     }
 }

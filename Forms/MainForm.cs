@@ -5,14 +5,15 @@ namespace VRC_Color_Changer
 {
     public partial class MainForm : Form
     {
-        private const string CURRENT_VERSION = "v1.0.5";
+        private const string CURRENT_VERSION = "v1.0.6";
         private const string FORM_TITLE = $"VRChat Color Changer {CURRENT_VERSION} by ぷこるふ";
 
         private Color previousColor = Color.Empty;
         private Color newColor = Color.Empty;
         private Point clickedPoint = Point.Empty;
+
         private static readonly Color lightGray = Color.LightGray;
-        private Color DEFAULT_BACKGROUND_COLOR = lightGray;
+        private readonly Color DEFAULT_BACKGROUND_COLOR = lightGray;
 
         private Bitmap? bmp;
         private string? filePath;
@@ -165,21 +166,35 @@ namespace VRC_Color_Changer
             ChangeColor(previousColor, newColor, newFilePath);
         }
 
-        // ヘルプボタン
+        // 使い方ボタン
         private void helpUseButton_Click(object sender, EventArgs e)
         {
-            string message = "このソフトの使い方: \n" +
-                "1. 画像を画面内にドラッグ&ドロップ、もしくは\"ファイルを開く\"を押して画像を開いてください。\n" +
-                "2. 変更前の色を画像内をクリックしたりドラッグして決めてください。\n" +
-                "3. 変更後の色を画面下のグレーの枠をクリックして選択してください。\n" +
-                "4. 作成ボタンを押すと、テクスチャの新規作成が開始されます。";
+            string message = "このソフトの基本的な使い方:\n" +
+                "1. 画像を画面内にドラッグ＆ドロップするか、「ファイルを開く」ボタンを押して画像を読み込んでください。\n" +
+                "2. 変更前の色は、画像内をクリックまたはドラッグして選択します。\n" +
+                "3. 変更後の色は、画面下部のグレーの枠をクリックして選択してください。\n" +
+                "4. 「作成」ボタンを押すと、テクスチャの作成が始まります。";
 
-            message += "\n\n選択モードの使い方: \n" +
-                "1. 背景色を右クリックで設定してください。\n" +
-                "2. 変更したい部分をクリックで選択してください(右に赤い枠線でプレビューが出ます)\n" +
-                "3. 選択が終わったら、選択モードのチェックを外してください。";
+            message += "\n\n選択モードの使い方:\n" +
+                "選択モードでは、出力時に選択された部分のみ色が変更され、他の場所は変更されません。\n" +
+                "1. 背景色を右クリックで設定します。\n" +
+                "2. 変更したい部分を左クリックで選択してください（右側の画像に赤い枠線でプレビューされます。複数選択も可能です）。\n" +
+                "3. 選択が完了したら、「選択モード」のチェックを外してください。\n" +
+                "※「戻る」ボタンを押すと、最後に選択したエリアから順に選択を解除できます。";
 
-            MessageBox.Show(message, "ヘルプ", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            message += "\n\n透過画像作成モードの使い方:\n" +
+                "透過画像作成モードでは、選択した部分だけが残る透過画像を生成します。\n" +
+                "1. 選択モードで、透過させたくない部分を選択します（複数選択可）。\n" +
+                "2. 「透過モード」にチェックを入れてください。\n" +
+                "3. 「作成」ボタンを押すと、選択された部分だけが残る透過画像が生成されます。";
+
+            message += "\n\nバランスモードについて:\n" +
+                "選択した色に近いほど強く、遠いほど弱く色を変更します。\n" +
+                "オン／オフを切り替えて、どちらがより自然か確認してから色変換を実行することをおすすめします。\n" +
+                "※上手く色が変わらない場合は、「重み」の値を調整してみてください。色変更率グラフ（非線形）のカーブの鋭さが変わります。\n" +
+                "※変えたくない部分が変わってしまう場合は値を大きく、もっと変えたい場合は小さくしてください。0にすると通常モードと同じになります。";
+
+            MessageBox.Show(message, "ソフトの使い方一覧", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         // 処理部分
@@ -189,6 +204,9 @@ namespace VRC_Color_Changer
             {
                 if (bmp == null) return;
                 if (previousColor == Color.Empty || newColor == Color.Empty) return;
+
+                var weight = double.TryParse(weightText.Text, out double result) ? result : 1;
+                weightText.Text = weight.ToString("F2");
 
                 var bitMap = new Bitmap(bmp);
 
@@ -224,13 +242,45 @@ namespace VRC_Color_Changer
                         int index = (y * data.Stride) + (x * 4);
                         if (ptr[index + 3] == 0) return; // A チャンネルが 0 ならスキップ
 
-                        int r = Math.Clamp(ptr[index + 2] + diffR, 0, 255); // 赤
-                        int g = Math.Clamp(ptr[index + 1] + diffG, 0, 255); // 緑
-                        int b = Math.Clamp(ptr[index + 0] + diffB, 0, 255); // 青
+                        int r = ptr[index + 2]; // 赤
+                        int g = ptr[index + 1]; // 緑
+                        int b = ptr[index + 0]; // 青
+
+                        if (balanceMode.Checked)
+                        {
+                            var minDistance = CalculateMinDistance(previousColor.R, previousColor.G, previousColor.B, r, g, b);
+
+                            //空間上での距離を計算
+                            double distance = Math.Sqrt(
+                                 Math.Pow(r - previousColor.R, 2) +
+                                 Math.Pow(g - previousColor.G, 2) +
+                                 Math.Pow(b - previousColor.B, 2)
+                            );
+
+                            // 変化率
+                            double adjustmentFactor = CalculateWeight(minDistance, distance, weight);
+
+                            // RGBの差分を補正
+                            int adjustedDiffR = (int)(diffR * adjustmentFactor);
+                            int adjustedDiffG = (int)(diffG * adjustmentFactor);
+                            int adjustedDiffB = (int)(diffB * adjustmentFactor);
+
+                            // 補正後のRGB値を計算
+                            r = Math.Clamp(r + adjustedDiffR, 0, 255); // 赤
+                            g = Math.Clamp(g + adjustedDiffG, 0, 255); // 緑
+                            b = Math.Clamp(b + adjustedDiffB, 0, 255); // 青
+                        }
+                        else
+                        {
+                            r = Math.Clamp(r + diffR, 0, 255); // 赤
+                            g = Math.Clamp(g + diffG, 0, 255); // 緑
+                            b = Math.Clamp(b + diffB, 0, 255); // 青
+                        }
 
                         targetPtr[index + 2] = (byte)r;
                         targetPtr[index + 1] = (byte)g;
                         targetPtr[index + 0] = (byte)b;
+
                         if (targetPtr == transPtr)
                         {
                             targetPtr[index + 3] = ptr[index + 3];
@@ -302,6 +352,9 @@ namespace VRC_Color_Changer
         // プレビュー画像の生成
         private Bitmap GenerateColoredPreview(Bitmap rawBitmap)
         {
+            var weight = double.TryParse(weightText.Text, out double result) ? result : 1;
+            weightText.Text = weight.ToString("F2");
+
             int boxHeight = coloredPreviewBox.Height;
             int boxWidth = coloredPreviewBox.Width;
 
@@ -338,30 +391,56 @@ namespace VRC_Color_Changer
                         int rawIndex = (rawY * rawData.Stride) + (rawX * 4);
 
                         // ピクセルデータを取得
-                        byte b = rawPtr[rawIndex + 0];
-                        byte g = rawPtr[rawIndex + 1];
-                        byte r = rawPtr[rawIndex + 2];
-                        byte a = rawPtr[rawIndex + 3];
+                        int b = rawPtr[rawIndex + 0];
+                        int g = rawPtr[rawIndex + 1];
+                        int r = rawPtr[rawIndex + 2];
+                        int a = rawPtr[rawIndex + 3];
 
                         if (a == 0) continue; // 透明なピクセルはそのままスキップ
 
-                        // RGBA 値を変更
-                        int newR = r + diffR;
-                        int newG = g + diffG;
-                        int newB = b + diffB;
-                        var newA = a;
+                        int newR = r;
+                        int newG = g;
+                        int newB = b;
 
-                        // 値を 0 ～ 255 にクランプ
-                        newR = Math.Max(0, Math.Min(255, newR));
-                        newG = Math.Max(0, Math.Min(255, newG));
-                        newB = Math.Max(0, Math.Min(255, newB));
+                        if (balanceMode.Checked)
+                        {
+                            var minDistance = CalculateMinDistance(previousColor.R, previousColor.G, previousColor.B, newR, newG, newB);
+
+                            //空間上での距離を計算
+                            double distance = Math.Sqrt(
+                                 Math.Pow(r - previousColor.R, 2) +
+                                 Math.Pow(g - previousColor.G, 2) +
+                                 Math.Pow(b - previousColor.B, 2)
+                            );
+
+                            // 変化率
+                            double adjustmentFactor = CalculateWeight(minDistance, distance, weight);
+
+
+                            // RGBの差分を補正
+                            int adjustedDiffR = (int)(diffR * adjustmentFactor);
+                            int adjustedDiffG = (int)(diffG * adjustmentFactor);
+                            int adjustedDiffB = (int)(diffB * adjustmentFactor);
+
+                            // 補正後のRGB値を計算
+                            newR = Math.Clamp(r + adjustedDiffR, 0, 255); // 赤
+                            newG = Math.Clamp(g + adjustedDiffG, 0, 255); // 緑
+                            newB = Math.Clamp(b + adjustedDiffB, 0, 255); // 青
+                        }
+                        else
+                        {
+                            // RGB 値を変更
+                            newR = Math.Clamp(r + diffR, 0, 255);
+                            newG = Math.Clamp(g + diffG, 0, 255);
+                            newB = Math.Clamp(b + diffB, 0, 255);
+                        }
 
                         // プレビュー用ビットマップに書き込み
                         int previewIndex = (y * previewData.Stride) + (x * 4);
                         previewPtr[previewIndex + 0] = (byte)newB;
                         previewPtr[previewIndex + 1] = (byte)newG;
                         previewPtr[previewIndex + 2] = (byte)newR;
-                        previewPtr[previewIndex + 3] = newA;
+                        previewPtr[previewIndex + 3] = (byte)a;
                     }
                 }
 
@@ -478,7 +557,7 @@ namespace VRC_Color_Changer
                 Text = previousFormTitle;
 
                 var totalSelectedPoints = selectedPointsArray.Sum(points => points.Length);
-                Text = FORM_TITLE + $" - {selectedPointsArray.Length} 個の選択エリア (処理予定ピクセル数: {totalSelectedPoints.ToString("N0")})";
+                Text = FORM_TITLE + $" - {selectedPointsArray.Length} 個の選択エリア (処理予定ピクセル数: {totalSelectedPoints:N0})";
                 coloredPreviewBox.Image = GenerateColoredPreview(bmp);
                 return;
             }
@@ -590,7 +669,7 @@ namespace VRC_Color_Changer
             }
             else
             {
-                Text = FORM_TITLE + $" - {selectedPointsArray.Length} 個の選択エリア (処理予定ピクセル数: {totalSelectedPoints.ToString("N0")})";
+                Text = FORM_TITLE + $" - {selectedPointsArray.Length} 個の選択エリア (処理予定ピクセル数: {totalSelectedPoints:N0})";
             }
 
             coloredPreviewBox.Image = GenerateColoredPreview(bmp);
@@ -621,6 +700,31 @@ namespace VRC_Color_Changer
             backgroundColorBox.Enabled = selectMode.Checked;
             backgroundColorLabel.Enabled = selectMode.Checked;
             UndoButton.Enabled = selectMode.Checked;
+        }
+
+        // バランスモードの有効化、無効化
+        private void balanceMode_CheckedChanged(object sender, EventArgs e)
+        {
+            if (bmp == null || previousColor == Color.Empty || newColor == Color.Empty) return;
+            coloredPreviewBox.Image = GenerateColoredPreview(bmp);
+        }
+
+        // 重みの値の変更時の処理
+        private void weightText_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter && balanceMode.Checked)
+            {
+                if (double.TryParse(weightText.Text, out double result))
+                {
+                    if (bmp == null || previousColor == Color.Empty || newColor == Color.Empty) return;
+                    coloredPreviewBox.Image = GenerateColoredPreview(bmp);
+                }
+                else
+                {
+                    MessageBox.Show("数値を入力してください。", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    weightText.Text = "1.00";
+                }
+            }
         }
     }
 }

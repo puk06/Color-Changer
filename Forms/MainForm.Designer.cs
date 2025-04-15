@@ -47,6 +47,9 @@
             backgroundColorLabel = new Label();
             UndoButton = new Button();
             transMode = new CheckBox();
+            balanceMode = new CheckBox();
+            weightLabel = new Label();
+            weightText = new TextBox();
             ((System.ComponentModel.ISupportInitialize)previewBox).BeginInit();
             ((System.ComponentModel.ISupportInitialize)previousColorBox).BeginInit();
             ((System.ComponentModel.ISupportInitialize)newColorBox).BeginInit();
@@ -163,7 +166,7 @@
             // 
             previousRGBLabel.AutoSize = true;
             previousRGBLabel.Font = new Font("Yu Gothic UI", 15F);
-            previousRGBLabel.Location = new Point(12, 500);
+            previousRGBLabel.Location = new Point(12, 501);
             previousRGBLabel.Name = "previousRGBLabel";
             previousRGBLabel.Size = new Size(0, 28);
             previousRGBLabel.TabIndex = 19;
@@ -172,7 +175,7 @@
             // 
             newRGBLabel.AutoSize = true;
             newRGBLabel.Font = new Font("Yu Gothic UI", 15F);
-            newRGBLabel.Location = new Point(210, 500);
+            newRGBLabel.Location = new Point(210, 501);
             newRGBLabel.Name = "newRGBLabel";
             newRGBLabel.Size = new Size(0, 28);
             newRGBLabel.TabIndex = 20;
@@ -181,7 +184,7 @@
             // 
             calculatedRGBLabel.AutoSize = true;
             calculatedRGBLabel.Font = new Font("Yu Gothic UI", 15F);
-            calculatedRGBLabel.Location = new Point(419, 504);
+            calculatedRGBLabel.Location = new Point(12, 533);
             calculatedRGBLabel.Name = "calculatedRGBLabel";
             calculatedRGBLabel.Size = new Size(0, 28);
             calculatedRGBLabel.TabIndex = 21;
@@ -251,12 +254,48 @@
             transMode.Text = "透過画像作成モード";
             transMode.UseVisualStyleBackColor = true;
             // 
+            // balanceMode
+            // 
+            balanceMode.AutoSize = true;
+            balanceMode.Font = new Font("Yu Gothic UI", 13F);
+            balanceMode.Location = new Point(652, 514);
+            balanceMode.Name = "balanceMode";
+            balanceMode.Size = new Size(123, 29);
+            balanceMode.TabIndex = 29;
+            balanceMode.Text = "バランスモード";
+            balanceMode.UseVisualStyleBackColor = true;
+            balanceMode.CheckedChanged += balanceMode_CheckedChanged;
+            // 
+            // weightLabel
+            // 
+            weightLabel.AutoSize = true;
+            weightLabel.Font = new Font("Yu Gothic UI", 13F);
+            weightLabel.Location = new Point(407, 516);
+            weightLabel.Name = "weightLabel";
+            weightLabel.Size = new Size(153, 25);
+            weightLabel.TabIndex = 31;
+            weightLabel.Text = "バランスモードの重み";
+            // 
+            // weightText
+            // 
+            weightText.Font = new Font("Yu Gothic UI", 12F);
+            weightText.Location = new Point(563, 514);
+            weightText.Name = "weightText";
+            weightText.Size = new Size(79, 29);
+            weightText.TabIndex = 32;
+            weightText.Text = "1.00";
+            weightText.TextAlign = HorizontalAlignment.Center;
+            weightText.KeyDown += weightText_KeyDown;
+            // 
             // MainForm
             // 
             AllowDrop = true;
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(846, 541);
+            ClientSize = new Size(846, 570);
+            Controls.Add(weightText);
+            Controls.Add(weightLabel);
+            Controls.Add(balanceMode);
             Controls.Add(transMode);
             Controls.Add(UndoButton);
             Controls.Add(backgroundColorLabel);
@@ -312,5 +351,8 @@
         private Label backgroundColorLabel;
         private Button UndoButton;
         private CheckBox transMode;
+        private CheckBox balanceMode;
+        private Label weightLabel;
+        private TextBox weightText;
     }
 }
