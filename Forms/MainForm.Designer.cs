@@ -86,10 +86,10 @@
             previewBox.SizeMode = PictureBoxSizeMode.StretchImage;
             previewBox.TabIndex = 4;
             previewBox.TabStop = false;
-            previewBox.Paint += previewBox_Paint;
+            previewBox.Paint += PreviewBox_Paint;
             previewBox.MouseDown += SetPreviousColor;
             previewBox.MouseMove += SetPreviousColor;
-            previewBox.MouseUp += previewBox_MouseUp;
+            previewBox.MouseUp += PreviewBox_MouseUp;
             // 
             // label4
             // 
@@ -118,7 +118,7 @@
             newColorBox.Size = new Size(60, 60);
             newColorBox.TabIndex = 8;
             newColorBox.TabStop = false;
-            newColorBox.MouseDown += newColorBox_MouseDown;
+            newColorBox.MouseDown += NewColorBox_MouseDown;
             // 
             // MakeButton
             // 
@@ -140,7 +140,7 @@
             coloredPreviewBox.SizeMode = PictureBoxSizeMode.StretchImage;
             coloredPreviewBox.TabIndex = 12;
             coloredPreviewBox.TabStop = false;
-            coloredPreviewBox.Paint += coloredPreviewBox_Paint;
+            coloredPreviewBox.Paint += ColoredPreviewBox_Paint;
             // 
             // label1
             // 
@@ -160,7 +160,7 @@
             helpUseButton.TabIndex = 18;
             helpUseButton.Text = "使い方";
             helpUseButton.UseVisualStyleBackColor = true;
-            helpUseButton.Click += helpUseButton_Click;
+            helpUseButton.Click += HelpUseButton_Click;
             // 
             // previousRGBLabel
             // 
@@ -197,7 +197,7 @@
             openFile.TabIndex = 22;
             openFile.Text = "ファイルを開く";
             openFile.UseVisualStyleBackColor = true;
-            openFile.Click += openFile_Click;
+            openFile.Click += OpenFile_Click;
             // 
             // selectMode
             // 
@@ -209,7 +209,7 @@
             selectMode.TabIndex = 23;
             selectMode.Text = "選択モード";
             selectMode.UseVisualStyleBackColor = true;
-            selectMode.CheckedChanged += selectMode_CheckedChanged;
+            selectMode.CheckedChanged += SelectMode_CheckedChanged;
             // 
             // backgroundColorBox
             // 
@@ -264,7 +264,7 @@
             balanceMode.TabIndex = 29;
             balanceMode.Text = "バランスモード";
             balanceMode.UseVisualStyleBackColor = true;
-            balanceMode.CheckedChanged += balanceMode_CheckedChanged;
+            balanceMode.CheckedChanged += BalanceMode_CheckedChanged;
             // 
             // weightLabel
             // 
@@ -285,7 +285,7 @@
             weightText.TabIndex = 32;
             weightText.Text = "1.00";
             weightText.TextAlign = HorizontalAlignment.Center;
-            weightText.KeyDown += weightText_KeyDown;
+            weightText.KeyDown += WeightText_KeyDown;
             // 
             // MainForm
             // 

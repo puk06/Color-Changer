@@ -59,8 +59,8 @@
             RedBar.Size = new Size(222, 45);
             RedBar.TabIndex = 0;
             RedBar.TickFrequency = 85;
-            RedBar.Scroll += sliderChanged;
-            RedBar.MouseUp += sliderEnd;
+            RedBar.Scroll += SliderChanged;
+            RedBar.MouseUp += SliderEnd;
             // 
             // ColorPalleteBox
             // 
@@ -71,7 +71,7 @@
             ColorPalleteBox.SizeMode = PictureBoxSizeMode.StretchImage;
             ColorPalleteBox.TabIndex = 1;
             ColorPalleteBox.TabStop = false;
-            ColorPalleteBox.Paint += ColorPalleteBox_Paint;
+            ColorPalleteBox.Paint += ColorPaletteBox_Paint;
             ColorPalleteBox.MouseDown += ColorPalleteBox_MouseMove;
             ColorPalleteBox.MouseMove += ColorPalleteBox_MouseMove;
             // 
@@ -83,8 +83,8 @@
             BlueBar.Size = new Size(221, 45);
             BlueBar.TabIndex = 2;
             BlueBar.TickFrequency = 85;
-            BlueBar.Scroll += sliderChanged;
-            BlueBar.MouseUp += sliderEnd;
+            BlueBar.Scroll += SliderChanged;
+            BlueBar.MouseUp += SliderEnd;
             // 
             // GreenBar
             // 
@@ -94,8 +94,8 @@
             GreenBar.Size = new Size(221, 45);
             GreenBar.TabIndex = 3;
             GreenBar.TickFrequency = 85;
-            GreenBar.Scroll += sliderChanged;
-            GreenBar.MouseUp += sliderEnd;
+            GreenBar.Scroll += SliderChanged;
+            GreenBar.MouseUp += SliderEnd;
             // 
             // previewColorBox
             // 
@@ -143,7 +143,7 @@
             selectButton.TabIndex = 9;
             selectButton.Text = "選択";
             selectButton.UseVisualStyleBackColor = true;
-            selectButton.Click += selectButton_Click;
+            selectButton.Click += SelectButton_Click;
             // 
             // RedTextBox
             // 
@@ -154,8 +154,8 @@
             RedTextBox.TabIndex = 10;
             RedTextBox.Text = "0";
             RedTextBox.TextAlign = HorizontalAlignment.Center;
-            RedTextBox.KeyDown += textKeyDown;
-            RedTextBox.Leave += textChanged;
+            RedTextBox.KeyDown += TextKeyDown;
+            RedTextBox.Leave += OnColorTextChanged;
             // 
             // GreenTextBox
             // 
@@ -166,8 +166,8 @@
             GreenTextBox.TabIndex = 11;
             GreenTextBox.Text = "0";
             GreenTextBox.TextAlign = HorizontalAlignment.Center;
-            GreenTextBox.KeyDown += textKeyDown;
-            GreenTextBox.Leave += textChanged;
+            GreenTextBox.KeyDown += TextKeyDown;
+            GreenTextBox.Leave += OnColorTextChanged;
             // 
             // BlueTextBox
             // 
@@ -178,8 +178,8 @@
             BlueTextBox.TabIndex = 12;
             BlueTextBox.Text = "0";
             BlueTextBox.TextAlign = HorizontalAlignment.Center;
-            BlueTextBox.KeyDown += textKeyDown;
-            BlueTextBox.Leave += textChanged;
+            BlueTextBox.KeyDown += TextKeyDown;
+            BlueTextBox.Leave += OnColorTextChanged;
             // 
             // label4
             // 
@@ -209,7 +209,7 @@
             colorCodeTextBox.Size = new Size(120, 29);
             colorCodeTextBox.TabIndex = 15;
             colorCodeTextBox.TextAlign = HorizontalAlignment.Center;
-            colorCodeTextBox.KeyDown += colorCodeTextBox_KeyDown;
+            colorCodeTextBox.KeyDown += ColorCodeTextBox_KeyDown;
             // 
             // label6
             // 
