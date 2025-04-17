@@ -86,7 +86,7 @@
             previewBox.SizeMode = PictureBoxSizeMode.StretchImage;
             previewBox.TabIndex = 4;
             previewBox.TabStop = false;
-            previewBox.Paint += PreviewBox_Paint;
+            previewBox.Paint += OnPaint;
             previewBox.MouseDown += SetPreviousColor;
             previewBox.MouseMove += SetPreviousColor;
             previewBox.MouseUp += PreviewBox_MouseUp;
@@ -140,7 +140,7 @@
             coloredPreviewBox.SizeMode = PictureBoxSizeMode.StretchImage;
             coloredPreviewBox.TabIndex = 12;
             coloredPreviewBox.TabStop = false;
-            coloredPreviewBox.Paint += ColoredPreviewBox_Paint;
+            coloredPreviewBox.Paint += OnPaint;
             // 
             // label1
             // 

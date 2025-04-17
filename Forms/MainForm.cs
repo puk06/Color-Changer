@@ -72,26 +72,21 @@ public partial class MainForm : Form
         coloredPreviewBox.Image = GenerateColoredPreview(bmp);
     }
 
-    private void PreviewBox_Paint(object sender, PaintEventArgs e)
+    // PreviewBoxの描画
+    private void OnPaint(object sender, PaintEventArgs e)
     {
         if (clickedPoint == Point.Empty) return;
 
-        Color inverseColor = Color.FromArgb(255 - previousColor.R, 255 - previousColor.G, 255 - previousColor.B);
-        Pen pen = new Pen(inverseColor, 2);
+        if (sender is PictureBox pictureBox)
+        {
+            Color color = pictureBox.Name == "previewBox" ? previousColor : newColor;
 
-        e.Graphics.DrawLine(pen, clickedPoint.X - 5, clickedPoint.Y, clickedPoint.X + 5, clickedPoint.Y);
-        e.Graphics.DrawLine(pen, clickedPoint.X, clickedPoint.Y - 5, clickedPoint.X, clickedPoint.Y + 5);
-    }
+            Color inverseColor = Color.FromArgb(255 - color.R, 255 - color.G, 255 - color.B);
+            Pen pen = new Pen(inverseColor, 2);
 
-    private void ColoredPreviewBox_Paint(object sender, PaintEventArgs e)
-    {
-        if (clickedPoint == Point.Empty) return;
-
-        Color inverseColor = Color.FromArgb(255 - newColor.R, 255 - newColor.G, 255 - newColor.B);
-        Pen pen = new Pen(inverseColor, 2);
-
-        e.Graphics.DrawLine(pen, clickedPoint.X - 5, clickedPoint.Y, clickedPoint.X + 5, clickedPoint.Y);
-        e.Graphics.DrawLine(pen, clickedPoint.X, clickedPoint.Y - 5, clickedPoint.X, clickedPoint.Y + 5);
+            e.Graphics.DrawLine(pen, clickedPoint.X - 5, clickedPoint.Y, clickedPoint.X + 5, clickedPoint.Y);
+            e.Graphics.DrawLine(pen, clickedPoint.X, clickedPoint.Y - 5, clickedPoint.X, clickedPoint.Y + 5);
+        }
     }
 
     // 色の選択
@@ -607,9 +602,17 @@ public partial class MainForm : Form
         {
             bmp = new Bitmap(path);
         }
-        catch
+        catch (Exception exception)
         {
-            MessageBox.Show("画像の読み込みに失敗しました。おそらく非対応のファイルです。", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            if (exception is ArgumentException)
+            {
+                MessageBox.Show("画像の読み込みに失敗しました。非対応のファイルです。", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            else
+            {
+                MessageBox.Show("画像の読み込みに失敗しました。\n\nエラー: " + exception, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+
             return;
         }
 
