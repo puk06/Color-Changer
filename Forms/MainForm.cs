@@ -147,7 +147,7 @@ public partial class MainForm : Form
         {
             Filter = "PNGファイル|*.png;",
             Title = "新規テクスチャ画像の保存先を選択してください",
-            FileName = "new_" + Path.GetFileName(filePath),
+            FileName = Path.GetFileNameWithoutExtension(filePath) + "_new" + Path.GetExtension(filePath),
             InitialDirectory = Path.GetDirectoryName(filePath) ?? Environment.GetFolderPath(Environment.SpecialFolder.Desktop)
         };
 
