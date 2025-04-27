@@ -104,8 +104,15 @@ public partial class MainForm : Form
             return;
         }
 
+        // Disable Drag and Drop
+        AllowDrop = false;
+
         ColorPicker colorPicker = new ColorPicker(newColor == Color.Empty ? previousColor : newColor);
         colorPicker.ShowDialog();
+
+        // Enable Drag and Drop
+        AllowDrop = true;
+
         Color color = colorPicker.SelectedColor;
 
         newColorBox.BackColor = color;
