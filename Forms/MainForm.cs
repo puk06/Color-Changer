@@ -142,12 +142,20 @@ public partial class MainForm : Form
         var result = MessageBox.Show("画像を作成しますか？", "確認", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
         if (result != DialogResult.Yes) return;
 
+        var originalFileName = Path.GetFileNameWithoutExtension(filePath);
+        if (string.IsNullOrEmpty(originalFileName)) originalFileName = "New Texture";
+
+        var originalExtension = Path.GetExtension(filePath);
+        if (string.IsNullOrEmpty(originalExtension)) originalExtension = ".png";
+
+        var newFileName = originalFileName + "_new" + originalExtension;
+
         // 名前をつけて保存
         SaveFileDialog dialog = new SaveFileDialog()
         {
             Filter = "PNGファイル|*.png;",
             Title = "新規テクスチャ画像の保存先を選択してください",
-            FileName = Path.GetFileNameWithoutExtension(filePath) + "_new" + Path.GetExtension(filePath),
+            FileName = newFileName,
             InitialDirectory = Path.GetDirectoryName(filePath) ?? Environment.GetFolderPath(Environment.SpecialFolder.Desktop)
         };
 
