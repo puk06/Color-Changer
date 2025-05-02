@@ -50,6 +50,7 @@
             balanceMode = new CheckBox();
             weightLabel = new Label();
             weightText = new TextBox();
+            InverseMode = new CheckBox();
             ((System.ComponentModel.ISupportInitialize)previewBox).BeginInit();
             ((System.ComponentModel.ISupportInitialize)previousColorBox).BeginInit();
             ((System.ComponentModel.ISupportInitialize)newColorBox).BeginInit();
@@ -287,12 +288,25 @@
             weightText.TextAlign = HorizontalAlignment.Center;
             weightText.KeyDown += WeightText_KeyDown;
             // 
+            // InverseMode
+            // 
+            InverseMode.AutoSize = true;
+            InverseMode.Font = new Font("Yu Gothic UI", 13F);
+            InverseMode.Location = new Point(540, 422);
+            InverseMode.Name = "InverseMode";
+            InverseMode.Size = new Size(141, 29);
+            InverseMode.TabIndex = 33;
+            InverseMode.Text = "選択反転モード";
+            InverseMode.UseVisualStyleBackColor = true;
+            InverseMode.CheckedChanged += InverseMode_CheckedChanged;
+            // 
             // MainForm
             // 
             AllowDrop = true;
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(846, 570);
+            Controls.Add(InverseMode);
             Controls.Add(weightText);
             Controls.Add(weightLabel);
             Controls.Add(balanceMode);
@@ -354,5 +368,6 @@
         private CheckBox balanceMode;
         private Label weightLabel;
         private TextBox weightText;
+        private CheckBox InverseMode;
     }
 }

@@ -5,7 +5,7 @@ namespace VRC_Color_Changer;
 
 public partial class MainForm : Form
 {
-    private const string CURRENT_VERSION = "v1.0.7";
+    private const string CURRENT_VERSION = "v1.0.8";
     private const string FORM_TITLE = $"VRChat Color Changer {CURRENT_VERSION} by ぷこるふ";
 
     private Color previousColor = Color.Empty;
@@ -189,6 +189,12 @@ public partial class MainForm : Form
             "3. 選択が完了したら、「選択モード」のチェックを外してください。\n" +
             "※「戻る」ボタンを押すと、最後に選択したエリアから順に選択を解除できます。";
 
+        message += "\n\n反転モードについて:\n" +
+            "選択された部分の色は変わらず、それ以外の場所の色のみ変わります。\n" +
+            "透過画像作成モードでは、透過する部分が選択部分と逆になります。\n" +
+            "耳毛など、変えたくない部分が少ない場合に有効的です。\n" +
+            "選択モードのみだと、変えたくない部分以外を全て選択した状態にしないといけないので便利です。";
+
         message += "\n\n透過画像作成モードの使い方:\n" +
             "透過画像作成モードでは、選択した部分だけが残る透過画像を生成します。\n" +
             "1. 選択モードで、透過させたくない部分を選択します（複数選択可）。\n" +
@@ -213,25 +219,27 @@ public partial class MainForm : Form
             if (previousColor == Color.Empty || newColor == Color.Empty) return;
 
             var weight = double.TryParse(weightText.Text, out double result) ? result : 1;
-
-            if (balanceMode.Checked)
-            {
-                weightText.Text = weight.ToString("F2");
-            }
+            if (balanceMode.Checked) weightText.Text = weight.ToString("F2");
 
             var bitMap = new Bitmap(bmp);
+            var rect = new Rectangle(0, 0, bitMap.Width, bitMap.Height);
+
+            Bitmap? rawBitMap = null;
+            BitmapData? rawBitMapData = null;
+            if (InverseMode.Checked)
+            {
+                rawBitMap = new Bitmap(bmp);
+                rawBitMapData = rawBitMap.LockBits(rect, ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);
+            }
 
             int diffR = newColor.R - previousColor.R;
             int diffG = newColor.G - previousColor.G;
             int diffB = newColor.B - previousColor.B;
 
-            // Bitmap をロックしてピクセルデータに直接アクセス
-            var rect = new Rectangle(0, 0, bitMap.Width, bitMap.Height);
-
             // 透過用のビットマップを作成
             Bitmap? transBitmap = null;
             BitmapData? transData = null;
-            if (transMode.Checked)
+            if (transMode.Checked && !InverseMode.Checked)
             {
                 transBitmap = new Bitmap(bmp.Width, bmp.Height, PixelFormat.Format32bppArgb);
                 Graphics g = Graphics.FromImage(transBitmap);
@@ -246,6 +254,7 @@ public partial class MainForm : Form
             unsafe
             {
                 byte* sourcePtr = (byte*)data.Scan0;
+                byte* rawPtr = rawBitMapData != null ? (byte*)rawBitMapData.Scan0 : null;
                 byte* transPtr = transData != null ? (byte*)transData.Scan0 : null;
 
                 void ProcessPixel(int x, int y, byte* targetPtr)
@@ -298,53 +307,134 @@ public partial class MainForm : Form
                     }
                 }
 
-                if (selectedPointsArray != null)
+                void ProcessInversePixel(int x, int y, byte* targetPtr)
+                {
+                    int pixelIndex = (y * data.Stride) + (x * 4);
+                    if (targetPtr[pixelIndex + 3] == 0) return; // A チャンネルが 0 ならスキップ
+
+                    targetPtr[pixelIndex + 2] = rawPtr[pixelIndex + 2];
+                    targetPtr[pixelIndex + 1] = rawPtr[pixelIndex + 1];
+                    targetPtr[pixelIndex + 0] = rawPtr[pixelIndex + 0];
+                }
+
+                void ProcessTransPixel(int x, int y, byte* targetPtr)
+                {
+                    int pixelIndex = (y * data.Stride) + (x * 4);
+                    if (targetPtr[pixelIndex + 3] == 0) return; // A チャンネルが 0 ならスキップ
+
+                    targetPtr[pixelIndex + 2] = 0;
+                    targetPtr[pixelIndex + 1] = 0;
+                    targetPtr[pixelIndex + 0] = 0;
+                    targetPtr[pixelIndex + 3] = 0;
+                }
+
+                void ProcessAllPixels(byte* ptr)
+                {
+                    for (int y = 0; y < bitMap.Height; y++)
+                        for (int x = 0; x < bitMap.Width; x++)
+                            ProcessPixel(x, y, ptr);
+                }
+
+                void ProcessSelectedPixels(byte* ptr)
                 {
                     foreach (var selectedPoints in selectedPointsArray)
-                    {
                         foreach (var (x, y) in selectedPoints)
-                        {
-                            ProcessPixel(x, y, transMode.Checked && transPtr != null ? transPtr : sourcePtr);
-                        }
-                    }
+                            ProcessPixel(x, y, ptr);
                 }
-                else
+
+                void ProcessInverseSelectedPixels()
+                {
+                    if (rawBitMap == null || rawBitMapData == null)
+                    {
+                        MessageBox.Show("元画像のデータの取得に失敗しました。選択反転モードの結果は作成されません。", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+
+                    foreach (var selectedPoints in selectedPointsArray)
+                        foreach (var (x, y) in selectedPoints)
+                            ProcessInversePixel(x, y, sourcePtr);
+                }
+
+                void ProcessTransparentSelectedPixels()
+                {
+                    if (transPtr == null)
+                    {
+                        MessageBox.Show("透過画像用データの取得に失敗しました。デフォルトの画像が使用されます。", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+
+                    foreach (var selectedPoints in selectedPointsArray)
+                        foreach (var (x, y) in selectedPoints)
+                            ProcessPixel(x, y, transPtr != null ? transPtr : sourcePtr);
+                }
+
+                void ProcessTransparentInverse()
+                {
+                    ProcessAllPixels(sourcePtr);
+                    foreach (var selectedPoints in selectedPointsArray)
+                        foreach (var (x, y) in selectedPoints)
+                            ProcessTransPixel(x, y, sourcePtr);
+                }
+
+                if (selectedPointsArray == null)
                 {
                     if (transMode.Checked)
                     {
-                        MessageBox.Show("選択エリアがなかったため、透過モードはスキップされます。", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        MessageBox.Show("選択エリアがなかったため、透過モードはスキップされます。", "情報", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         skipped = true;
                     }
 
-                    for (int y = 0; y < bitMap.Height; y++)
+                    ProcessAllPixels(sourcePtr);
+                }
+                else if (transMode.Checked)
+                {
+                    if (InverseMode.Checked)
                     {
-                        for (int x = 0; x < bitMap.Width; x++)
-                        {
-                            ProcessPixel(x, y, sourcePtr);
-                        }
+                        ProcessTransparentInverse();
                     }
+                    else
+                    {
+                        ProcessTransparentSelectedPixels();
+                    }
+                }
+                else if (InverseMode.Checked)
+                {
+                    ProcessAllPixels(sourcePtr);
+                    ProcessInverseSelectedPixels();
+                }
+                else
+                {
+                    ProcessSelectedPixels(sourcePtr);
                 }
             }
 
             // ビットマップのロックを解除
             bitMap.UnlockBits(data);
 
-            if (transMode.Checked && !skipped)
+            if (rawBitMap != null && rawBitMapData != null)
+            {
+                rawBitMap.UnlockBits(rawBitMapData);
+                rawBitMap.Dispose();
+            }
+
+            if (!skipped && transMode.Checked && !InverseMode.Checked)
             {
                 if (transBitmap == null || transData == null)
                 {
                     MessageBox.Show("透過用画像が作成できませんでした。", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
                 }
-
-                transBitmap.UnlockBits(transData);
-                transBitmap.Save(filePath);
-                transBitmap.Dispose();
+                else
+                {
+                    transBitmap.UnlockBits(transData);
+                    transBitmap.Save(filePath);
+                    transBitmap.Dispose();
+                }
             }
             else
             {
                 bitMap.Save(filePath);
             }
+
+            bitMap.Dispose();
 
             MessageBox.Show("テクスチャ画像の作成が完了しました。"
                 , "完了", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -569,7 +659,7 @@ public partial class MainForm : Form
             Text = previousFormTitle;
 
             var totalSelectedPoints = selectedPointsArray.Sum(points => points.Length);
-            Text = FORM_TITLE + $" - {selectedPointsArray.Length} 個の選択エリア (処理予定ピクセル数: {totalSelectedPoints:N0})";
+            Text = FORM_TITLE + $" - {selectedPointsArray.Length} 個の選択エリア (総選択ピクセル数: {totalSelectedPoints:N0})";
             coloredPreviewBox.Image = GenerateColoredPreview(previewImage);
             return;
         }
@@ -693,7 +783,7 @@ public partial class MainForm : Form
         }
         else
         {
-            Text = FORM_TITLE + $" - {selectedPointsArray.Length} 個の選択エリア (処理予定ピクセル数: {totalSelectedPoints:N0})";
+            Text = FORM_TITLE + $" - {selectedPointsArray.Length} 個の選択エリア (総選択ピクセル数: {totalSelectedPoints:N0})";
         }
 
         coloredPreviewBox.Image = GenerateColoredPreview(bmp);
@@ -749,5 +839,10 @@ public partial class MainForm : Form
                 weightText.Text = "1.00";
             }
         }
+    }
+
+    private void InverseMode_CheckedChanged(object sender, EventArgs e)
+    {
+        if (InverseMode.Checked) MessageBox.Show("反転モードがオンになりました。\n選択された部分の色は変わらず、それ以外の場所の色のみ変わります。\n透過画像作成モードでは、透過する部分が選択部分と逆になります。\n", "情報", MessageBoxButtons.OK, MessageBoxIcon.Information);
     }
 }
