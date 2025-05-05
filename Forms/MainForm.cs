@@ -5,7 +5,7 @@ namespace VRC_Color_Changer;
 
 public partial class MainForm : Form
 {
-    private const string CURRENT_VERSION = "v1.0.8";
+    private const string CURRENT_VERSION = "v1.0.9";
     private const string FORM_TITLE = $"VRChat Color Changer {CURRENT_VERSION} by ‚Õ‚±‚é‚Ó";
 
     private Color previousColor = Color.Empty;
@@ -705,7 +705,14 @@ public partial class MainForm : Form
 
         try
         {
-            bmp = new Bitmap(path);
+            if (bmp != null)
+            {
+                bmp.Dispose();
+                bmp = null;
+            }
+
+            using var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read);
+            bmp = new Bitmap(stream);
         }
         catch (Exception exception)
         {
