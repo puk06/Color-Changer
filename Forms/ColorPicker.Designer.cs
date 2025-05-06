@@ -1,4 +1,4 @@
-﻿namespace VRC_Color_Changer
+﻿namespace ColorChanger
 {
     partial class ColorPicker
     {
@@ -247,7 +247,8 @@
             MinimizeBox = false;
             Name = "ColorPicker";
             StartPosition = FormStartPosition.CenterScreen;
-            Text = "ColorPicker";
+            Text = "Color Picker by Color Changer";
+            Icon = new Icon(new MemoryStream(Properties.Resources.AppIcon));
             ((System.ComponentModel.ISupportInitialize)RedBar).EndInit();
             ((System.ComponentModel.ISupportInitialize)ColorPalleteBox).EndInit();
             ((System.ComponentModel.ISupportInitialize)BlueBar).EndInit();

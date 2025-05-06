@@ -1,6 +1,6 @@
-﻿using static VRC_Color_Changer.Classes.Helper;
+﻿using static ColorChanger.Classes.Helper;
 
-namespace VRC_Color_Changer;
+namespace ColorChanger;
 
 public partial class ColorPicker : Form
 {

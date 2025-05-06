@@ -1,6 +1,6 @@
 ﻿using System.Drawing.Imaging;
 
-namespace VRC_Color_Changer.Classes;
+namespace ColorChanger.Classes;
 
 public static class Helper
 {

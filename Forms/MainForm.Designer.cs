@@ -1,4 +1,4 @@
-﻿namespace VRC_Color_Changer
+﻿namespace ColorChanger
 {
     partial class MainForm
     {
@@ -336,6 +336,7 @@
             Text = "VRC Color Changer";
             DragDrop += MainForm_DragDrop;
             DragEnter += MainForm_DragEnter;
+            Icon = new Icon(new MemoryStream(Properties.Resources.AppIcon));
             ((System.ComponentModel.ISupportInitialize)previewBox).EndInit();
             ((System.ComponentModel.ISupportInitialize)previousColorBox).EndInit();
             ((System.ComponentModel.ISupportInitialize)newColorBox).EndInit();

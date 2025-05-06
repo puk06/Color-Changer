@@ -1,4 +1,4 @@
-namespace VRC_Color_Changer
+namespace ColorChanger
 {
     internal static class Program
     {

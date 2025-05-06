@@ -1,12 +1,12 @@
 using System.Drawing.Imaging;
-using static VRC_Color_Changer.Classes.Helper;
+using static ColorChanger.Classes.Helper;
 
-namespace VRC_Color_Changer;
+namespace ColorChanger;
 
 public partial class MainForm : Form
 {
     private const string CURRENT_VERSION = "v1.0.9";
-    private const string FORM_TITLE = $"VRChat Color Changer {CURRENT_VERSION} by ‚Õ‚±‚é‚Ó";
+    private const string FORM_TITLE = $"Color Changer For Texture {CURRENT_VERSION}";
 
     private Color previousColor = Color.Empty;
     private Color newColor = Color.Empty;
@@ -454,11 +454,7 @@ public partial class MainForm : Form
     private Bitmap GenerateColoredPreview(Bitmap sourceBitmap)
     {
         var weight = double.TryParse(weightText.Text, out double result) ? result : 1;
-
-        if (balanceMode.Checked)
-        {
-            weightText.Text = weight.ToString("F2");
-        }
+        if (balanceMode.Checked) weightText.Text = weight.ToString("F2");
 
         int boxHeight = coloredPreviewBox.Height;
         int boxWidth = coloredPreviewBox.Width;
