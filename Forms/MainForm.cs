@@ -5,7 +5,7 @@ namespace ColorChanger;
 
 public partial class MainForm : Form
 {
-    private const string CURRENT_VERSION = "v1.0.9";
+    private const string CURRENT_VERSION = "v1.0.10";
     private const string FORM_TITLE = $"Color Changer For Texture {CURRENT_VERSION}";
 
     private Color previousColor = Color.Empty;
@@ -104,13 +104,11 @@ public partial class MainForm : Form
             return;
         }
 
-        // Disable Drag and Drop
         AllowDrop = false;
 
         ColorPicker colorPicker = new ColorPicker(newColor == Color.Empty ? previousColor : newColor);
         colorPicker.ShowDialog();
 
-        // Enable Drag and Drop
         AllowDrop = true;
 
         Color color = colorPicker.SelectedColor;
@@ -270,7 +268,7 @@ public partial class MainForm : Form
                     {
                         var (hasIntersection, IntersectionDistance) = GetRGBIntersectionDistance(previousColor.R, previousColor.G, previousColor.B, r, g, b);
 
-                        //空間上での距離を計算
+                        // 空間上での距離を計算
                         double distance = Math.Sqrt(
                             Math.Pow(r - previousColor.R, 2) +
                             Math.Pow(g - previousColor.G, 2) +
@@ -507,7 +505,7 @@ public partial class MainForm : Form
                     {
                         var (hasIntersection, IntersectionDistance) = GetRGBIntersectionDistance(previousColor.R, previousColor.G, previousColor.B, newR, newG, newB);
 
-                        //空間上での距離を計算
+                        // 空間上での距離を計算
                         double distance = Math.Sqrt(
                             Math.Pow(r - previousColor.R, 2) +
                             Math.Pow(g - previousColor.G, 2) +
@@ -847,5 +845,16 @@ public partial class MainForm : Form
     private void InverseMode_CheckedChanged(object sender, EventArgs e)
     {
         if (InverseMode.Checked) MessageBox.Show("選択反転モードがオンになりました。\n\n- 選択された部分の色は変わらず、それ以外の場所の色のみ変わります。\n- 透過画像作成モードでは、透過する部分が選択部分と逆になります。", "選択反転モード", MessageBoxButtons.OK, MessageBoxIcon.Information);
+    }
+
+    private void AboutThisSoftware_Click(object sender, EventArgs e)
+    {
+        string message = "Color Changer For Texture " + CURRENT_VERSION + "\n\n";
+        message += "柔軟なテクスチャ色変換ツール\n指定した色の差分をもとに、テクスチャの色を簡単に変更できます。\n\n";
+        message += "ツール情報:\n制作者: ぷこるふ\nTwitter: @pukorufu\nGithub: https://github.com/puk06/Color-Changer\n\n";
+        message += "このソフトウェアは、個人の趣味で作成されたものです。\nもしこのソフトウェアが役に立ったと感じたら、ぜひ支援をお願いします！\n支援先: https://pukorufu.booth.pm/items/6519471\n\n";
+        message += "ライセンス:\nこのソフトウェアは、MITライセンスのもとで配布されています。";
+
+        MessageBox.Show(message, "Color Changer For Texture " + CURRENT_VERSION, MessageBoxButtons.OK, MessageBoxIcon.Information);
     }
 }

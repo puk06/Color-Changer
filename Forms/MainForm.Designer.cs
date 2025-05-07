@@ -51,6 +51,7 @@
             weightLabel = new Label();
             weightText = new TextBox();
             InverseMode = new CheckBox();
+            aboutThisSoftware = new Button();
             ((System.ComponentModel.ISupportInitialize)previewBox).BeginInit();
             ((System.ComponentModel.ISupportInitialize)previousColorBox).BeginInit();
             ((System.ComponentModel.ISupportInitialize)newColorBox).BeginInit();
@@ -155,7 +156,7 @@
             // 
             // helpUseButton
             // 
-            helpUseButton.Location = new Point(700, 3);
+            helpUseButton.Location = new Point(563, 3);
             helpUseButton.Name = "helpUseButton";
             helpUseButton.Size = new Size(129, 35);
             helpUseButton.TabIndex = 18;
@@ -192,7 +193,7 @@
             // 
             // openFile
             // 
-            openFile.Location = new Point(550, 3);
+            openFile.Location = new Point(700, 3);
             openFile.Name = "openFile";
             openFile.Size = new Size(129, 35);
             openFile.TabIndex = 22;
@@ -300,12 +301,23 @@
             InverseMode.UseVisualStyleBackColor = true;
             InverseMode.CheckedChanged += InverseMode_CheckedChanged;
             // 
+            // aboutThisSoftware
+            // 
+            aboutThisSoftware.Location = new Point(428, 3);
+            aboutThisSoftware.Name = "aboutThisSoftware";
+            aboutThisSoftware.Size = new Size(129, 35);
+            aboutThisSoftware.TabIndex = 34;
+            aboutThisSoftware.Text = "このソフトについて";
+            aboutThisSoftware.UseVisualStyleBackColor = true;
+            aboutThisSoftware.Click += AboutThisSoftware_Click;
+            // 
             // MainForm
             // 
             AllowDrop = true;
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(846, 570);
+            Controls.Add(aboutThisSoftware);
             Controls.Add(InverseMode);
             Controls.Add(weightText);
             Controls.Add(weightLabel);
@@ -370,5 +382,6 @@
         private Label weightLabel;
         private TextBox weightText;
         private CheckBox InverseMode;
+        private Button aboutThisSoftware;
     }
 }
