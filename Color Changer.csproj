@@ -8,7 +8,7 @@
 		<UseWindowsForms>true</UseWindowsForms>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-		<ApplicationIcon>AppIcon.ico</ApplicationIcon>
+		<ApplicationIcon>Resources\AppIcon.ico</ApplicationIcon>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -16,7 +16,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<Content Include="AppIcon.ico" />
+		<Content Include="Resources\AppIcon.ico" />
 	</ItemGroup>
 
 	<ItemGroup>
