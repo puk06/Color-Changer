@@ -1,4 +1,4 @@
-﻿namespace ColorChanger
+﻿namespace ColorChanger.Forms
 {
     partial class ColorPicker
     {

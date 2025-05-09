@@ -1,4 +1,4 @@
-﻿namespace ColorChanger
+﻿namespace ColorChanger.Forms
 {
     partial class MainForm
     {
@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             label2 = new Label();
             label3 = new Label();
             previewBox = new PictureBox();
@@ -48,10 +49,9 @@
             UndoButton = new Button();
             transMode = new CheckBox();
             balanceMode = new CheckBox();
-            weightLabel = new Label();
-            weightText = new TextBox();
             InverseMode = new CheckBox();
             aboutThisSoftware = new Button();
+            balanceModeSettingsButton = new Button();
             ((System.ComponentModel.ISupportInitialize)previewBox).BeginInit();
             ((System.ComponentModel.ISupportInitialize)previousColorBox).BeginInit();
             ((System.ComponentModel.ISupportInitialize)newColorBox).BeginInit();
@@ -237,7 +237,7 @@
             // UndoButton
             // 
             UndoButton.Enabled = false;
-            UndoButton.Location = new Point(537, 461);
+            UndoButton.Location = new Point(537, 457);
             UndoButton.Name = "UndoButton";
             UndoButton.Size = new Size(85, 34);
             UndoButton.TabIndex = 27;
@@ -249,7 +249,7 @@
             // 
             transMode.AutoSize = true;
             transMode.Font = new Font("Yu Gothic UI", 13F);
-            transMode.Location = new Point(652, 480);
+            transMode.Location = new Point(428, 504);
             transMode.Name = "transMode";
             transMode.Size = new Size(177, 29);
             transMode.TabIndex = 28;
@@ -260,34 +260,13 @@
             // 
             balanceMode.AutoSize = true;
             balanceMode.Font = new Font("Yu Gothic UI", 13F);
-            balanceMode.Location = new Point(652, 514);
+            balanceMode.Location = new Point(428, 536);
             balanceMode.Name = "balanceMode";
             balanceMode.Size = new Size(123, 29);
             balanceMode.TabIndex = 29;
             balanceMode.Text = "バランスモード";
             balanceMode.UseVisualStyleBackColor = true;
             balanceMode.CheckedChanged += BalanceMode_CheckedChanged;
-            // 
-            // weightLabel
-            // 
-            weightLabel.AutoSize = true;
-            weightLabel.Font = new Font("Yu Gothic UI", 13F);
-            weightLabel.Location = new Point(407, 516);
-            weightLabel.Name = "weightLabel";
-            weightLabel.Size = new Size(153, 25);
-            weightLabel.TabIndex = 31;
-            weightLabel.Text = "バランスモードの重み";
-            // 
-            // weightText
-            // 
-            weightText.Font = new Font("Yu Gothic UI", 12F);
-            weightText.Location = new Point(563, 514);
-            weightText.Name = "weightText";
-            weightText.Size = new Size(79, 29);
-            weightText.TabIndex = 32;
-            weightText.Text = "1.00";
-            weightText.TextAlign = HorizontalAlignment.Center;
-            weightText.KeyDown += WeightText_KeyDown;
             // 
             // InverseMode
             // 
@@ -311,16 +290,25 @@
             aboutThisSoftware.UseVisualStyleBackColor = true;
             aboutThisSoftware.Click += AboutThisSoftware_Click;
             // 
+            // balanceModeSettingsButton
+            // 
+            balanceModeSettingsButton.Location = new Point(557, 533);
+            balanceModeSettingsButton.Name = "balanceModeSettingsButton";
+            balanceModeSettingsButton.Size = new Size(135, 36);
+            balanceModeSettingsButton.TabIndex = 35;
+            balanceModeSettingsButton.Text = "バランスモードの設定";
+            balanceModeSettingsButton.UseVisualStyleBackColor = true;
+            balanceModeSettingsButton.Click += BalanceModeSettingsButton_Click;
+            // 
             // MainForm
             // 
             AllowDrop = true;
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(846, 570);
+            ClientSize = new Size(846, 578);
+            Controls.Add(balanceModeSettingsButton);
             Controls.Add(aboutThisSoftware);
             Controls.Add(InverseMode);
-            Controls.Add(weightText);
-            Controls.Add(weightLabel);
             Controls.Add(balanceMode);
             Controls.Add(transMode);
             Controls.Add(UndoButton);
@@ -342,13 +330,13 @@
             Controls.Add(label3);
             Controls.Add(label2);
             FormBorderStyle = FormBorderStyle.FixedSingle;
+            Icon = new Icon(new MemoryStream(Properties.Resources.AppIcon));
             MaximizeBox = false;
             Name = "MainForm";
             StartPosition = FormStartPosition.CenterScreen;
-            Text = "VRC Color Changer";
+            Text = "Color Changer For Texture v{version}";
             DragDrop += MainForm_DragDrop;
             DragEnter += MainForm_DragEnter;
-            Icon = new Icon(new MemoryStream(Properties.Resources.AppIcon));
             ((System.ComponentModel.ISupportInitialize)previewBox).EndInit();
             ((System.ComponentModel.ISupportInitialize)previousColorBox).EndInit();
             ((System.ComponentModel.ISupportInitialize)newColorBox).EndInit();
@@ -379,9 +367,8 @@
         private Button UndoButton;
         private CheckBox transMode;
         private CheckBox balanceMode;
-        private Label weightLabel;
-        private TextBox weightText;
         private CheckBox InverseMode;
         private Button aboutThisSoftware;
+        private Button balanceModeSettingsButton;
     }
 }

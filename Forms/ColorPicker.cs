@@ -1,13 +1,13 @@
-﻿using static ColorChanger.Classes.Helper;
+﻿using ColorChanger.Utils;
 
-namespace ColorChanger;
+namespace ColorChanger.Forms;
 
-public partial class ColorPicker : Form
+internal partial class ColorPicker : Form
 {
-    public Color SelectedColor { get; private set; }
-    private Point clickedPoint;
+    internal Color SelectedColor { get; private set; }
+    private Point _clickedPoint;
 
-    public ColorPicker(Color defaultColor)
+    internal ColorPicker(Color defaultColor)
     {
         InitializeComponent();
 
@@ -21,26 +21,26 @@ public partial class ColorPicker : Form
         if (e.Button != MouseButtons.Left) return;
 
         // Convert clicked coordinates to original image coordinates
-        var originalCoords = GetOriginalCoordinates(e.Location, ((Bitmap)ColorPalleteBox.Image).Size, ColorPalleteBox.Size);
-        if (!IsValidCoordinate(originalCoords, ((Bitmap)ColorPalleteBox.Image).Size)) return;
+        var originalCoords = BitmapUtils.GetOriginalCoordinates(e.Location, ((Bitmap)ColorPalleteBox.Image).Size, ColorPalleteBox.Size);
+        if (!BitmapUtils.IsValidCoordinate(originalCoords, ((Bitmap)ColorPalleteBox.Image).Size)) return;
 
         // Get color from the original image
         UpdateSelectedColor(((Bitmap)ColorPalleteBox.Image).GetPixel(originalCoords.X, originalCoords.Y), true);
 
-        clickedPoint = e.Location;
+        _clickedPoint = e.Location;
         ColorPalleteBox.Invalidate();
     }
 
     private void ColorPaletteBox_Paint(object sender, PaintEventArgs e)
     {
         if (ColorPalleteBox.Image is not Bitmap) return;
-        if (clickedPoint == Point.Empty) return;
+        if (_clickedPoint == Point.Empty) return;
 
         Color inverseColor = Color.FromArgb(255 - SelectedColor.R, 255 - SelectedColor.G, 255 - SelectedColor.B);
         Pen pen = new Pen(inverseColor, 2);
 
-        e.Graphics.DrawLine(pen, clickedPoint.X - 5, clickedPoint.Y, clickedPoint.X + 5, clickedPoint.Y);
-        e.Graphics.DrawLine(pen, clickedPoint.X, clickedPoint.Y - 5, clickedPoint.X, clickedPoint.Y + 5);
+        e.Graphics.DrawLine(pen, _clickedPoint.X - 5, _clickedPoint.Y, _clickedPoint.X + 5, _clickedPoint.Y);
+        e.Graphics.DrawLine(pen, _clickedPoint.X, _clickedPoint.Y - 5, _clickedPoint.X, _clickedPoint.Y + 5);
     }
 
     private void SliderChanged(object sender, EventArgs e)
@@ -66,9 +66,9 @@ public partial class ColorPicker : Form
 
     private void UpdateColor()
     {
-        int r = ParseAndClamp(RedTextBox.Text);
-        int g = ParseAndClamp(GreenTextBox.Text);
-        int b = ParseAndClamp(BlueTextBox.Text);
+        int r = MathUtils.ParseAndClamp(RedTextBox.Text);
+        int g = MathUtils.ParseAndClamp(GreenTextBox.Text);
+        int b = MathUtils.ParseAndClamp(BlueTextBox.Text);
 
         UpdateSelectedColor(Color.FromArgb(r, g, b));
     }
@@ -93,13 +93,13 @@ public partial class ColorPicker : Form
         GreenTextBox.Text = color.G.ToString();
         BlueTextBox.Text = color.B.ToString();
 
-        colorCodeTextBox.Text = GetColorCodeFromColor(color);
+        colorCodeTextBox.Text = ColorUtils.GetColorCodeFromColor(color);
 
         // Update color palette
         if (ColorPalleteBox.Image is not Bitmap) return;
         if (noMoveMode) return;
-        Point closestPoint = GetClosestColorPoint(color, (Bitmap)ColorPalleteBox.Image);
-        clickedPoint = new Point((int)(closestPoint.X * (float)ColorPalleteBox.Width / ((Bitmap)ColorPalleteBox.Image).Width), (int)(closestPoint.Y * (float)ColorPalleteBox.Height / ((Bitmap)ColorPalleteBox.Image).Height));
+        Point closestPoint = ColorUtils.GetClosestColorPoint(color, (Bitmap)ColorPalleteBox.Image);
+        _clickedPoint = new Point((int)(closestPoint.X * (float)ColorPalleteBox.Width / ((Bitmap)ColorPalleteBox.Image).Width), (int)(closestPoint.Y * (float)ColorPalleteBox.Height / ((Bitmap)ColorPalleteBox.Image).Height));
         ColorPalleteBox.Invalidate();
     }
 
@@ -107,7 +107,7 @@ public partial class ColorPicker : Form
     {
         if (CheckKeyInput(e))
         {
-            Color color = GetColorFromColorCode(colorCodeTextBox.Text);
+            Color color = ColorUtils.GetColorFromColorCode(colorCodeTextBox.Text);
             if (color != Color.Empty)
             {
                 UpdateSelectedColor(color);

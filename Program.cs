@@ -1,3 +1,5 @@
+using ColorChanger.Forms;
+
 namespace ColorChanger
 {
     internal static class Program
