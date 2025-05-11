@@ -13,6 +13,6 @@ internal class FormUtils
     {
         return e.KeyCode == Keys.Enter
             || e.KeyCode == Keys.Tab
-            || (ModiferKeys == Keys.Shift && e.KeyCode == Keys.Tab);
+            || (e.KeyCode == Keys.Tab && ModiferKeys == Keys.Shift);
     }
 }

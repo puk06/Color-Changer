@@ -108,7 +108,7 @@ internal class ImageProcessor
         Span<ColorPixel> trans,
         (int x, int y)[][] selectedPointsArray)
     {
-        Span<ColorPixel> target = trans != default ? trans : source;
+        Span<ColorPixel> target = !trans.IsEmpty ? trans : source;
 
         foreach (var (x, y) in selectedPointsArray.SelectMany(p => p))
         {
