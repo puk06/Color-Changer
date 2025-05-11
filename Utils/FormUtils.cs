@@ -2,8 +2,6 @@
 
 internal class FormUtils
 {
-    private static readonly Keys ModiferKeys = Control.ModifierKeys;
-
     /// <summary>
     /// キー入力がナビゲーションキーかどうかを判定する
     /// </summary>
@@ -11,8 +9,16 @@ internal class FormUtils
     /// <returns></returns>
     internal static bool IsNavigationKey(KeyEventArgs e)
     {
-        return e.KeyCode == Keys.Enter
-            || e.KeyCode == Keys.Tab
-            || (e.KeyCode == Keys.Tab && ModiferKeys == Keys.Shift);
+        if (e.KeyCode == Keys.Enter || e.KeyCode == Keys.Tab)
+        {
+            return true;
+        }
+
+        if (e.KeyCode == Keys.Tab && e.Modifiers == Keys.Shift)
+        {
+            return true;
+        }
+
+        return false;
     }
 }
