@@ -224,9 +224,9 @@ internal class ColorUtils
         {
             if (t > 0)
             {
-                double x = base_r + t * dx;
-                double y = base_g + t * dy;
-                double z = base_b + t * dz;
+                double x = base_r + (t * dx);
+                double y = base_g + (t * dy);
+                double z = base_b + (t * dz);
 
                 // 点がRGB空間内にあるか（各成分が0〜255の間）
                 if (x >= 0 && x <= 255 && y >= 0 && y <= 255 && z >= 0 && z <= 255)

@@ -185,7 +185,7 @@ public partial class MainForm : Form
                     }
                     else
                     {
-                        if (transPixels == default) MessageBox.Show("透過画像用データの取得に失敗しました。デフォルトの画像が使用されます。", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        if (transPixels.IsEmpty) MessageBox.Show("透過画像用データの取得に失敗しました。デフォルトの画像が使用されます。", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         imageProcessor.ProcessTransparentSelectedPixels(sourcePixels, transPixels, _selectedPointsArray);
                     }
                 }
