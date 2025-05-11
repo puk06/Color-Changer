@@ -2,7 +2,7 @@
 
 internal class BalanceModeConfiguration
 {
-    internal int modeVersion;
+    internal int modeVersion = 1; // 1: v1, 2: v2
 
     internal double v1Weight = 1.0;
     internal double v1MinimumValue = 0.0;

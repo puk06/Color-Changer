@@ -28,7 +28,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             label2 = new Label();
             label3 = new Label();
             previewBox = new PictureBox();
@@ -89,8 +88,8 @@
             previewBox.TabIndex = 4;
             previewBox.TabStop = false;
             previewBox.Paint += OnPaint;
-            previewBox.MouseDown += SetPreviousColor;
-            previewBox.MouseMove += SetPreviousColor;
+            previewBox.MouseDown += SelectPreviousColor;
+            previewBox.MouseMove += SelectPreviousColor;
             previewBox.MouseUp += PreviewBox_MouseUp;
             // 
             // label4

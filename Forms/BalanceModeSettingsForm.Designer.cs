@@ -2,7 +2,7 @@
 
 namespace ColorChanger.Forms
 {
-    partial class BalanceModeSettings
+    partial class BalanceModeSettingsForm
     {
         /// <summary>
         /// Required designer variable.
@@ -30,7 +30,6 @@ namespace ColorChanger.Forms
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(BalanceModeSettings));
             label1 = new Label();
             balanceModeComboBox = new ComboBox();
             balanceModeDescription = new Label();
@@ -117,7 +116,7 @@ namespace ColorChanger.Forms
             v1minValue.Name = "v1minValue";
             v1minValue.Size = new Size(102, 27);
             v1minValue.TabIndex = 7;
-            v1minValue.KeyDown += OnKeyDown;
+            v1minValue.KeyDown += HandleKeyDown;
             // 
             // label5
             // 
@@ -134,7 +133,7 @@ namespace ColorChanger.Forms
             v1weight.Name = "v1weight";
             v1weight.Size = new Size(102, 27);
             v1weight.TabIndex = 1;
-            v1weight.KeyDown += OnKeyDown;
+            v1weight.KeyDown += HandleKeyDown;
             // 
             // weightLabel
             // 
@@ -189,7 +188,7 @@ namespace ColorChanger.Forms
             v2minValue.Name = "v2minValue";
             v2minValue.Size = new Size(102, 27);
             v2minValue.TabIndex = 5;
-            v2minValue.KeyDown += OnKeyDown;
+            v2minValue.KeyDown += HandleKeyDown;
             // 
             // label4
             // 
@@ -206,7 +205,7 @@ namespace ColorChanger.Forms
             v2weight.Name = "v2weight";
             v2weight.Size = new Size(102, 27);
             v2weight.TabIndex = 3;
-            v2weight.KeyDown += OnKeyDown;
+            v2weight.KeyDown += HandleKeyDown;
             // 
             // label3
             // 
@@ -223,7 +222,7 @@ namespace ColorChanger.Forms
             v2radius.Name = "v2radius";
             v2radius.Size = new Size(102, 27);
             v2radius.TabIndex = 1;
-            v2radius.KeyDown += OnKeyDown;
+            v2radius.KeyDown += HandleKeyDown;
             // 
             // label2
             // 

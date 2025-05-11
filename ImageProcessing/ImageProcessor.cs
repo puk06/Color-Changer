@@ -7,118 +7,142 @@ internal class ImageProcessor
 {
     private readonly int _width;
     private readonly int _height;
-    private readonly bool _isBalanceMode;
-    private readonly Color _previousColor;
-    private readonly ColorDifference _colorDifference;
-    private readonly BalanceModeConfiguration _balanceModeConfiguration;
+    private readonly ColorDifference _colorOffset;
+    private BalanceModeConfiguration _balanceModeConfiguration = new();
+    private bool _isBalanceMode = false;
 
-    internal ImageProcessor(int width, int height, Color previousColor, ColorDifference colorDifference, bool isBalanceMode, BalanceModeConfiguration balanceModeConfiguration)
+    internal ImageProcessor(Size bitmapSize, ColorDifference colorDifference)
     {
-        _width = width;
-        _height = height;
-        _previousColor = previousColor;
-        _colorDifference = colorDifference;
-        _isBalanceMode = isBalanceMode;
-        _balanceModeConfiguration = balanceModeConfiguration;
+        _width = bitmapSize.Width;
+        _height = bitmapSize.Height;
+        _colorOffset = colorDifference;
     }
 
-    internal void ProcessPixel(int x, int y, Span<ColorPixel> source, Span<ColorPixel> target, int customIndex = -1)
+    /// <summary>
+    /// バランスモード用の設定を適用する
+    /// </summary>
+    /// <param name="balanceModeConfiguration"></param>
+    internal void SetBalanceSettings(BalanceModeConfiguration balanceModeConfiguration)
     {
-        int index = MathUtils.GetPixelIndex(x, y, _width);
-        if (source[index].IsTransparent) return;
+        _balanceModeConfiguration = balanceModeConfiguration;
+        _isBalanceMode = true;
+    }
 
-        ColorPixel src = source[index];
+    private ColorPixel ProcessPixel(ColorPixel source)
+    {
+        if (source.IsTransparent) return source;
 
         if (_isBalanceMode)
-            src = ColorUtils.BalanceColorAdjustment(src, _previousColor, _colorDifference, _balanceModeConfiguration);
-        else
-            src += _colorDifference;
+            return ColorUtils.BalanceColorAdjustment(source, _colorOffset, _balanceModeConfiguration);
 
-        if (customIndex == -1)
-            target[index] = src;
-        else
-            target[customIndex] = src;
+        return source + _colorOffset;
     }
 
-    internal void ProcessInversePixel(int x, int y, Span<ColorPixel> source, Span<ColorPixel> raw)
-    {
-        int index = MathUtils.GetPixelIndex(x, y, _width);
-        if (source[index].IsTransparent) return;
-
-        source[index] = new ColorPixel(
-            raw[index].R,
-            raw[index].G,
-            raw[index].B,
-            source[index].A
-        );
-    }
-
-    internal void ProcessTransPixel(int x, int y, Span<ColorPixel> source)
-    {
-        int index = MathUtils.GetPixelIndex(x, y, _width);
-        source[index] = new ColorPixel(0, 0, 0, 0);
-    }
-
-    internal void ProcessAllPixels(Span<ColorPixel> source, Span<ColorPixel> target)
+    internal void ProcessAllPixels(
+        Span<ColorPixel> source,
+        Span<ColorPixel> target)
     {
         for (int y = 0; y < _height; y++)
-            for (int x = 0; x < _width; x++)
-                ProcessPixel(x, y, source, target);
-    }
-
-    internal void ProcessAllPreviewPixels(Span<ColorPixel> source, Span<ColorPixel> target, float ratioX, float ratioY, int previewWidth, int previewHeight)
-    {
-        for (int y = 0; y < previewHeight; y++)
         {
-            for (int x = 0; x < previewWidth; x++)
+            for (int x = 0; x < _width; x++)
             {
-                int sourceX = (int)(x * ratioX);
-                int sourceY = (int)(y * ratioY);
-
-                int previewIndex = MathUtils.GetPixelIndex(x, y, previewWidth);
-                ProcessPixel(sourceX, sourceY, source, target, previewIndex);
+                int index = PixelUtils.GetPixelIndex(x, y, _width);
+                target[index] = ProcessPixel(source[index]);
             }
         }
     }
 
-    internal void ProcessSelectedPixels(Span<ColorPixel> source, Span<ColorPixel> target, (int x, int y)[][] selectedPointsArray)
+    internal void ProcessAllPreviewPixels(
+        Span<ColorPixel> source,
+        Span<ColorPixel> target,
+        (float ratioX, float ratioY) ratios,
+        Size previewSize)
     {
-        foreach (var selectedPoints in selectedPointsArray)
-            foreach (var (x, y) in selectedPoints)
-                ProcessPixel(x, y, source, target);
+        for (int y = 0; y < previewSize.Height; y++)
+        {
+            for (int x = 0; x < previewSize.Width; x++)
+            {
+                int sourceX = (int)(x * ratios.ratioX);
+                int sourceY = (int)(y * ratios.ratioY);
+                int sourceIndex = PixelUtils.GetPixelIndex(sourceX, sourceY, _width);
+                int targetIndex = PixelUtils.GetPixelIndex(x, y, previewSize.Width);
+
+                target[targetIndex] = ProcessPixel(source[sourceIndex]);
+            }
+        }
     }
 
-    internal void ProcessInverseSelectedPixels(Span<ColorPixel> source, Span<ColorPixel> raw, (int x, int y)[][] selectedPointsArray)
+    internal void ProcessSelectedPixels(
+        Span<ColorPixel> source,
+        Span<ColorPixel> target,
+        (int x, int y)[][] selectedPointsArray)
     {
-        foreach (var selectedPoints in selectedPointsArray)
-            foreach (var (x, y) in selectedPoints)
-                ProcessInversePixel(x, y, source, raw);
+        foreach (var (x, y) in selectedPointsArray.SelectMany(p => p))
+        {
+            int index = PixelUtils.GetPixelIndex(x, y, _width);
+
+            target[index] = ProcessPixel(source[index]);
+        }
     }
 
-    internal void ProcessTransparentSelectedPixels(Span<ColorPixel> source, Span<ColorPixel> trans, (int x, int y)[][] selectedPointsArray)
+    internal void ProcessInverseSelectedPixels(
+        Span<ColorPixel> source,
+        Span<ColorPixel> raw,
+        (int x, int y)[][] selectedPointsArray)
     {
-        foreach (var selectedPoints in selectedPointsArray)
-            foreach (var (x, y) in selectedPoints)
-                ProcessPixel(x, y, source, trans != default ? trans : source);
+        foreach (var (x, y) in selectedPointsArray.SelectMany(p => p))
+        {
+            int index = PixelUtils.GetPixelIndex(x, y, _width);
+
+            source[index] = new ColorPixel(
+                raw[index].R,
+                raw[index].G,
+                raw[index].B,
+                source[index].A
+            );
+        }
     }
 
-    internal void ProcessTransparentInverse(Span<ColorPixel> source, (int x, int y)[][] selectedPointsArray)
+    internal void ProcessTransparentSelectedPixels(
+        Span<ColorPixel> source,
+        Span<ColorPixel> trans,
+        (int x, int y)[][] selectedPointsArray)
+    {
+        Span<ColorPixel> target = trans != default ? trans : source;
+
+        foreach (var (x, y) in selectedPointsArray.SelectMany(p => p))
+        {
+            int index = PixelUtils.GetPixelIndex(x, y, _width);
+
+            target[index] = ProcessPixel(source[index]);
+        }
+    }
+
+    internal void ProcessTransparentAndInversePixels(
+        Span<ColorPixel> source,
+        (int x, int y)[][] selectedPointsArray)
     {
         ProcessAllPixels(source, source);
-        foreach (var selectedPoints in selectedPointsArray)
-            foreach (var (x, y) in selectedPoints)
-                ProcessTransPixel(x, y, source);
+
+        foreach (var (x, y) in selectedPointsArray.SelectMany(p => p))
+        {
+            int index = PixelUtils.GetPixelIndex(x, y, _width);
+
+            source[index] = ColorUtils.TransparentPixel;
+        }
     }
 
-    internal static void ChangeSelectedPixelsColor(Span<ColorPixel> source, int previewWidth, (int x, int y)[][] selectedPointsArray, ColorPixel color)
+    internal static void ChangeSelectedPixelsColor(
+        Span<ColorPixel> source,
+        int previewWidth,
+        (int x, int y)[][] selectedPointsArray,
+        ColorPixel color)
     {
-        foreach (var selectedPoints in selectedPointsArray)
+        foreach (var (x, y) in selectedPointsArray.SelectMany(p => p))
         {
-            foreach (var (x, y) in selectedPoints)
-            {
-                int index = MathUtils.GetPixelIndex(x, y, previewWidth);
-                source[index] = color;
-            }
+            int index = PixelUtils.GetPixelIndex(x, y, previewWidth);
+
+            source[index] = color;
         }
     }
 }

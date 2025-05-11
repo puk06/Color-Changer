@@ -1,6 +1,6 @@
 ﻿namespace ColorChanger.Forms
 {
-    partial class ColorPicker
+    partial class ColorPickerForm
     {
         /// <summary>
         /// Required designer variable.
@@ -59,8 +59,8 @@
             RedBar.Size = new Size(222, 45);
             RedBar.TabIndex = 0;
             RedBar.TickFrequency = 85;
-            RedBar.Scroll += SliderChanged;
-            RedBar.MouseUp += SliderEnd;
+            RedBar.Scroll += HandleSliderChanged;
+            RedBar.MouseUp += HandleSliderEnd;
             // 
             // ColorPalleteBox
             // 
@@ -72,8 +72,9 @@
             ColorPalleteBox.TabIndex = 1;
             ColorPalleteBox.TabStop = false;
             ColorPalleteBox.Paint += ColorPaletteBox_Paint;
-            ColorPalleteBox.MouseDown += ColorPalleteBox_MouseMove;
-            ColorPalleteBox.MouseMove += ColorPalleteBox_MouseMove;
+            ColorPalleteBox.MouseDown += (s, e) => ColorPalleteBox_MouseEvent(s, e, true);
+            ColorPalleteBox.MouseMove += (s, e) => ColorPalleteBox_MouseEvent(s, e, true);
+            ColorPalleteBox.MouseUp += (s, e) => ColorPalleteBox_MouseEvent(s, e, false);
             // 
             // BlueBar
             // 
@@ -83,8 +84,8 @@
             BlueBar.Size = new Size(221, 45);
             BlueBar.TabIndex = 2;
             BlueBar.TickFrequency = 85;
-            BlueBar.Scroll += SliderChanged;
-            BlueBar.MouseUp += SliderEnd;
+            BlueBar.Scroll += HandleSliderChanged;
+            BlueBar.MouseUp += HandleSliderEnd;
             // 
             // GreenBar
             // 
@@ -94,8 +95,8 @@
             GreenBar.Size = new Size(221, 45);
             GreenBar.TabIndex = 3;
             GreenBar.TickFrequency = 85;
-            GreenBar.Scroll += SliderChanged;
-            GreenBar.MouseUp += SliderEnd;
+            GreenBar.Scroll += HandleSliderChanged;
+            GreenBar.MouseUp += HandleSliderEnd;
             // 
             // previewColorBox
             // 
@@ -154,7 +155,7 @@
             RedTextBox.TabIndex = 10;
             RedTextBox.Text = "0";
             RedTextBox.TextAlign = HorizontalAlignment.Center;
-            RedTextBox.KeyDown += TextKeyDown;
+            RedTextBox.KeyDown += HandleTextKeyDown;
             RedTextBox.Leave += OnColorTextChanged;
             // 
             // GreenTextBox
@@ -166,7 +167,7 @@
             GreenTextBox.TabIndex = 11;
             GreenTextBox.Text = "0";
             GreenTextBox.TextAlign = HorizontalAlignment.Center;
-            GreenTextBox.KeyDown += TextKeyDown;
+            GreenTextBox.KeyDown += HandleTextKeyDown;
             GreenTextBox.Leave += OnColorTextChanged;
             // 
             // BlueTextBox
@@ -178,7 +179,7 @@
             BlueTextBox.TabIndex = 12;
             BlueTextBox.Text = "0";
             BlueTextBox.TextAlign = HorizontalAlignment.Center;
-            BlueTextBox.KeyDown += TextKeyDown;
+            BlueTextBox.KeyDown += HandleTextKeyDown;
             BlueTextBox.Leave += OnColorTextChanged;
             // 
             // label4
@@ -243,12 +244,13 @@
             Controls.Add(ColorPalleteBox);
             Controls.Add(RedBar);
             FormBorderStyle = FormBorderStyle.FixedSingle;
+            Icon = new Icon(new MemoryStream(Properties.Resources.AppIcon));
             MaximizeBox = false;
             MinimizeBox = false;
             Name = "ColorPicker";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Color Picker by Color Changer";
-            Icon = new Icon(new MemoryStream(Properties.Resources.AppIcon));
+            FormClosing += ColorPicker_FormClosing;
             ((System.ComponentModel.ISupportInitialize)RedBar).EndInit();
             ((System.ComponentModel.ISupportInitialize)ColorPalleteBox).EndInit();
             ((System.ComponentModel.ISupportInitialize)BlueBar).EndInit();

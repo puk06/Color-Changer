@@ -1,59 +1,64 @@
-﻿using System.Drawing.Imaging;
+﻿using System.Collections;
+using System.Drawing.Imaging;
 
-namespace ColorChanger.Utils
+namespace ColorChanger.Utils;
+
+internal class BitmapUtils
 {
-    internal class BitmapUtils
+    const int COLOR_PIXEL_SIZE = 4; // 32ビットARGB形式のピクセルサイズ
+
+    /// <summary>
+    /// 選択範囲を取得する
+    /// </summary>
+    /// <param name="clickedLocation"></param>
+    /// <param name="rawImage"></param>
+    /// <param name="backgroundColor"></param>
+    /// <returns></returns>
+    internal static unsafe (int x, int y)[] GetSelectedArea(Point clickedLocation, Bitmap rawImage, Color backgroundColor)
     {
-        /// <summary>
-        /// 選択範囲を取得する
-        /// </summary>
-        /// <param name="clickedLocation"></param>
-        /// <param name="rawImage"></param>
-        /// <param name="backgroundColor"></param>
-        /// <returns></returns>
-        internal static unsafe (int x, int y)[] GetSelectedArea(Point clickedLocation, Bitmap rawImage, Color backgroundColor)
+        int width = rawImage.Width;
+        int height = rawImage.Height;
+        int totalPixels = width * height;
+
+        var selected = new BitArray(totalPixels);
+        var queue = new Queue<PixelPoint>();
+
+        var rect = new Rectangle(0, 0, width, height);
+        BitmapData bmpData = rawImage.LockBits(rect, ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+
+        try
         {
-            var selectedPoints = new HashSet<(int x, int y)>();
-            var queue = new Queue<(int x, int y)>();
+            Span<ColorPixel> pixels = new(
+                (void*)bmpData.Scan0,
+                totalPixels
+            );
 
-            int width = rawImage.Width;
-            int height = rawImage.Height;
-
-            var rawImageRect = new Rectangle(0, 0, width, height);
-            BitmapData bmpData = rawImage.LockBits(rawImageRect, ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
-
-            int stride = bmpData.Stride;
-            byte* scan0 = (byte*)bmpData.Scan0;
-
-            // 指定位置の色取得（クリック地点）
             int startX = clickedLocation.X;
             int startY = clickedLocation.Y;
-            byte* startPixel = scan0 + startY * stride + startX * 4;
 
-            byte targetB = startPixel[0];
-            byte targetG = startPixel[1];
-            byte targetR = startPixel[2];
-            byte targetA = startPixel[3];
-
-            // 背景色と一致していたらスキップ
-            if (targetR == backgroundColor.R &&
-                targetG == backgroundColor.G &&
-                targetB == backgroundColor.B &&
-                targetA == backgroundColor.A)
+            if (startX < 0 || startY < 0 || startX >= width || startY >= height)
             {
-                rawImage.UnlockBits(bmpData);
-                return Array.Empty<(int x, int y)>();
+                return [];
             }
 
-            queue.Enqueue((startX, startY));
-            selectedPoints.Add((startX, startY));
+            int startIndex = PixelUtils.GetPixelIndex(startX, startY, width);
+            ColorPixel targetPixel = pixels[startIndex];
 
-            int[] dx = [-1, 1, 0, 0];
-            int[] dy = [0, 0, -1, 1];
+            if (targetPixel.Equals(backgroundColor))
+            {
+                return [];
+            }
+
+            selected[startIndex] = true;
+            queue.Enqueue(new PixelPoint(startX, startY));
+
+            ReadOnlySpan<int> dx = [-1, 1, 0, 0];
+            ReadOnlySpan<int> dy = [0, 0, -1, 1];
 
             while (queue.Count > 0)
             {
-                var (x, y) = queue.Dequeue();
+                var point = queue.Dequeue();
+                var (x, y) = point;
 
                 for (int i = 0; i < 4; i++)
                 {
@@ -61,99 +66,177 @@ namespace ColorChanger.Utils
                     int ny = y + dy[i];
 
                     if (nx < 0 || nx >= width || ny < 0 || ny >= height) continue;
-                    if (selectedPoints.Contains((nx, ny))) continue;
 
-                    byte* p = scan0 + ny * stride + nx * 4;
-                    byte b = p[0], g = p[1], r = p[2], a = p[3];
+                    int nIndex = PixelUtils.GetPixelIndex(nx, ny, width);
+                    if (selected[nIndex]) continue;
 
-                    // 背景色と違うなら追加
-                    if (!(r == backgroundColor.R && g == backgroundColor.G && b == backgroundColor.B && a == backgroundColor.A))
+                    if (!pixels[nIndex].Equals(backgroundColor))
                     {
-                        selectedPoints.Add((nx, ny));
-                        queue.Enqueue((nx, ny));
+                        selected[nIndex] = true;
+                        queue.Enqueue(new PixelPoint(nx, ny));
                     }
                 }
             }
 
-            // 外周点を抽出（内側に全方向に隣接がある点）
-            var outerPoints = new HashSet<(int x, int y)>();
-            foreach (var (x, y) in selectedPoints)
+            var innerPoints = new List<(int x, int y)>();
+
+            for (int y = 1; y < height - 1; y++)
             {
-                if (selectedPoints.Contains((x - 1, y)) &&
-                    selectedPoints.Contains((x + 1, y)) &&
-                    selectedPoints.Contains((x, y - 1)) &&
-                    selectedPoints.Contains((x, y + 1)))
+                for (int x = 1; x < width - 1; x++)
                 {
-                    outerPoints.Add((x, y));
+                    int index = PixelUtils.GetPixelIndex(x, y, width);
+                    if (!selected[index]) continue;
+
+                    if (selected[PixelUtils.GetPixelIndex(x, y - 1, width)] &&
+                        selected[PixelUtils.GetPixelIndex(x, y + 1, width)] &&
+                        selected[PixelUtils.GetPixelIndex(x - 1, y, width)] &&
+                        selected[PixelUtils.GetPixelIndex(x + 1, y, width)])
+                    {
+                        innerPoints.Add((x, y));
+                    }
                 }
             }
 
+            return innerPoints.ToArray();
+        }
+        finally
+        {
             rawImage.UnlockBits(bmpData);
-            return outerPoints.ToArray();
         }
+    }
 
+    /// <summary>
+    /// 選択範囲をプレビュー用の座標に変換する
+    /// </summary>
+    /// <param name="selectedArea"></param>
+    /// <param name="sourceImage"></paramImageProcessing
+    /// <param name="previewBox"></param>
+    /// <returns></returns>
+    internal static (int x, int y)[] ConvertSelectedAreaToPreviewBox((int x, int y)[] selectedArea, Bitmap sourceImage, PictureBox previewBox)
+    {
+        int previewHeight = previewBox.Height;
+        int previewWidth = previewBox.Width;
 
-        /// <summary>
-        /// 選択範囲をプレビュー用の座標に変換する
-        /// </summary>
-        /// <param name="selectedArea"></param>
-        /// <param name="sourceImage"></paramImageProcessing
-        /// <param name="previewBox"></param>
-        /// <returns></returns>
-        internal static (int x, int y)[] ConvertSelectedAreaToPreviewBox((int x, int y)[] selectedArea, Bitmap sourceImage, PictureBox previewBox)
+        float ratioX = (float)sourceImage.Width / previewWidth;
+        float ratioY = (float)sourceImage.Height / previewHeight;
+
+        var scaledSelectedArea = selectedArea.Select(point => ((int)(point.x / ratioX), (int)(point.y / ratioY))).ToArray();
+        return DeleteInnerSelectedArea(scaledSelectedArea);
+    }
+
+    /// <summary>
+    /// 選択範囲の内側の点を削除する
+    /// </summary>
+    /// <param name="selectedArea"></param>
+    /// <returns></returns>
+    private static (int x, int y)[] DeleteInnerSelectedArea((int x, int y)[] selectedArea)
+    {
+        HashSet<(int x, int y)> selectedPoints = new(selectedArea);
+        HashSet<(int x, int y)> innerPoints = new();
+
+        foreach (var (x, y) in selectedArea)
         {
-            int previewHeight = previewBox.Height;
-            int previewWidth = previewBox.Width;
-
-            float ratioX = (float)sourceImage.Width / previewWidth;
-            float ratioY = (float)sourceImage.Height / previewHeight;
-
-            var scaledSelectedArea = selectedArea.Select(point => ((int)(point.x / ratioX), (int)(point.y / ratioY))).ToArray();
-            return DeleteInnerSelectedArea(scaledSelectedArea);
-        }
-
-        /// <summary>
-        /// 選択範囲の内側の点を削除する
-        /// </summary>
-        /// <param name="selectedArea"></param>
-        /// <returns></returns>
-        private static (int x, int y)[] DeleteInnerSelectedArea((int x, int y)[] selectedArea)
-        {
-            var selectedPoints = new HashSet<(int x, int y)>(selectedArea);
-            var innerPoints = new HashSet<(int x, int y)>();
-
-            foreach (var (x, y) in selectedArea)
+            if (selectedPoints.Contains((x - 2, y)) && selectedPoints.Contains((x + 2, y)) && selectedPoints.Contains((x, y - 2)) && selectedPoints.Contains((x, y + 2)))
             {
-                if (selectedPoints.Contains((x - 2, y)) && selectedPoints.Contains((x + 2, y)) && selectedPoints.Contains((x, y - 2)) && selectedPoints.Contains((x, y + 2)))
-                {
-                    innerPoints.Add((x, y));
-                }
+                innerPoints.Add((x, y));
             }
-
-            return selectedArea.Except(innerPoints).ToArray();
         }
 
-        /// <summary>
-        /// 座標が範囲内かどうかを判定する
-        /// </summary>
-        /// <param name="coords"></param>
-        /// <param name="size"></param>
-        /// <returns></returns>
-        internal static bool IsValidCoordinate(Point coords, Size size) => coords.X >= 0 && coords.X < size.Width && coords.Y >= 0 && coords.Y < size.Height;
+        return selectedArea.Except(innerPoints).ToArray();
+    }
 
-        /// <summary>
-        /// クリックした座標を元の画像の座標に変換する
-        /// </summary>
-        /// <param name="clickedPoint"></param>
-        /// <param name="originalSize"></param>
-        /// <param name="displaySize"></param>
-        /// <returns></returns>
-        internal static Point GetOriginalCoordinates(Point clickedPoint, Size originalSize, Size displaySize)
-        {
-            float ratioX = (float)originalSize.Width / displaySize.Width;
-            float ratioY = (float)originalSize.Height / displaySize.Height;
+    /// <summary>
+    /// 座標が範囲内かどうかを判定する
+    /// </summary>
+    /// <param name="coords"></param>
+    /// <param name="size"></param>
+    /// <returns></returns>
+    internal static bool IsValidCoordinate(Point coords, Size size)
+        => coords.X >= 0 && coords.X < size.Width && coords.Y >= 0 && coords.Y < size.Height;
 
-            return new Point((int)(clickedPoint.X * ratioX), (int)(clickedPoint.Y * ratioY));
-        }
+    /// <summary>
+    /// クリックした座標を元の画像の座標に変換する
+    /// </summary>
+    /// <param name="clickedPoint"></param>
+    /// <param name="originalSize"></param>
+    /// <param name="displaySize"></param>
+    /// <returns></returns>
+    internal static Point GetOriginalCoordinates(Point clickedPoint, Size originalSize, Size displaySize)
+    {
+        float ratioX = (float)originalSize.Width / displaySize.Width;
+        float ratioY = (float)originalSize.Height / displaySize.Height;
+
+        return new Point((int)(clickedPoint.X * ratioX), (int)(clickedPoint.Y * ratioY));
+    }
+
+    /// <summary>
+    /// BitmapのサイズからRectangleを取得する
+    /// </summary>
+    /// <param name="bitmap"></param>
+    /// <returns></returns>
+    internal static Rectangle GetRectangle(Bitmap bitmap)
+    {
+        var size = bitmap.Size;
+        return new Rectangle(0, 0, size.Width, size.Height);
+    }
+
+    /// <summary>
+    /// BitmapをDisposeする
+    /// </summary>
+    /// <param name="bitmap"></param>
+    internal static void DisposeBitmap(ref Bitmap? bitmap)
+    {
+        bitmap?.Dispose();
+        bitmap = null;
+    }
+
+    /// <summary>
+    /// BitmapをPictureBoxにセットする
+    /// </summary>
+    /// <param name="pictureBox"></param>
+    /// <param name="bitmapImage"></param>
+    internal static void SetImage(PictureBox pictureBox, Bitmap bitmapImage, bool disposeImage = true)
+    {
+        ResetImage(pictureBox, false);
+        pictureBox.Image = new Bitmap(bitmapImage);
+        pictureBox.Invalidate();
+        if (disposeImage) bitmapImage.Dispose();
+    }
+
+    /// <summary>
+    /// BitmapをPictureBoxから削除する
+    /// </summary>
+    /// <param name="pictureBox"></param>
+    /// <param name="invalidate"></param>
+    internal static void ResetImage(PictureBox pictureBox, bool invalidate = true)
+    {
+        pictureBox.Image?.Dispose();
+        pictureBox.Image = null;
+        if (invalidate) pictureBox.Invalidate();
+    }
+
+    /// <summary>
+    /// クリックした座標を元の画像の座標に変換する
+    /// </summary>
+    internal static Point ConvertToOriginalCoordinates(MouseEventArgs e, PictureBox pictureBox, Bitmap image)
+    {
+        int x = e.X;
+        int y = e.Y;
+
+        float ratioX = (float)image.Width / pictureBox.Width;
+        float ratioY = (float)image.Height / pictureBox.Height;
+
+        return new Point((int)(x * ratioX), (int)(y * ratioY));
+    }
+
+    /// <summary>
+    /// BitmapDataからピクセル数を取得する
+    /// </summary>
+    /// <param name="bitmapData"></param>
+    /// <returns></returns>
+    internal static int GetSpanLength(BitmapData? bitmapData)
+    {
+        if (bitmapData == null) return 0;
+        return (bitmapData.Stride * bitmapData.Height) / COLOR_PIXEL_SIZE;
     }
 }

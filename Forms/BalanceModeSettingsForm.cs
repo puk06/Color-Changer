@@ -3,16 +3,31 @@ using ColorChanger.Utils;
 
 namespace ColorChanger.Forms;
 
-internal partial class BalanceModeSettings : Form
+internal partial class BalanceModeSettingsForm : Form
 {
-    internal event EventHandler? ValueChanged;
+    /// <summary>
+    /// 設定値が変更されたときに発生するイベント
+    /// </summary>
+    internal event EventHandler? ConfigurationChanged;
 
+    /// <summary>
+    /// 現在のバランスモードの設定値
+    /// </summary>
     internal BalanceModeConfiguration Configuration
     {
         get => CreateConfigurationFromInputs();
         set => ApplyConfigurationToInputs(value);
     }
 
+    internal BalanceModeSettingsForm()
+    {
+        InitializeComponent();
+
+        v2radiusBar.Maximum = (int)Math.Sqrt(3 * 255 * 255) + 1;
+        Configuration = new BalanceModeConfiguration();
+    }
+
+    #region Configuration関連
     private BalanceModeConfiguration CreateConfigurationFromInputs()
     {
         return new BalanceModeConfiguration
@@ -29,6 +44,7 @@ internal partial class BalanceModeSettings : Form
 
     private void ApplyConfigurationToInputs(BalanceModeConfiguration config)
     {
+        balanceModeComboBox.SelectedIndex = config.modeVersion - 1;
         v1weight.Text = config.v1Weight.ToString("F2");
         v1minValue.Text = config.v1MinimumValue.ToString("F2");
         v2weight.Text = config.v2Weight.ToString("F2");
@@ -37,15 +53,9 @@ internal partial class BalanceModeSettings : Form
         v2minValue.Text = config.v2MinimumValue.ToString("F2");
         v2includeOutside.Checked = config.v2IncludeOutside;
     }
+    #endregion
 
-    internal BalanceModeSettings()
-    {
-        InitializeComponent();
-        balanceModeComboBox.SelectedIndex = 0;
-        v2radiusBar.Maximum = (int)Math.Sqrt(3 * 255 * 255) + 1;
-        Configuration = new BalanceModeConfiguration();
-    }
-
+    #region イベントハンドラー
     private void BalanceModeComboBox_SelectedIndexChanged(object sender, EventArgs e)
     {
         string description = "このモードの説明:\n";
@@ -72,21 +82,22 @@ internal partial class BalanceModeSettings : Form
         balanceModeSettingsTab.SelectedIndex = balanceModeComboBox.SelectedIndex;
         balanceModeDescription.Text = description;
 
-        TriggerValueChanged();
+        NotifyConfigurationChanged();
     }
 
-    private void OnKeyDown(object sender, KeyEventArgs e)
+    private void HandleKeyDown(object sender, KeyEventArgs e)
     {
-        if (e.KeyCode == Keys.Enter) TriggerValueChanged();
+        if (e.KeyCode == Keys.Enter) NotifyConfigurationChanged();
     }
 
     private void V2radiusBar_MouseUp(object sender, MouseEventArgs e)
     {
         v2radius.Text = v2radiusBar.Value.ToString("F2");
-        TriggerValueChanged();
+        NotifyConfigurationChanged();
     }
 
-    private void V2includeOutside_CheckedChanged(object sender, EventArgs e) => TriggerValueChanged();
+    private void V2includeOutside_CheckedChanged(object sender, EventArgs e)
+        => NotifyConfigurationChanged();
 
     private void BalanceModeSettings_FormClosing(object sender, FormClosingEventArgs e)
     {
@@ -94,5 +105,6 @@ internal partial class BalanceModeSettings : Form
         e.Cancel = true;
     }
 
-    private void TriggerValueChanged() => ValueChanged?.Invoke(this, EventArgs.Empty);
+    private void NotifyConfigurationChanged() => ConfigurationChanged?.Invoke(this, EventArgs.Empty);
+    #endregion
 }
