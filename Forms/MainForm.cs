@@ -374,10 +374,10 @@ public partial class MainForm : Form
             return;
         }
 
+        _selectedPoints = values;
+
         if (_selectedPoints.Length != 0)
             _selectedHistory.Add(BitArrayUtils.GetClone(_selectedPoints));
-
-        _selectedPoints = values;
 
         AddSelectedArea(previewImage);
     }
@@ -392,7 +392,7 @@ public partial class MainForm : Form
 
         int selectedPixels = BitArrayUtils.GetCount(_selectedPoints);
 
-        Text = FORM_TITLE + $" - {_selectedHistory.Count + 1} 個の選択エリア (総選択ピクセル数: {selectedPixels:N0})";
+        Text = FORM_TITLE + $" - {_selectedHistory.Count} 個の選択エリア (総選択ピクセル数: {selectedPixels:N0})";
 
         BitmapUtils.SetImage(coloredPreviewBox, GenerateColoredPreview(previewImage));
     }
@@ -595,26 +595,27 @@ public partial class MainForm : Form
 
     private void UndoButton_Click(object sender, EventArgs e)
     {
-        if (_bmp == null) return;
-        if (_selectedHistory.Count == 0)
+        if (_selectedHistory.Count == 0 || _bmp == null) return;
+
+        if (_selectedHistory.Count == 1)
         {
+            _selectedHistory.Clear();
             _selectedPoints = BitArrayUtils.GetEmpty();
             _selectedPointsForPreview = BitArrayUtils.GetEmpty();
-            BitmapUtils.SetImage(coloredPreviewBox, GenerateColoredPreview(_bmp));
+
             Text = FORM_TITLE;
-            return;
         }
+        else
+        {
+            BitArray lastHistory = _selectedHistory[^2];
 
-        BitArray lastHistory = _selectedHistory[^1];
+            _selectedHistory = _selectedHistory[..^1];
+            _selectedPoints = lastHistory;
+            _selectedPointsForPreview = BitmapUtils.ConvertSelectedAreaToPreviewBox(_selectedPoints, _bmp, previewBox);
 
-        _selectedHistory = _selectedHistory[..^1];
-        _selectedPoints = lastHistory;
-
-        _selectedPointsForPreview = BitmapUtils.ConvertSelectedAreaToPreviewBox(_selectedPoints, _bmp, previewBox);
-
-        int totalSelectedPoints = BitArrayUtils.GetCount(_selectedPoints);
-
-        Text = FORM_TITLE + $" - {_selectedHistory.Count + 1} 個の選択エリア (総選択ピクセル数: {totalSelectedPoints:N0})";
+            int totalSelectedPoints = BitArrayUtils.GetCount(_selectedPoints);
+            Text = FORM_TITLE + $" - {_selectedHistory.Count} 個の選択エリア (総選択ピクセル数: {totalSelectedPoints:N0})";
+        }
 
         BitmapUtils.SetImage(coloredPreviewBox, GenerateColoredPreview(_bmp));
     }
