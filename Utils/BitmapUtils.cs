@@ -274,18 +274,8 @@ internal class BitmapUtils
     /// <param name="bmp"></param>
     /// <param name="rect"></param>
     /// <returns></returns>
-    internal static BitmapData? LockBitmap(Bitmap? bmp, Rectangle rect, int mode)
-    {
-        ImageLockMode lockMode = mode switch
-        {
-            1 => ImageLockMode.ReadOnly,
-            2 => ImageLockMode.WriteOnly,
-            3 => ImageLockMode.ReadWrite,
-            _ => ImageLockMode.ReadWrite
-        };
-
-        return bmp?.LockBits(rect, lockMode, PixelFormat.Format32bppArgb);
-    }
+    internal static BitmapData? LockBitmap(Bitmap? bmp, Rectangle rect, ImageLockMode imageLockMode)
+        => bmp?.LockBits(rect, imageLockMode, PixelFormat.Format32bppArgb);
 
     /// <summary>
     /// BitmapのSpanを取得する

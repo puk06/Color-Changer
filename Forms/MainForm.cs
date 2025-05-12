@@ -119,14 +119,14 @@ public partial class MainForm : Form
             Rectangle rect = BitmapUtils.GetRectangle(_bmp);
 
             var bitMap = new Bitmap(_bmp);
-            BitmapData? data = BitmapUtils.LockBitmap(bitMap, rect, 3);
+            BitmapData? data = BitmapUtils.LockBitmap(bitMap, rect, ImageLockMode.ReadWrite);
             if (data == null) return;
 
             Bitmap? rawBitmap = BitmapUtils.CreateInverseBitmap(_bmp, InverseMode.Checked);
-            BitmapData? rawBitmapData = BitmapUtils.LockBitmap(rawBitmap, rect, 1);
+            BitmapData? rawBitmapData = BitmapUtils.LockBitmap(rawBitmap, rect, ImageLockMode.ReadOnly);
 
             Bitmap? transBitmap = BitmapUtils.CreateTransparentBitmap(_bmp, transMode.Checked, InverseMode.Checked);
-            BitmapData? transData = BitmapUtils.LockBitmap(transBitmap, rect, 3);
+            BitmapData? transData = BitmapUtils.LockBitmap(transBitmap, rect, ImageLockMode.ReadWrite);
 
             bool skipped = false;
 
