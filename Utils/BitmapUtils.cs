@@ -226,7 +226,7 @@ internal class BitmapUtils
     internal static void SetImage(PictureBox pictureBox, Bitmap bitmapImage, bool disposeImage = true)
     {
         ResetImage(pictureBox, false);
-        pictureBox.Image = new Bitmap(bitmapImage);
+        pictureBox.Image = disposeImage ? new Bitmap(bitmapImage) : bitmapImage;
         pictureBox.Invalidate();
         if (disposeImage) bitmapImage.Dispose();
     }
