@@ -165,7 +165,7 @@ internal class BitmapUtils
                     selectedArea[leftIndex] &&
                     selectedArea[rightIndex];
 
-                if (!isInner) continue;
+                if (isInner) continue;
                 result[index] = true;
             }
         }
