@@ -1,5 +1,6 @@
 ﻿using ColorChanger.Models;
 using ColorChanger.Utils;
+using System.Collections;
 using System.Drawing.Imaging;
 
 namespace ColorChanger.ImageProcessing;
@@ -13,14 +14,14 @@ internal class ImageProcessorService
     /// <param name="colorDifference"></param>
     /// <param name="balanceMode"></param>
     /// <param name="configuration"></param>
-    /// <param name="selectedPointsArrayForPreview"></param>
+    /// <param name="selectedPoints"></param>
     /// <param name="previewBoxSize"></param>
     /// <returns></returns>
     public static Bitmap GeneratePreview(
         Bitmap sourceBitmap,
         ColorDifference colorDifference,
         bool balanceMode, BalanceModeConfiguration configuration,
-        (int x, int y)[][]? selectedPointsArrayForPreview,
+        BitArray selectedPoints,
         Size previewBoxSize)
     {
         int boxHeight = previewBoxSize.Height;
@@ -53,9 +54,9 @@ internal class ImageProcessorService
 
                 imageProcessor.ProcessAllPreviewPixels(sourcePixels, previewPixels, ratios, previewBoxSize);
 
-                if (selectedPointsArrayForPreview != null)
+                if (selectedPoints.Length != 0)
                 {
-                    ImageProcessor.ChangeSelectedPixelsColor(previewPixels, boxWidth, selectedPointsArrayForPreview, new ColorPixel(255, 0, 0, 255));
+                    ImageProcessor.ChangeSelectedPixelsColor(previewPixels, selectedPoints, new ColorPixel(255, 0, 0, 255));
                 }
             }
         }

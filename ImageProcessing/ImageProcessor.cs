@@ -1,5 +1,6 @@
 ﻿using ColorChanger.Models;
 using ColorChanger.Utils;
+using System.Collections;
 
 namespace ColorChanger.ImageProcessing;
 
@@ -75,30 +76,28 @@ internal class ImageProcessor
     internal void ProcessSelectedPixels(
         Span<ColorPixel> source,
         Span<ColorPixel> target,
-        (int x, int y)[][] selectedPointsArray)
+        BitArray selectedPoints)
     {
-        foreach (var (x, y) in selectedPointsArray.SelectMany(p => p))
+        for (int i = 0; i < selectedPoints.Length; i++)
         {
-            int index = PixelUtils.GetPixelIndex(x, y, _width);
-
-            target[index] = ProcessPixel(source[index]);
+            if (!selectedPoints[i]) continue;
+            target[i] = ProcessPixel(source[i]);
         }
     }
 
     internal void ProcessInverseSelectedPixels(
         Span<ColorPixel> source,
         Span<ColorPixel> raw,
-        (int x, int y)[][] selectedPointsArray)
+        BitArray selectedPoints)
     {
-        foreach (var (x, y) in selectedPointsArray.SelectMany(p => p))
+        for (int i = 0; i < selectedPoints.Length; i++)
         {
-            int index = PixelUtils.GetPixelIndex(x, y, _width);
-
-            source[index] = new ColorPixel(
-                raw[index].R,
-                raw[index].G,
-                raw[index].B,
-                source[index].A
+            if (!selectedPoints[i]) continue;
+            source[i] = new ColorPixel(
+                raw[i].R,
+                raw[i].G,
+                raw[i].B,
+                source[i].A
             );
         }
     }
@@ -106,43 +105,39 @@ internal class ImageProcessor
     internal void ProcessTransparentSelectedPixels(
         Span<ColorPixel> source,
         Span<ColorPixel> trans,
-        (int x, int y)[][] selectedPointsArray)
+        BitArray selectedPoints)
     {
         Span<ColorPixel> target = !trans.IsEmpty ? trans : source;
 
-        foreach (var (x, y) in selectedPointsArray.SelectMany(p => p))
+        for (int i = 0; i < selectedPoints.Length; i++)
         {
-            int index = PixelUtils.GetPixelIndex(x, y, _width);
-
-            target[index] = ProcessPixel(source[index]);
+            if (!selectedPoints[i]) continue;
+            target[i] = ProcessPixel(source[i]);
         }
     }
 
     internal void ProcessTransparentAndInversePixels(
         Span<ColorPixel> source,
-        (int x, int y)[][] selectedPointsArray)
+        BitArray selectedPoints)
     {
         ProcessAllPixels(source, source);
 
-        foreach (var (x, y) in selectedPointsArray.SelectMany(p => p))
+        for (int i = 0; i < selectedPoints.Length; i++)
         {
-            int index = PixelUtils.GetPixelIndex(x, y, _width);
-
-            source[index] = ColorUtils.TransparentPixel;
+            if (!selectedPoints[i]) continue;
+            source[i] = ColorUtils.TransparentPixel;
         }
     }
 
     internal static void ChangeSelectedPixelsColor(
         Span<ColorPixel> source,
-        int previewWidth,
-        (int x, int y)[][] selectedPointsArray,
+        BitArray selectedPoints,
         ColorPixel color)
     {
-        foreach (var (x, y) in selectedPointsArray.SelectMany(p => p))
+        for (int i = 0; i < selectedPoints.Length; i++)
         {
-            int index = PixelUtils.GetPixelIndex(x, y, previewWidth);
-
-            source[index] = color;
+            if (!selectedPoints[i]) continue;
+            source[i] = color;
         }
     }
 }

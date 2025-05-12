@@ -14,16 +14,19 @@ internal class BitmapUtils
     /// <param name="rawImage"></param>
     /// <param name="backgroundColor"></param>
     /// <returns></returns>
-    internal static unsafe (int x, int y)[] GetSelectedArea(Point clickedLocation, Bitmap rawImage, Color backgroundColor)
+    internal static unsafe BitArray GetSelectedArea(BitArray selectedPoints, Point clickedLocation, Bitmap rawImage, Color backgroundColor)
     {
         int width = rawImage.Width;
         int height = rawImage.Height;
         int totalPixels = width * height;
 
-        var selected = new BitArray(totalPixels);
+        BitArray selected = selectedPoints.Length == totalPixels
+            ? selectedPoints
+            : new(totalPixels, false);
+
         var queue = new Queue<PixelPoint>();
 
-        var rect = new Rectangle(0, 0, width, height);
+        var rect = GetRectangle(rawImage);
         BitmapData bmpData = rawImage.LockBits(rect, ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
 
         try
@@ -38,7 +41,7 @@ internal class BitmapUtils
 
             if (startX < 0 || startY < 0 || startX >= width || startY >= height)
             {
-                return [];
+                return BitArrayUtils.GetEmpty();
             }
 
             int startIndex = PixelUtils.GetPixelIndex(startX, startY, width);
@@ -46,7 +49,7 @@ internal class BitmapUtils
 
             if (targetPixel.Equals(backgroundColor))
             {
-                return [];
+                return BitArrayUtils.GetEmpty();
             }
 
             selected[startIndex] = true;
@@ -78,26 +81,7 @@ internal class BitmapUtils
                 }
             }
 
-            var innerPoints = new List<(int x, int y)>();
-
-            for (int y = 1; y < height - 1; y++)
-            {
-                for (int x = 1; x < width - 1; x++)
-                {
-                    int index = PixelUtils.GetPixelIndex(x, y, width);
-                    if (!selected[index]) continue;
-
-                    if (selected[PixelUtils.GetPixelIndex(x, y - 1, width)] &&
-                        selected[PixelUtils.GetPixelIndex(x, y + 1, width)] &&
-                        selected[PixelUtils.GetPixelIndex(x - 1, y, width)] &&
-                        selected[PixelUtils.GetPixelIndex(x + 1, y, width)])
-                    {
-                        innerPoints.Add((x, y));
-                    }
-                }
-            }
-
-            return innerPoints.ToArray();
+            return selected;
         }
         finally
         {
@@ -112,16 +96,37 @@ internal class BitmapUtils
     /// <param name="sourceImage"></paramImageProcessing
     /// <param name="previewBox"></param>
     /// <returns></returns>
-    internal static (int x, int y)[] ConvertSelectedAreaToPreviewBox((int x, int y)[] selectedArea, Bitmap sourceImage, PictureBox previewBox)
+    internal static BitArray ConvertSelectedAreaToPreviewBox(BitArray selectedArea, Bitmap sourceImage, PictureBox previewBox)
     {
         int previewHeight = previewBox.Height;
         int previewWidth = previewBox.Width;
+        int totalPixels = previewWidth * previewHeight;
 
         float ratioX = (float)sourceImage.Width / previewWidth;
         float ratioY = (float)sourceImage.Height / previewHeight;
 
-        var scaledSelectedArea = selectedArea.Select(point => ((int)(point.x / ratioX), (int)(point.y / ratioY))).ToArray();
-        return DeleteInnerSelectedArea(scaledSelectedArea);
+        BitArray bitArray = new BitArray(totalPixels, false);
+
+        for (int y = 0; y < previewHeight; y++)
+        {
+            for (int x = 0; x < previewWidth; x++)
+            {
+                int originalX = (int)(x * ratioX);
+                int originalY = (int)(y * ratioY);
+                if (originalX >= sourceImage.Width || originalY >= sourceImage.Height) continue;
+
+                int originalIndex = PixelUtils.GetPixelIndex(originalX, originalY, sourceImage.Width);
+                if (selectedArea[originalIndex])
+                {
+                    int previewIndex = PixelUtils.GetPixelIndex(x, y, previewWidth);
+                    bitArray[previewIndex] = true;
+                }
+            }
+        }
+
+        BitArray outerSelectedArea = DeleteInnerSelectedArea(bitArray, previewWidth, previewHeight);
+
+        return outerSelectedArea;
     }
 
     /// <summary>
@@ -129,20 +134,43 @@ internal class BitmapUtils
     /// </summary>
     /// <param name="selectedArea"></param>
     /// <returns></returns>
-    private static (int x, int y)[] DeleteInnerSelectedArea((int x, int y)[] selectedArea)
+    private static BitArray DeleteInnerSelectedArea(BitArray selectedArea, int width, int height)
     {
-        HashSet<(int x, int y)> selectedPoints = new(selectedArea);
-        HashSet<(int x, int y)> innerPoints = new();
+        BitArray result = new BitArray(selectedArea.Length, false);
 
-        foreach (var (x, y) in selectedArea)
+        for (int y = 1; y < height - 1; y++)
         {
-            if (selectedPoints.Contains((x - 2, y)) && selectedPoints.Contains((x + 2, y)) && selectedPoints.Contains((x, y - 2)) && selectedPoints.Contains((x, y + 2)))
+            for (int x = 1; x < width - 1; x++)
             {
-                innerPoints.Add((x, y));
+                int index = PixelUtils.GetPixelIndex(x, y, width);
+
+                if (!selectedArea[index]) continue;
+
+                int upperIndex = PixelUtils.GetPixelIndex(x, y - 2, width); // 上
+                int lowerIndex = PixelUtils.GetPixelIndex(x, y + 2, width); // 下
+                int leftIndex = PixelUtils.GetPixelIndex(x - 2, y, width);  // 左
+                int rightIndex = PixelUtils.GetPixelIndex(x + 2, y, width); // 右
+
+                if (!PixelUtils.IsValid(selectedArea, upperIndex) ||
+                    !PixelUtils.IsValid(selectedArea, lowerIndex) ||
+                    !PixelUtils.IsValid(selectedArea, leftIndex) ||
+                    !PixelUtils.IsValid(selectedArea, rightIndex))
+                {
+                    continue;
+                }
+
+                bool isInner =
+                    selectedArea[upperIndex] &&
+                    selectedArea[lowerIndex] &&
+                    selectedArea[leftIndex] &&
+                    selectedArea[rightIndex];
+
+                if (!isInner) continue;
+                result[index] = true;
             }
         }
 
-        return selectedArea.Except(innerPoints).ToArray();
+        return result;
     }
 
     /// <summary>

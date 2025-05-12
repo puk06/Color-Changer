@@ -1,6 +1,7 @@
 using ColorChanger.ImageProcessing;
 using ColorChanger.Models;
 using ColorChanger.Utils;
+using System.Collections;
 using System.Drawing.Imaging;
 
 namespace ColorChanger.Forms;
@@ -21,8 +22,9 @@ public partial class MainForm : Form
     private string? _imageFilePath;
 
     // 選択モード
-    private (int x, int y)[][]? _selectedPointsArray;
-    private (int x, int y)[][]? _selectedPointsArrayForPreview;
+    private BitArray _selectedPoints = BitArrayUtils.GetEmpty();
+    private BitArray _selectedPointsForPreview = BitArrayUtils.GetEmpty();
+    private List<BitArray> _selectedHistory = new List<BitArray>();
 
     private readonly ColorPickerForm _colorPicker = new ColorPickerForm();
     private readonly BalanceModeSettingsForm _balanceModeSettings = new BalanceModeSettingsForm();
@@ -125,7 +127,6 @@ public partial class MainForm : Form
                 rawBitMapData = rawBitMap.LockBits(rect, ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);
             }
 
-            // 透過用のビットマップを作成
             Bitmap? transBitmap = null;
             BitmapData? transData = null;
             if (transMode.Checked && !InverseMode.Checked)
@@ -167,7 +168,7 @@ public partial class MainForm : Form
                 if (balanceMode.Checked)
                     imageProcessor.SetBalanceSettings(_balanceModeSettings.Configuration);
 
-                if (_selectedPointsArray == null)
+                if (_selectedPoints.Length == 0)
                 {
                     if (transMode.Checked)
                     {
@@ -181,12 +182,12 @@ public partial class MainForm : Form
                 {
                     if (InverseMode.Checked)
                     {
-                        imageProcessor.ProcessTransparentAndInversePixels(sourcePixels, _selectedPointsArray);
+                        imageProcessor.ProcessTransparentAndInversePixels(sourcePixels, _selectedPoints);
                     }
                     else
                     {
                         if (transPixels.IsEmpty) MessageBox.Show("透過画像用データの取得に失敗しました。デフォルトの画像が使用されます。", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        imageProcessor.ProcessTransparentSelectedPixels(sourcePixels, transPixels, _selectedPointsArray);
+                        imageProcessor.ProcessTransparentSelectedPixels(sourcePixels, transPixels, _selectedPoints);
                     }
                 }
                 else if (InverseMode.Checked)
@@ -199,16 +200,15 @@ public partial class MainForm : Form
                     }
                     else
                     {
-                        imageProcessor.ProcessInverseSelectedPixels(sourcePixels, rawPixels, _selectedPointsArray);
+                        imageProcessor.ProcessInverseSelectedPixels(sourcePixels, rawPixels, _selectedPoints);
                     }
                 }
                 else
                 {
-                    imageProcessor.ProcessSelectedPixels(sourcePixels, sourcePixels, _selectedPointsArray);
+                    imageProcessor.ProcessSelectedPixels(sourcePixels, sourcePixels, _selectedPoints);
                 }
             }
 
-            // ビットマップのロックを解除
             bitMap.UnlockBits(data);
 
             if (rawBitMap != null && rawBitMapData != null)
@@ -261,7 +261,7 @@ public partial class MainForm : Form
             sourceBitmap,
             ColorDifference,
             balanceMode.Checked, _balanceModeSettings.Configuration,
-            _selectedPointsArrayForPreview,
+            _selectedPointsForPreview,
             coloredPreviewBox.Size
         );
     }
@@ -284,6 +284,8 @@ public partial class MainForm : Form
 
             using var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read);
             _bmp = new Bitmap(stream);
+
+            BitmapUtils.SetImage(previewBox, _bmp, disposeImage: false);
         }
         catch (Exception exception)
         {
@@ -296,33 +298,36 @@ public partial class MainForm : Form
                 MessageBox.Show("画像の読み込みに失敗しました。\n\nエラー: " + exception, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
 
-            return;
+            BitmapUtils.DisposeBitmap(ref _bmp);
+            BitmapUtils.ResetImage(previewBox);
         }
+        finally
+        {
+            BitmapUtils.ResetImage(coloredPreviewBox);
 
-        _imageFilePath = path;
+            _imageFilePath = path;
 
-        BitmapUtils.SetImage(previewBox, _bmp, disposeImage: false);
-        BitmapUtils.ResetImage(coloredPreviewBox);
+            _previousColor = Color.Empty;
+            _newColor = Color.Empty;
+            _backgroundColor = Color.Empty;
 
-        _previousColor = Color.Empty;
-        _newColor = Color.Empty;
-        _backgroundColor = Color.Empty;
+            previousColorBox.BackColor = DEFAULT_BACKGROUND_COLOR;
+            newColorBox.BackColor = DEFAULT_BACKGROUND_COLOR;
+            backgroundColorBox.BackColor = DEFAULT_BACKGROUND_COLOR;
 
-        previousColorBox.BackColor = DEFAULT_BACKGROUND_COLOR;
-        newColorBox.BackColor = DEFAULT_BACKGROUND_COLOR;
-        backgroundColorBox.BackColor = DEFAULT_BACKGROUND_COLOR;
+            _clickedPoint = Point.Empty;
 
-        _clickedPoint = Point.Empty;
+            previousRGBLabel.Text = "";
+            newRGBLabel.Text = "";
+            calculatedRGBLabel.Text = "";
 
-        previousRGBLabel.Text = "";
-        newRGBLabel.Text = "";
-        calculatedRGBLabel.Text = "";
+            _selectedPoints = BitArrayUtils.GetEmpty();
+            _selectedPointsForPreview = BitArrayUtils.GetEmpty();
+            _selectedHistory.Clear();
 
-        _selectedPointsArray = null;
-        _selectedPointsArrayForPreview = null;
-
-        Text = FORM_TITLE;
-        selectMode.Checked = false;
+            Text = FORM_TITLE;
+            selectMode.Checked = false;
+        }
     }
     #endregion
 
@@ -353,8 +358,21 @@ public partial class MainForm : Form
 
         string previousFormTitle = Text;
         Text = FORM_TITLE + " - 選択処理中...";
-        (int x, int y)[] values = BitmapUtils.GetSelectedArea(originalCoordinates, previewImage, _backgroundColor);
+
+        int previousSelectedCount = BitArrayUtils.GetCount(_selectedPoints);
+
+        BitArray values = BitmapUtils.GetSelectedArea(
+            _selectedPoints,
+            originalCoordinates,
+            previewImage,
+            _backgroundColor
+        );
+
+        int selectedCount = BitArrayUtils.GetCount(values);
+
         Text = previousFormTitle;
+
+        if (previousSelectedCount == selectedCount) return;
 
         if (values.Length == 0)
         {
@@ -362,32 +380,25 @@ public partial class MainForm : Form
             return;
         }
 
-        AddSelectedArea(values, previewImage);
+        if (_selectedPoints.Length != 0)
+            _selectedHistory.Add(BitArrayUtils.GetClone(_selectedPoints));
+
+        _selectedPoints = values;
+
+        AddSelectedArea(previewImage);
     }
 
     /// <summary>
     /// 選択エリアを追加
     /// </summary>
-    private void AddSelectedArea((int x, int y)[] values, Bitmap previewImage)
+    private void AddSelectedArea(Bitmap previewImage)
     {
-        if (_selectedPointsArray == null)
-        {
-            _selectedPointsArray = new[] { values };
-        }
-        else
-        {
-            if (_selectedPointsArray.Any(points => points.Intersect(values).Any()))
-            {
-                MessageBox.Show("選択済みのエリアが含まれています。", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-
-            _selectedPointsArray = _selectedPointsArray.Append(values).ToArray();
-        }
-
         Text = FORM_TITLE + " - プレビュー用の選択エリア作成中...";
-        _selectedPointsArrayForPreview = _selectedPointsArray.Select(points => BitmapUtils.ConvertSelectedAreaToPreviewBox(points, previewImage, previewBox)).ToArray();
-        Text = FORM_TITLE + $" - {_selectedPointsArray.Length} 個の選択エリア (総選択ピクセル数: {_selectedPointsArray.Sum(points => points.Length):N0})";
+        _selectedPointsForPreview = BitmapUtils.ConvertSelectedAreaToPreviewBox(_selectedPoints, previewImage, previewBox);
+
+        int selectedPixels = BitArrayUtils.GetCount(_selectedPoints);
+
+        Text = FORM_TITLE + $" - {_selectedHistory.Count + 1} 個の選択エリア (総選択ピクセル数: {selectedPixels:N0})";
 
         BitmapUtils.SetImage(coloredPreviewBox, GenerateColoredPreview(previewImage));
     }
@@ -591,25 +602,25 @@ public partial class MainForm : Form
     private void UndoButton_Click(object sender, EventArgs e)
     {
         if (_bmp == null) return;
-        if (_selectedPointsArray == null || _selectedPointsArray.Length == 0) return;
-        _selectedPointsArray = _selectedPointsArray.Length == 1 ? null : _selectedPointsArray[..^1];
-
-        if (_selectedPointsArray == null)
+        if (_selectedHistory.Count == 0)
         {
-            _selectedPointsArrayForPreview = null;
-            Text = FORM_TITLE;
-
+            _selectedPoints = BitArrayUtils.GetEmpty();
+            _selectedPointsForPreview = BitArrayUtils.GetEmpty();
             BitmapUtils.SetImage(coloredPreviewBox, GenerateColoredPreview(_bmp));
+            Text = FORM_TITLE;
             return;
         }
 
-        _selectedPointsArrayForPreview = _selectedPointsArray.Select(points => BitmapUtils.ConvertSelectedAreaToPreviewBox(points, _bmp, previewBox)).ToArray();
+        BitArray lastHistory = _selectedHistory[^1];
 
-        int totalSelectedPoints = _selectedPointsArray.Sum(points => points.Length);
+        _selectedHistory = _selectedHistory[..^1];
+        _selectedPoints = lastHistory;
 
-        Text = _selectedPointsArray.Length == 0
-            ? FORM_TITLE
-            : FORM_TITLE + $" - {_selectedPointsArray.Length} 個の選択エリア (総選択ピクセル数: {totalSelectedPoints:N0})";
+        _selectedPointsForPreview = BitmapUtils.ConvertSelectedAreaToPreviewBox(_selectedPoints, _bmp, previewBox);
+
+        int totalSelectedPoints = BitArrayUtils.GetCount(_selectedPoints);
+
+        Text = FORM_TITLE + $" - {_selectedHistory.Count + 1} 個の選択エリア (総選択ピクセル数: {totalSelectedPoints:N0})";
 
         BitmapUtils.SetImage(coloredPreviewBox, GenerateColoredPreview(_bmp));
     }
