@@ -504,7 +504,6 @@ public partial class MainForm : Form
     {
         if (InverseMode.Checked)
             FormUtils.ShowInfo("選択反転モードがオンになりました。\n\n- 選択された部分の色は変わらず、それ以外の場所の色のみ変わります。\n- 透過画像作成モードでは、透過する部分が選択部分と逆になります。", "選択反転モード");
-
     }
 
     private void OpenFile_Click(object sender, EventArgs e)
