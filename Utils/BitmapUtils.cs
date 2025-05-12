@@ -262,9 +262,73 @@ internal class BitmapUtils
     /// </summary>
     /// <param name="bitmapData"></param>
     /// <returns></returns>
-    internal static int GetSpanLength(BitmapData? bitmapData)
+    private static int GetSpanLength(BitmapData? bitmapData)
     {
         if (bitmapData == null) return 0;
         return (bitmapData.Stride * bitmapData.Height) / COLOR_PIXEL_SIZE;
+    }
+
+    /// <summary>
+    /// Bitmapをロックする
+    /// </summary>
+    /// <param name="bmp"></param>
+    /// <param name="rect"></param>
+    /// <returns></returns>
+    internal static BitmapData? LockBitmap(Bitmap? bmp, Rectangle rect, int mode)
+    {
+        ImageLockMode lockMode = mode switch
+        {
+            1 => ImageLockMode.ReadOnly,
+            2 => ImageLockMode.WriteOnly,
+            3 => ImageLockMode.ReadWrite,
+            _ => ImageLockMode.ReadWrite
+        };
+
+        return bmp?.LockBits(rect, lockMode, PixelFormat.Format32bppArgb);
+    }
+
+    /// <summary>
+    /// BitmapのSpanを取得する
+    /// </summary>
+    /// <param name="data"></param>
+    /// <returns></returns>
+    internal static unsafe Span<ColorPixel> GetPixelSpan(BitmapData? data)
+    {
+        return data != null
+            ? new Span<ColorPixel>((void*)data.Scan0, GetSpanLength(data))
+            : default;
+    }
+
+    /// <summary>
+    /// 反転モード用のBitmapコピーを生成する
+    /// </summary>
+    /// <param name="bitmap"></param>
+    /// <param name="inverseMode"></param>
+    /// <returns></returns>
+    internal static Bitmap? CreateInverseBitmap(Bitmap? bitmap, bool inverseMode)
+    {
+        if (bitmap == null) return null;
+        return inverseMode ? new Bitmap(bitmap) : null;
+    }
+
+    /// <summary>
+    /// 透明モード用のBitmapをコピーを生成する
+    /// </summary>
+    /// <param name="bitmap"></param>
+    /// <param name="transMode"></param>
+    /// <param name="InverseMode"></param>
+    /// <returns></returns>
+    internal static Bitmap? CreateTransparentBitmap(Bitmap bitmap, bool transMode, bool InverseMode)
+    {
+        if (bitmap == null) return null;
+        if (transMode && !InverseMode)
+        {
+            var bmp = new Bitmap(bitmap.Width, bitmap.Height, PixelFormat.Format32bppArgb);
+            using var g = Graphics.FromImage(bmp);
+            g.Clear(Color.Transparent);
+            return bmp;
+        }
+
+        return null;
     }
 }

@@ -7,6 +7,8 @@ namespace ColorChanger.ImageProcessing;
 
 internal class ImageProcessorService
 {
+    private static readonly ColorPixel PreviewOutlineColor = new ColorPixel(255, 0, 0, 255);
+
     /// <summary>
     /// プレビュー画像を生成する
     /// </summary>
@@ -29,23 +31,28 @@ internal class ImageProcessorService
 
         float ratioX = (float)sourceBitmap.Width / boxWidth;
         float ratioY = (float)sourceBitmap.Height / boxHeight;
-
         var ratios = (ratioX, ratioY);
 
-        Bitmap previewBitmap = new Bitmap(boxWidth, boxHeight, PixelFormat.Format32bppArgb);
+        var previewBitmap = new Bitmap(boxWidth, boxHeight, PixelFormat.Format32bppArgb);
 
-        var sourceRect = BitmapUtils.GetRectangle(sourceBitmap);
-        var sourceBitmapData = sourceBitmap.LockBits(sourceRect, ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+        Rectangle sourceRect = BitmapUtils.GetRectangle(sourceBitmap);
+        BitmapData? sourceBitmapData = BitmapUtils.LockBitmap(sourceBitmap, sourceRect, 1);
 
-        var previewRect = BitmapUtils.GetRectangle(previewBitmap);
-        var previewBitmapData = previewBitmap.LockBits(previewRect, ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
+        Rectangle previewRect = BitmapUtils.GetRectangle(previewBitmap);
+        BitmapData? previewBitmapData = BitmapUtils.LockBitmap(previewBitmap, previewRect, 2);
 
         try
         {
             unsafe
             {
-                var sourcePixels = new Span<ColorPixel>((void*)sourceBitmapData.Scan0, BitmapUtils.GetSpanLength(sourceBitmapData));
-                var previewPixels = new Span<ColorPixel>((void*)previewBitmapData.Scan0, BitmapUtils.GetSpanLength(previewBitmapData));
+                Span<ColorPixel> sourcePixels = BitmapUtils.GetPixelSpan(sourceBitmapData);
+                Span<ColorPixel> previewPixels = BitmapUtils.GetPixelSpan(previewBitmapData);
+
+                if (sourcePixels.IsEmpty || previewPixels.IsEmpty)
+                {
+                    FormUtils.ShowError("画像の読み込みに失敗しました。");
+                    return sourceBitmap;
+                }
 
                 ImageProcessor imageProcessor = new ImageProcessor(sourceBitmap.Size, colorDifference);
 
@@ -56,14 +63,14 @@ internal class ImageProcessorService
 
                 if (selectedPoints.Length != 0)
                 {
-                    ImageProcessor.ChangeSelectedPixelsColor(previewPixels, selectedPoints, new ColorPixel(255, 0, 0, 255));
+                    ImageProcessor.ChangeSelectedPixelsColor(previewPixels, selectedPoints, PreviewOutlineColor);
                 }
             }
         }
         finally
         {
-            sourceBitmap.UnlockBits(sourceBitmapData);
-            previewBitmap.UnlockBits(previewBitmapData);
+            if (sourceBitmapData != null) sourceBitmap.UnlockBits(sourceBitmapData);
+            if (previewBitmapData != null) previewBitmap.UnlockBits(previewBitmapData);
         }
 
         return previewBitmap;

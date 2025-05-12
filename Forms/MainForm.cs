@@ -112,55 +112,31 @@ public partial class MainForm : Form
         {
             if (_bmp == null)
             {
-                MessageBox.Show("画像が読み込まれていません。", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                FormUtils.ShowError("画像が読み込まれていません。");
                 return;
             }
 
+            Rectangle rect = BitmapUtils.GetRectangle(_bmp);
+
             var bitMap = new Bitmap(_bmp);
-            var rect = BitmapUtils.GetRectangle(bitMap);
+            BitmapData? data = BitmapUtils.LockBitmap(bitMap, rect, 3);
+            if (data == null) return;
 
-            Bitmap? rawBitMap = null;
-            BitmapData? rawBitMapData = null;
-            if (InverseMode.Checked)
-            {
-                rawBitMap = new Bitmap(_bmp);
-                rawBitMapData = rawBitMap.LockBits(rect, ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);
-            }
+            Bitmap? rawBitmap = BitmapUtils.CreateInverseBitmap(_bmp, InverseMode.Checked);
+            BitmapData? rawBitmapData = BitmapUtils.LockBitmap(rawBitmap, rect, 1);
 
-            Bitmap? transBitmap = null;
-            BitmapData? transData = null;
-            if (transMode.Checked && !InverseMode.Checked)
-            {
-                transBitmap = new Bitmap(_bmp.Width, _bmp.Height, PixelFormat.Format32bppArgb);
-                Graphics g = Graphics.FromImage(transBitmap);
-                g.Clear(Color.Transparent);
-                g.Dispose();
-                transData = transBitmap.LockBits(rect, ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);
-            }
+            Bitmap? transBitmap = BitmapUtils.CreateTransparentBitmap(_bmp, transMode.Checked, InverseMode.Checked);
+            BitmapData? transData = BitmapUtils.LockBitmap(transBitmap, rect, 3);
 
-            var data = bitMap.LockBits(rect, ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);
-            var skipped = false;
+            bool skipped = false;
 
             unsafe
             {
-                Span<ColorPixel> sourcePixels = new(
-                    (void*)data.Scan0,
-                    BitmapUtils.GetSpanLength(data)
-                );
+                Span<ColorPixel> sourcePixels = BitmapUtils.GetPixelSpan(data);
+                Span<ColorPixel> rawPixels = BitmapUtils.GetPixelSpan(rawBitmapData);
+                Span<ColorPixel> transPixels = BitmapUtils.GetPixelSpan(transData);
 
-                Span<ColorPixel> rawPixels = rawBitMap != null && rawBitMapData != null
-                    ? new(
-                        (void*)rawBitMapData.Scan0,
-                        BitmapUtils.GetSpanLength(rawBitMapData)
-                    ) : default;
-
-                Span<ColorPixel> transPixels = transData != null
-                    ? new(
-                        (void*)transData.Scan0,
-                        BitmapUtils.GetSpanLength(transData)
-                    ) : default;
-
-                ImageProcessor imageProcessor = new(
+                var imageProcessor = new ImageProcessor(
                     bitMap.Size,
                     ColorDifference
                 );
@@ -168,66 +144,24 @@ public partial class MainForm : Form
                 if (balanceMode.Checked)
                     imageProcessor.SetBalanceSettings(_balanceModeSettings.Configuration);
 
-                if (_selectedPoints.Length == 0)
-                {
-                    if (transMode.Checked)
-                    {
-                        MessageBox.Show("選択エリアがなかったため、透過モードはスキップされます。", "情報", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                        skipped = true;
-                    }
-
-                    imageProcessor.ProcessAllPixels(sourcePixels, sourcePixels);
-                }
-                else if (transMode.Checked)
-                {
-                    if (InverseMode.Checked)
-                    {
-                        imageProcessor.ProcessTransparentAndInversePixels(sourcePixels, _selectedPoints);
-                    }
-                    else
-                    {
-                        if (transPixels.IsEmpty) MessageBox.Show("透過画像用データの取得に失敗しました。デフォルトの画像が使用されます。", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        imageProcessor.ProcessTransparentSelectedPixels(sourcePixels, transPixels, _selectedPoints);
-                    }
-                }
-                else if (InverseMode.Checked)
-                {
-                    imageProcessor.ProcessAllPixels(sourcePixels, sourcePixels);
-
-                    if (rawBitMap == null || rawBitMapData == null)
-                    {
-                        MessageBox.Show("元画像のデータの取得に失敗しました。選択反転モードの結果は作成されません。", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
-                    else
-                    {
-                        imageProcessor.ProcessInverseSelectedPixels(sourcePixels, rawPixels, _selectedPoints);
-                    }
-                }
-                else
-                {
-                    imageProcessor.ProcessSelectedPixels(sourcePixels, sourcePixels, _selectedPoints);
-                }
+                skipped = ProcessImage(sourcePixels, rawPixels, transPixels, imageProcessor);
             }
 
             bitMap.UnlockBits(data);
-
-            if (rawBitMap != null && rawBitMapData != null)
-            {
-                rawBitMap.UnlockBits(rawBitMapData);
-                rawBitMap.Dispose();
-            }
+            if (rawBitmapData != null) rawBitmap?.UnlockBits(rawBitmapData);
+            rawBitmap?.Dispose();
 
             if (!skipped && transMode.Checked && !InverseMode.Checked)
             {
-                if (transBitmap == null || transData == null)
-                {
-                    MessageBox.Show("透過用画像が作成できませんでした。", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-                else
+                if (transBitmap != null && transData != null)
                 {
                     transBitmap.UnlockBits(transData);
                     transBitmap.Save(filePath);
                     transBitmap.Dispose();
+                }
+                else
+                {
+                    FormUtils.ShowError("透過用画像が作成できませんでした。");
                 }
             }
             else
@@ -236,18 +170,78 @@ public partial class MainForm : Form
             }
 
             bitMap.Dispose();
-
-            MessageBox.Show("テクスチャ画像の作成が完了しました。", "完了", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            FormUtils.ShowInfo("テクスチャ画像の作成が完了しました。");
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
-            MessageBox.Show("テクスチャ画像作成中にエラーが発生しました。\n" + e.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            FormUtils.ShowError($"テクスチャ画像作成中にエラーが発生しました。\n{ex.Message}");
         }
         finally
         {
             MakeButton.Enabled = true;
             MakeButton.Text = "作成";
         }
+    }
+
+    /// <summary>
+    /// 画像を処理する
+    /// </summary>
+    /// <param name="sourcePixels"></param>
+    /// <param name="rawPixels"></param>
+    /// <param name="transPixels"></param>
+    /// <param name="processor"></param>
+    /// <returns></returns>
+    private bool ProcessImage(
+        Span<ColorPixel> sourcePixels,
+        Span<ColorPixel> rawPixels,
+        Span<ColorPixel> transPixels,
+        ImageProcessor processor)
+    {
+        bool skipped = false;
+
+        if (_selectedPoints.Length == 0)
+        {
+            if (transMode.Checked)
+            {
+                FormUtils.ShowInfo("選択エリアがなかったため、透過モードはスキップされます。");
+                skipped = true;
+            }
+
+            processor.ProcessAllPixels(sourcePixels, sourcePixels);
+        }
+        else if (transMode.Checked)
+        {
+            if (InverseMode.Checked)
+            {
+                processor.ProcessTransparentAndInversePixels(sourcePixels, _selectedPoints);
+            }
+            else
+            {
+                if (transPixels.IsEmpty)
+                    FormUtils.ShowError("透過画像用データの取得に失敗しました。デフォルトの画像が使用されます。");
+
+                processor.ProcessTransparentSelectedPixels(sourcePixels, transPixels, _selectedPoints);
+            }
+        }
+        else if (InverseMode.Checked)
+        {
+            processor.ProcessAllPixels(sourcePixels, sourcePixels);
+
+            if (rawPixels.IsEmpty)
+            {
+                FormUtils.ShowError("元画像のデータの取得に失敗しました。選択反転モードの結果は作成されません。");
+            }
+            else
+            {
+                processor.ProcessInverseSelectedPixels(sourcePixels, rawPixels, _selectedPoints);
+            }
+        }
+        else
+        {
+            processor.ProcessSelectedPixels(sourcePixels, sourcePixels, _selectedPoints);
+        }
+
+        return skipped;
     }
 
     /// <summary>
@@ -274,7 +268,7 @@ public partial class MainForm : Form
     {
         if (!File.Exists(path))
         {
-            MessageBox.Show("ファイルが存在しません。", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            FormUtils.ShowError("ファイルが存在しません。");
             return;
         }
 
@@ -291,11 +285,11 @@ public partial class MainForm : Form
         {
             if (exception is ArgumentException)
             {
-                MessageBox.Show("画像の読み込みに失敗しました。非対応のファイルです。", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                FormUtils.ShowError("画像の読み込みに失敗しました。非対応のファイルです。");
             }
             else
             {
-                MessageBox.Show("画像の読み込みに失敗しました。\n\nエラー: " + exception, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                FormUtils.ShowError("画像の読み込みに失敗しました。\n\nエラー: " + exception);
             }
 
             BitmapUtils.DisposeBitmap(ref _bmp);
@@ -346,13 +340,13 @@ public partial class MainForm : Form
 
         if (_previousColor == Color.Empty || _newColor == Color.Empty)
         {
-            MessageBox.Show("色が選択されていません。（プレビューが作成できません）", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            FormUtils.ShowError("色が選択されていません。（プレビューが作成できません）");
             return;
         }
 
         if (_backgroundColor == Color.Empty)
         {
-            MessageBox.Show("背景色が選択されていません。", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            FormUtils.ShowError("背景色が選択されていません。");
             return;
         }
 
@@ -376,7 +370,7 @@ public partial class MainForm : Form
 
         if (values.Length == 0)
         {
-            MessageBox.Show("選択可能なエリアがありません。", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            FormUtils.ShowError("選択可能なエリアがありません。");
             return;
         }
 
@@ -459,13 +453,13 @@ public partial class MainForm : Form
     {
         if (_bmp == null)
         {
-            MessageBox.Show("画像が読み込まれていません。", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            FormUtils.ShowError("画像が読み込まれていません。");
             return;
         }
 
         if (_previousColor == Color.Empty)
         {
-            MessageBox.Show("変更前の色が選択されていません。(プレビューが作成できません)", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            FormUtils.ShowError("変更前の色が選択されていません。(プレビューが作成できません)");
             return;
         }
 
@@ -477,21 +471,21 @@ public partial class MainForm : Form
     {
         if (selectMode.Checked && _bmp == null)
         {
-            MessageBox.Show("画像が読み込まれていません。", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            FormUtils.ShowError("画像が読み込まれていません。");
             selectMode.Checked = false;
             return;
         }
 
         if (selectMode.Checked && (_previousColor == Color.Empty || _newColor == Color.Empty))
         {
-            MessageBox.Show("色が選択されていません。（プレビューが作成できません）", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            FormUtils.ShowError("色が選択されていません。（プレビューが作成できません）");
             selectMode.Checked = false;
             return;
         }
 
         if (selectMode.Checked && _backgroundColor == Color.Empty)
         {
-            MessageBox.Show("選択モードが有効になりました。はじめに背景色を右クリックで設定してください。", "選択モード", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            FormUtils.ShowInfo("選択モードが有効になりました。はじめに背景色を右クリックで設定してください。", "選択モード");
         }
 
         backgroundColorBox.Enabled = selectMode.Checked;
@@ -508,7 +502,9 @@ public partial class MainForm : Form
 
     private void InverseMode_CheckedChanged(object sender, EventArgs e)
     {
-        if (InverseMode.Checked) MessageBox.Show("選択反転モードがオンになりました。\n\n- 選択された部分の色は変わらず、それ以外の場所の色のみ変わります。\n- 透過画像作成モードでは、透過する部分が選択部分と逆になります。", "選択反転モード", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        if (InverseMode.Checked)
+            FormUtils.ShowInfo("選択反転モードがオンになりました。\n\n- 選択された部分の色は変わらず、それ以外の場所の色のみ変わります。\n- 透過画像作成モードでは、透過する部分が選択部分と逆になります。", "選択反転モード");
+
     }
 
     private void OpenFile_Click(object sender, EventArgs e)
@@ -527,20 +523,19 @@ public partial class MainForm : Form
     {
         if (_bmp == null)
         {
-            MessageBox.Show("画像が読み込まれていません。", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            FormUtils.ShowError("画像が読み込まれていません。");
             return;
         }
 
         if (_previousColor == Color.Empty || _newColor == Color.Empty)
         {
-            MessageBox.Show("色が選択されていません。", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            FormUtils.ShowError("色が選択されていません。");
             return;
         }
 
-        var result = MessageBox.Show("画像を作成しますか？", "確認", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
-        if (result != DialogResult.Yes) return;
+        var result = FormUtils.ShowConfirm("画像を作成しますか？");
+        if (!result) return;
 
-        // 名前をつけて保存
         SaveFileDialog dialog = new SaveFileDialog()
         {
             Filter = "PNGファイル|*.png;",
@@ -554,7 +549,7 @@ public partial class MainForm : Form
 
         if (newFilePath == "")
         {
-            MessageBox.Show("ファイルの保存先が選択されていません。", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            FormUtils.ShowError("ファイルの保存先が選択されていません。");
             return;
         }
 
@@ -596,7 +591,7 @@ public partial class MainForm : Form
             "※上手く色が変わらない場合は、設定内の値を調整してみてください。\n" +
             "※「重り」は変えたくない部分が変わってしまう場合は値を大きく、もっと変えたい場合は小さくしてください。0にすると通常モードと同じになります。";
 
-        MessageBox.Show(message, "ソフトの使い方一覧", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        FormUtils.ShowInfo(message, "ソフトの使い方一覧");
     }
 
     private void UndoButton_Click(object sender, EventArgs e)
@@ -633,7 +628,7 @@ public partial class MainForm : Form
         message += "このソフトウェアは、個人の趣味で作成されたものです。\nもしこのソフトウェアが役に立ったと感じたら、ぜひ支援をお願いします！\n支援先: https://pukorufu.booth.pm/items/6519471\n\n";
         message += "ライセンス:\nこのソフトウェアは、MITライセンスのもとで配布されています。";
 
-        MessageBox.Show(message, "Color Changer For Texture " + CURRENT_VERSION, MessageBoxButtons.OK, MessageBoxIcon.Information);
+        FormUtils.ShowInfo(message, "Color Changer For Texture " + CURRENT_VERSION);
     }
 
     private void BalanceModeSettingsButton_Click(object sender, EventArgs e)
