@@ -276,4 +276,10 @@ internal class ColorUtils
     /// </summary>
     internal static ColorPixel TransparentPixel
         => _transparentPixel;
+
+    /// <summary>
+    /// デフォルトの背景色を取得する
+    /// </summary>
+    internal static Color DefaultBackgroundColor
+        => Color.LightGray;
 }

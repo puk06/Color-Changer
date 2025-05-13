@@ -11,8 +11,6 @@ public partial class MainForm : Form
     private const string CURRENT_VERSION = "v1.0.11";
     private const string FORM_TITLE = $"Color Changer For Texture {CURRENT_VERSION}";
 
-    private static readonly Color DEFAULT_BACKGROUND_COLOR = Color.LightGray;
-
     private Color _previousColor = Color.Empty;
     private Color _newColor = Color.Empty;
     private Color _backgroundColor = Color.Empty;
@@ -38,11 +36,11 @@ public partial class MainForm : Form
 
         Text = FORM_TITLE;
 
-        previousColorBox.BackColor = DEFAULT_BACKGROUND_COLOR;
-        newColorBox.BackColor = DEFAULT_BACKGROUND_COLOR;
-        previewBox.BackColor = DEFAULT_BACKGROUND_COLOR;
-        coloredPreviewBox.BackColor = DEFAULT_BACKGROUND_COLOR;
-        backgroundColorBox.BackColor = DEFAULT_BACKGROUND_COLOR;
+        previousColorBox.BackColor = ColorUtils.DefaultBackgroundColor;
+        newColorBox.BackColor = ColorUtils.DefaultBackgroundColor;
+        previewBox.BackColor = ColorUtils.DefaultBackgroundColor;
+        coloredPreviewBox.BackColor = ColorUtils.DefaultBackgroundColor;
+        backgroundColorBox.BackColor = ColorUtils.DefaultBackgroundColor;
 
         SetupEventHandlers();
     }
@@ -90,12 +88,7 @@ public partial class MainForm : Form
             return;
         }
 
-        var colorDiff = new ColorDifference(
-            _previousColor,
-            _newColor
-        );
-
-        calculatedRGBLabel.Text = $"ŒvŽZŒã‚ÌRGB: ({colorDiff})";
+        calculatedRGBLabel.Text = $"ŒvŽZŒã‚ÌRGB: ({ColorDifference})";
     }
     #endregion
 
@@ -305,9 +298,9 @@ public partial class MainForm : Form
             _newColor = Color.Empty;
             _backgroundColor = Color.Empty;
 
-            previousColorBox.BackColor = DEFAULT_BACKGROUND_COLOR;
-            newColorBox.BackColor = DEFAULT_BACKGROUND_COLOR;
-            backgroundColorBox.BackColor = DEFAULT_BACKGROUND_COLOR;
+            previousColorBox.BackColor = ColorUtils.DefaultBackgroundColor;
+            newColorBox.BackColor = ColorUtils.DefaultBackgroundColor;
+            backgroundColorBox.BackColor = ColorUtils.DefaultBackgroundColor;
 
             _clickedPoint = Point.Empty;
 
