@@ -52,24 +52,22 @@ public partial class MainForm : Form
     private void SelectPreviousColor(object sender, MouseEventArgs e)
     {
         if (e.Button != MouseButtons.Left && !(e.Button == MouseButtons.Right && selectMode.Checked)) return;
-
         if (previewBox.Image is not Bitmap previewImage) return;
 
         Point originalCoordinates = BitmapUtils.ConvertToOriginalCoordinates(e, previewBox, previewImage);
-
         if (!BitmapUtils.IsValidCoordinate(originalCoordinates, previewImage.Size)) return;
 
-        Color color = previewImage.GetPixel(originalCoordinates.X, originalCoordinates.Y);
+        Color selectedColor = previewImage.GetPixel(originalCoordinates.X, originalCoordinates.Y);
 
         if (selectMode.Checked)
         {
-            HandleSelectionMode(e, color, originalCoordinates, previewImage);
+            HandleSelectionMode(e, selectedColor, originalCoordinates, previewImage);
             return;
         }
 
-        previousColorBox.BackColor = color;
-        _previousColor = color;
-        previousRGBLabel.Text = $"RGB: ({color.R}, {color.G}, {color.B})";
+        previousColorBox.BackColor = selectedColor;
+        _previousColor = selectedColor;
+        previousRGBLabel.Text = $"RGB: ({selectedColor.R}, {selectedColor.G}, {selectedColor.B})";
         UpdateCalculatedRGBValue();
 
         _clickedPoint = e.Location;
@@ -84,7 +82,7 @@ public partial class MainForm : Form
     {
         if (_previousColor == Color.Empty || _newColor == Color.Empty)
         {
-            calculatedRGBLabel.Text = "";
+            calculatedRGBLabel.Text = string.Empty;
             return;
         }
 
@@ -304,9 +302,9 @@ public partial class MainForm : Form
 
             _clickedPoint = Point.Empty;
 
-            previousRGBLabel.Text = "";
-            newRGBLabel.Text = "";
-            calculatedRGBLabel.Text = "";
+            previousRGBLabel.Text = string.Empty;
+            newRGBLabel.Text = string.Empty;
+            calculatedRGBLabel.Text = string.Empty;
 
             _selectedPoints = BitArrayUtils.GetEmpty();
             _selectedPointsForPreview = BitArrayUtils.GetEmpty();
@@ -539,7 +537,7 @@ public partial class MainForm : Form
         if (dialog.ShowDialog() != DialogResult.OK) return;
         var newFilePath = dialog.FileName;
 
-        if (newFilePath == "")
+        if (newFilePath == string.Empty)
         {
             FormUtils.ShowError("ファイルの保存先が選択されていません。");
             return;
