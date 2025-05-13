@@ -19,7 +19,7 @@ internal class ImageProcessorService
     /// <param name="selectedPoints"></param>
     /// <param name="previewBoxSize"></param>
     /// <returns></returns>
-    public static Bitmap GeneratePreview(
+    internal static Bitmap GeneratePreview(
         Bitmap sourceBitmap,
         ColorDifference colorDifference,
         bool balanceMode, BalanceModeConfiguration configuration,
