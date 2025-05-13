@@ -102,8 +102,8 @@ internal class ColorUtils
         {
             for (int y = 0; y < bmp.Height; y++)
             {
-                Color currentColor = bmp.GetPixel(x, y);
-                double distance = GetColorDistance(color, currentColor);
+                Color currentPixelColor = bmp.GetPixel(x, y);
+                double distance = GetColorDistance(color, currentPixelColor);
                 if (distance < closestDistance)
                 {
                     closestDistance = distance;

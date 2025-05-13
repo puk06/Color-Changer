@@ -2,17 +2,24 @@
 
 internal class ColorDifference(Color previousColor, Color newColor)
 {
-    internal Color PreviousColor { get; set; } = previousColor;
-    internal int DiffR { get; set; } = newColor.R - previousColor.R;
-    internal int DiffG { get; set; } = newColor.G - previousColor.G;
-    internal int DiffB { get; set; } = newColor.B - previousColor.B;
+    internal Color PreviousColor { get; private set; } = previousColor;
+    internal int DiffR { get; private set; } = newColor.R - previousColor.R;
+    internal int DiffG { get; private set; } = newColor.G - previousColor.G;
+    internal int DiffB { get; private set; } = newColor.B - previousColor.B;
 
     public override string ToString()
     {
-        var diffRStr = DiffR > 0 ? "+" + DiffR : DiffR.ToString();
-        var diffGStr = DiffG > 0 ? "+" + DiffG : DiffG.ToString();
-        var diffBStr = DiffB > 0 ? "+" + DiffB : DiffB.ToString();
-
+        string diffRStr = DiffR > 0 ? $"+{DiffR}" : DiffR.ToString();
+        string diffGStr = DiffG > 0 ? $"+{DiffG}" : DiffG.ToString();
+        string diffBStr = DiffB > 0 ? $"+{DiffB}" : DiffB.ToString();
         return $"{diffRStr}, {diffGStr}, {diffBStr}";
+    }
+
+    internal void Set(Color previousColor, Color newColor)
+    {
+        PreviousColor = previousColor;
+        DiffR = newColor.R - previousColor.R;
+        DiffG = newColor.G - previousColor.G;
+        DiffB = newColor.B - previousColor.B;
     }
 }

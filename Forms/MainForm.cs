@@ -19,7 +19,6 @@ public partial class MainForm : Form
     private Bitmap? _bmp;
     private string? _imageFilePath;
 
-    // ëIëÉÇÅ[Éh
     private BitArray _selectedPoints = BitArrayUtils.GetEmpty();
     private BitArray _selectedPointsForPreview = BitArrayUtils.GetEmpty();
     private List<BitArray> _selectedHistory = new List<BitArray>();
@@ -27,8 +26,15 @@ public partial class MainForm : Form
     private readonly ColorPickerForm _colorPicker = new ColorPickerForm();
     private readonly BalanceModeSettingsForm _balanceModeSettings = new BalanceModeSettingsForm();
 
+    private readonly ColorDifference _colorDifference = new ColorDifference(Color.Empty, Color.Empty);
     private ColorDifference ColorDifference
-        => new(_previousColor, _newColor);
+    {
+        get
+        {
+            _colorDifference.Set(_previousColor, _newColor);
+            return _colorDifference;
+        }
+    }
 
     public MainForm()
     {
