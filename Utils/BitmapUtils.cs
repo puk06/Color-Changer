@@ -225,10 +225,17 @@ internal class BitmapUtils
     /// <param name="bitmapImage"></param>
     internal static void SetImage(PictureBox pictureBox, Bitmap bitmapImage, bool disposeImage = true)
     {
-        ResetImage(pictureBox, false);
-        pictureBox.Image = disposeImage ? new Bitmap(bitmapImage) : bitmapImage;
-        pictureBox.Invalidate();
-        if (disposeImage) bitmapImage.Dispose();
+        try
+        {
+            ResetImage(pictureBox, false);
+            pictureBox.Image = disposeImage ? new Bitmap(bitmapImage) : bitmapImage;
+            pictureBox.Invalidate();
+            if (disposeImage) bitmapImage.Dispose();
+        }
+        catch (Exception ex)
+        {
+            FormUtils.ShowError($"画像の読み込みに失敗しました。\n{ex.Message}");
+        }
     }
 
     /// <summary>

@@ -248,13 +248,21 @@ public partial class MainForm : Form
     /// <returns></returns>
     private Bitmap GenerateColoredPreview(Bitmap sourceBitmap)
     {
-        return ImageProcessorService.GeneratePreview(
-            sourceBitmap,
-            ColorDifference,
-            balanceMode.Checked, _balanceModeSettings.Configuration,
-            _selectedPointsForPreview,
-            coloredPreviewBox.Size
-        );
+        try
+        {
+            return ImageProcessorService.GeneratePreview(
+                sourceBitmap,
+                ColorDifference,
+                balanceMode.Checked, _balanceModeSettings.Configuration,
+                _selectedPointsForPreview,
+                coloredPreviewBox.Size
+            );
+        }
+        catch (Exception ex)
+        {
+            FormUtils.ShowError($"プレビュー画像の生成に失敗しました。\n{ex.Message}");
+            return sourceBitmap;
+        }
     }
 
     /// <summary>
