@@ -32,3 +32,15 @@ This tool extracts the color difference from your initial input (e.g., "change t
 ### 📄 License
 
 This project is licensed under the [MIT License](LICENSE).
+
+---
+
+### 📦 Versioning
+
+This project uses a **custom versioning system** to reflect major changes in development approach and functionality.
+
+- **v2.0.0** – Complete rewrite in a different programming language. The entire application was rebuilt from scratch.
+- **v1.1.0** – Updated to a newer version of .NET for improved stability and compatibility.
+- **v1.0.1** – Minor feature additions and bug fixes.
+
+Note: Versions do not strictly follow [Semantic Versioning](https://semver.org/) but are incremented based on the scale and nature of the changes.

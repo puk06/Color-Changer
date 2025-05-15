@@ -53,4 +53,19 @@ internal class FormUtils
         var result = MessageBox.Show(message, title, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
         return result == DialogResult.Yes;
     }
+
+    /// <summary>
+    /// ラベルの位置を指定された場所から右寄せにする
+    /// </summary>
+    /// <param name="label"></param>
+    /// <param name="x"></param>
+    /// <param name="y"></param>
+    internal static void AlignTextRight(Label label, Point point)
+    {
+        int x = point.X;
+        int y = point.Y;
+
+        int textWidthSize = TextRenderer.MeasureText(label.Text, label.Font).Width;
+        label.Location = new Point(x - textWidthSize, y);
+    }
 }

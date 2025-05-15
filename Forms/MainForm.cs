@@ -2,14 +2,24 @@ using ColorChanger.ImageProcessing;
 using ColorChanger.Models;
 using ColorChanger.Utils;
 using System.Collections;
+using System.Diagnostics;
 using System.Drawing.Imaging;
 
 namespace ColorChanger.Forms;
 
 public partial class MainForm : Form
 {
-    private const string CURRENT_VERSION = "v1.0.11";
-    private const string FORM_TITLE = $"Color Changer For Texture {CURRENT_VERSION}";
+    private const string CURRENT_VERSION = "v1.0.12";
+    private static readonly string FORM_TITLE = $"Color Changer For Texture {CURRENT_VERSION}";
+
+    private static readonly string ITEM_URL = "https://pukorufu.booth.pm/items/6519471";
+    private static readonly Point VERSION_LABEL_POSITION = new(275, 54);
+
+    private readonly ProcessStartInfo _processStartInfo = new()
+    {
+        FileName = ITEM_URL,
+        UseShellExecute = true
+    };
 
     private Color _previousColor = Color.Empty;
     private Color _newColor = Color.Empty;
@@ -19,12 +29,13 @@ public partial class MainForm : Form
     private Bitmap? _bmp;
     private string? _imageFilePath;
 
-    private BitArray _selectedPoints = BitArrayUtils.GetEmpty();
     private BitArray _selectedPointsForPreview = BitArrayUtils.GetEmpty();
-    private List<BitArray> _selectedHistory = new List<BitArray>();
+    private Bitmap? _previewBitmap;
 
-    private readonly ColorPickerForm _colorPicker = new ColorPickerForm();
-    private readonly BalanceModeSettingsForm _balanceModeSettings = new BalanceModeSettingsForm();
+    private readonly ColorPickerForm _colorPickerForm = new ColorPickerForm();
+    private readonly BalanceModeSettingsForm _balanceModeSettingsForm = new BalanceModeSettingsForm();
+    private readonly SelectedAreaListForm _selectedAreaListForm = new SelectedAreaListForm();
+    private readonly HelpForm _helpForm = new HelpForm();
 
     private readonly ColorDifference _colorDifference = new ColorDifference(Color.Empty, Color.Empty);
     private ColorDifference ColorDifference
@@ -42,6 +53,9 @@ public partial class MainForm : Form
 
         Text = FORM_TITLE;
 
+        versionLabel.Text = CURRENT_VERSION;
+        FormUtils.AlignTextRight(versionLabel, VERSION_LABEL_POSITION);
+
         previousColorBox.BackColor = ColorUtils.DefaultBackgroundColor;
         newColorBox.BackColor = ColorUtils.DefaultBackgroundColor;
         previewBox.BackColor = ColorUtils.DefaultBackgroundColor;
@@ -58,22 +72,22 @@ public partial class MainForm : Form
     private void SelectPreviousColor(object sender, MouseEventArgs e)
     {
         if (e.Button != MouseButtons.Left && !(e.Button == MouseButtons.Right && selectMode.Checked)) return;
-        if (previewBox.Image is not Bitmap previewImage) return;
+        if (_bmp == null || _previewBitmap == null) return;
 
-        Point originalCoordinates = BitmapUtils.ConvertToOriginalCoordinates(e, previewBox, previewImage);
-        if (!BitmapUtils.IsValidCoordinate(originalCoordinates, previewImage.Size)) return;
+        if (!BitmapUtils.IsValidCoordinate(e.Location, _previewBitmap.Size)) return;
 
-        Color selectedColor = previewImage.GetPixel(originalCoordinates.X, originalCoordinates.Y);
+        Color selectedColor = _previewBitmap.GetPixel(e.X, e.Y);
 
         if (selectMode.Checked)
         {
-            HandleSelectionMode(e, selectedColor, originalCoordinates, previewImage);
+            Point originalCoordinates = BitmapUtils.ConvertToOriginalCoordinates(e, previewBox, _bmp);
+            HandleSelectionMode(e, selectedColor, originalCoordinates);
             return;
         }
 
         previousColorBox.BackColor = selectedColor;
         _previousColor = selectedColor;
-        previousRGBLabel.Text = $"RGB: ({selectedColor.R}, {selectedColor.G}, {selectedColor.B})";
+        previousRGBLabel.Text = $"{selectedColor.R}, {selectedColor.G}, {selectedColor.B}";
         UpdateCalculatedRGBValue();
 
         _clickedPoint = e.Location;
@@ -92,7 +106,7 @@ public partial class MainForm : Form
             return;
         }
 
-        calculatedRGBLabel.Text = $"計算後のRGB: ({ColorDifference})";
+        calculatedRGBLabel.Text = ColorDifference.ToString();
     }
     #endregion
 
@@ -119,10 +133,10 @@ public partial class MainForm : Form
             BitmapData? data = BitmapUtils.LockBitmap(bitMap, rect, ImageLockMode.ReadWrite);
             if (data == null) return;
 
-            Bitmap? rawBitmap = BitmapUtils.CreateInverseBitmap(_bmp, InverseMode.Checked);
+            Bitmap? rawBitmap = BitmapUtils.CreateInverseBitmap(_bmp, inverseMode.Checked);
             BitmapData? rawBitmapData = BitmapUtils.LockBitmap(rawBitmap, rect, ImageLockMode.ReadOnly);
 
-            Bitmap? transBitmap = BitmapUtils.CreateTransparentBitmap(_bmp, transMode.Checked, InverseMode.Checked);
+            Bitmap? transBitmap = BitmapUtils.CreateTransparentBitmap(_bmp, transMode.Checked, inverseMode.Checked);
             BitmapData? transData = BitmapUtils.LockBitmap(transBitmap, rect, ImageLockMode.ReadWrite);
 
             bool skipped = false;
@@ -139,7 +153,7 @@ public partial class MainForm : Form
                 );
 
                 if (balanceMode.Checked)
-                    imageProcessor.SetBalanceSettings(_balanceModeSettings.Configuration);
+                    imageProcessor.SetBalanceSettings(_balanceModeSettingsForm.Configuration);
 
                 skipped = ProcessImage(sourcePixels, rawPixels, transPixels, imageProcessor);
             }
@@ -148,7 +162,7 @@ public partial class MainForm : Form
             if (rawBitmapData != null) rawBitmap?.UnlockBits(rawBitmapData);
             rawBitmap?.Dispose();
 
-            if (!skipped && transMode.Checked && !InverseMode.Checked)
+            if (!skipped && transMode.Checked && !inverseMode.Checked)
             {
                 if (transBitmap != null && transData != null)
                 {
@@ -171,12 +185,12 @@ public partial class MainForm : Form
         }
         catch (Exception ex)
         {
-            FormUtils.ShowError($"テクスチャ画像作成中にエラーが発生しました。\n{ex.Message}");
+            FormUtils.ShowError($"テクスチャ画像作成中にエラーが発生しました。\n{ex}");
         }
         finally
         {
-            MakeButton.Enabled = true;
-            MakeButton.Text = "作成";
+            makeButton.Enabled = true;
+            makeButton.Text = "作成";
         }
     }
 
@@ -196,7 +210,9 @@ public partial class MainForm : Form
     {
         bool skipped = false;
 
-        if (_selectedPoints.Length == 0)
+        BitArray selectedPoints = _selectedAreaListForm.SelectedArea;
+
+        if (selectedPoints.Length == 0)
         {
             if (transMode.Checked)
             {
@@ -208,19 +224,19 @@ public partial class MainForm : Form
         }
         else if (transMode.Checked)
         {
-            if (InverseMode.Checked)
+            if (inverseMode.Checked)
             {
-                processor.ProcessTransparentAndInversePixels(sourcePixels, _selectedPoints);
+                processor.ProcessTransparentAndInversePixels(sourcePixels, selectedPoints);
             }
             else
             {
                 if (transPixels.IsEmpty)
                     FormUtils.ShowError("透過画像用データの取得に失敗しました。デフォルトの画像が使用されます。");
 
-                processor.ProcessTransparentSelectedPixels(sourcePixels, transPixels, _selectedPoints);
+                processor.ProcessTransparentSelectedPixels(sourcePixels, transPixels, selectedPoints);
             }
         }
-        else if (InverseMode.Checked)
+        else if (inverseMode.Checked)
         {
             processor.ProcessAllPixels(sourcePixels, sourcePixels);
 
@@ -230,12 +246,12 @@ public partial class MainForm : Form
             }
             else
             {
-                processor.ProcessInverseSelectedPixels(sourcePixels, rawPixels, _selectedPoints);
+                processor.ProcessInverseSelectedPixels(sourcePixels, rawPixels, selectedPoints);
             }
         }
         else
         {
-            processor.ProcessSelectedPixels(sourcePixels, sourcePixels, _selectedPoints);
+            processor.ProcessSelectedPixels(sourcePixels, sourcePixels, selectedPoints);
         }
 
         return skipped;
@@ -246,16 +262,17 @@ public partial class MainForm : Form
     /// </summary>
     /// <param name="sourceBitmap"></param>
     /// <returns></returns>
-    private Bitmap GenerateColoredPreview(Bitmap sourceBitmap)
+    private Bitmap GenerateColoredPreview(Bitmap sourceBitmap, bool rawMode = false)
     {
         try
         {
             return ImageProcessorService.GeneratePreview(
                 sourceBitmap,
                 ColorDifference,
-                balanceMode.Checked, _balanceModeSettings.Configuration,
+                balanceMode.Checked, _balanceModeSettingsForm.Configuration,
                 _selectedPointsForPreview,
-                coloredPreviewBox.Size
+                coloredPreviewBox.Size,
+                rawMode
             );
         }
         catch (Exception ex)
@@ -280,11 +297,13 @@ public partial class MainForm : Form
         try
         {
             BitmapUtils.DisposeBitmap(ref _bmp);
+            BitmapUtils.DisposeBitmap(ref _previewBitmap);
 
             using var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read);
             _bmp = new Bitmap(stream);
+            _previewBitmap = GenerateColoredPreview(_bmp, rawMode: true);
 
-            BitmapUtils.SetImage(previewBox, _bmp, disposeImage: false);
+            BitmapUtils.SetImage(previewBox, _previewBitmap, disposeImage: false);
         }
         catch (Exception exception)
         {
@@ -298,6 +317,7 @@ public partial class MainForm : Form
             }
 
             BitmapUtils.DisposeBitmap(ref _bmp);
+            BitmapUtils.DisposeBitmap(ref _previewBitmap);
             BitmapUtils.ResetImage(previewBox);
         }
         finally
@@ -320,12 +340,16 @@ public partial class MainForm : Form
             newRGBLabel.Text = string.Empty;
             calculatedRGBLabel.Text = string.Empty;
 
-            _selectedPoints = BitArrayUtils.GetEmpty();
+            estimatedMemoryUsageBase.Text = string.Empty;
+            estimatedMemoryUsageCount.Text = string.Empty;
+            estimatedMemoryUsageTotal.Text = string.Empty;
+
             _selectedPointsForPreview = BitArrayUtils.GetEmpty();
-            _selectedHistory.Clear();
+            _selectedAreaListForm.Clear();
 
             Text = FORM_TITLE;
             selectMode.Checked = false;
+            UpdateEstimatedMemoryUsage();
         }
     }
     #endregion
@@ -334,8 +358,9 @@ public partial class MainForm : Form
     /// <summary>
     /// 選択モードの処理
     /// </summary>
-    private void HandleSelectionMode(MouseEventArgs e, Color color, Point originalCoordinates, Bitmap previewImage)
+    private void HandleSelectionMode(MouseEventArgs e, Color color, Point originalCoordinates)
     {
+        if (_bmp == null) return;
         if (e.Button == MouseButtons.Right)
         {
             _backgroundColor = color;
@@ -358,48 +383,20 @@ public partial class MainForm : Form
         string previousFormTitle = Text;
         Text = FORM_TITLE + " - 選択処理中...";
 
-        int previousSelectedCount = BitArrayUtils.GetCount(_selectedPoints);
-
         BitArray values = BitmapUtils.GetSelectedArea(
-            _selectedPoints,
             originalCoordinates,
-            previewImage,
+            _bmp,
             _backgroundColor
         );
 
-        int selectedCount = BitArrayUtils.GetCount(values);
-
-        Text = previousFormTitle;
-
-        if (previousSelectedCount == selectedCount) return;
-
         if (values.Length == 0)
         {
-            FormUtils.ShowError("選択可能なエリアがありません。");
+            FormUtils.ShowError("選択エリアがありません。");
+            Text = previousFormTitle;
             return;
         }
 
-        _selectedPoints = values;
-
-        if (_selectedPoints.Length != 0)
-            _selectedHistory.Add(BitArrayUtils.GetClone(_selectedPoints));
-
-        AddSelectedArea(previewImage);
-    }
-
-    /// <summary>
-    /// 選択エリアを追加
-    /// </summary>
-    private void AddSelectedArea(Bitmap previewImage)
-    {
-        Text = FORM_TITLE + " - プレビュー用の選択エリア作成中...";
-        _selectedPointsForPreview = BitmapUtils.ConvertSelectedAreaToPreviewBox(_selectedPoints, previewImage, previewBox);
-
-        int selectedPixels = BitArrayUtils.GetCount(_selectedPoints);
-
-        Text = FORM_TITLE + $" - {_selectedHistory.Count} 個の選択エリア (総選択ピクセル数: {selectedPixels:N0})";
-
-        BitmapUtils.SetImage(coloredPreviewBox, GenerateColoredPreview(previewImage));
+        _selectedAreaListForm.Add(values);
     }
     #endregion
 
@@ -409,26 +406,78 @@ public partial class MainForm : Form
     /// </summary>
     private void SetupEventHandlers()
     {
-        _balanceModeSettings.ConfigurationChanged += (s, e) =>
+        _balanceModeSettingsForm.ConfigurationChanged += (s, e) =>
         {
-            if (_bmp == null || _previousColor == Color.Empty || _newColor == Color.Empty) return;
-            BitmapUtils.SetImage(coloredPreviewBox, GenerateColoredPreview(_bmp));
+            if (_previewBitmap == null || _previousColor == Color.Empty || _newColor == Color.Empty) return;
+            BitmapUtils.SetImage(coloredPreviewBox, GenerateColoredPreview(_previewBitmap));
         };
 
-        _colorPicker.ColorChanged += (s, e) =>
+        _colorPickerForm.ColorChanged += (s, e) =>
         {
-            if (_bmp == null || _previousColor == Color.Empty) return;
+            if (_previewBitmap == null || _previousColor == Color.Empty) return;
 
-            Color color = _colorPicker.SelectedColor;
+            Color color = _colorPickerForm.SelectedColor;
 
             _newColor = color;
             newColorBox.BackColor = color;
-            newRGBLabel.Text = $"RGB: ({color.R}, {color.G}, {color.B})";
+            newRGBLabel.Text = $"{color.R}, {color.G}, {color.B}";
 
             UpdateCalculatedRGBValue();
 
-            BitmapUtils.SetImage(coloredPreviewBox, GenerateColoredPreview(_bmp));
+            BitmapUtils.SetImage(coloredPreviewBox, GenerateColoredPreview(_previewBitmap));
         };
+
+        _selectedAreaListForm.OnCheckedChanged += (s, e)
+            => UpdateSelectedArea();
+    }
+
+    /// <summary>
+    /// 選択エリアを更新する
+    /// </summary>
+    private void UpdateSelectedArea()
+    {
+        if (_bmp == null || _previewBitmap == null || _previousColor == Color.Empty || _newColor == Color.Empty) return;
+
+        BitArray allSelectedAreas = _selectedAreaListForm.SelectedArea;
+        int enabledCount = _selectedAreaListForm.EnabledCount;
+
+        if (allSelectedAreas.Length == 0)
+        {
+            _selectedPointsForPreview = BitArrayUtils.GetEmpty();
+
+            Text = FORM_TITLE;
+        }
+        else
+        {
+            Text = FORM_TITLE + " - プレビュー用の選択エリア作成中...";
+            _selectedPointsForPreview = BitmapUtils.ConvertSelectedAreaToPreviewBox(allSelectedAreas, _bmp, previewBox, inverseMode.Checked);
+
+            int totalSelectedPoints = BitArrayUtils.GetCount(allSelectedAreas);
+            Text = FORM_TITLE + $" - {enabledCount} 個の選択エリア (総選択ピクセル数: {totalSelectedPoints:N0})";
+        }
+
+        BitmapUtils.SetImage(coloredPreviewBox, GenerateColoredPreview(_previewBitmap));
+    }
+
+    /// <summary>
+    /// 推定メモリ使用量を更新する
+    /// </summary>
+    private void UpdateEstimatedMemoryUsage()
+    {
+        if (_bmp == null) return;
+
+        int bitmapCount = 1;
+
+        if (inverseMode.Checked)
+            bitmapCount += 1;
+
+        if (transMode.Checked)
+            bitmapCount += 1;
+
+        double totalMB = BitmapUtils.CalculateEstimatedMemoryUsage(_bmp);
+        estimatedMemoryUsageBase.Text = $"{totalMB:F2} MB";
+        estimatedMemoryUsageCount.Text = bitmapCount.ToString();
+        estimatedMemoryUsageTotal.Text = $"{totalMB * bitmapCount:F2} MB";
     }
 
     private void OnPaint(object sender, PaintEventArgs e)
@@ -449,9 +498,9 @@ public partial class MainForm : Form
     private void PreviewBox_MouseUp(object sender, MouseEventArgs e)
     {
         if (e.Button != MouseButtons.Left) return;
-        if (_bmp == null || _newColor == Color.Empty || _previousColor == Color.Empty) return;
+        if (_previewBitmap == null || _newColor == Color.Empty || _previousColor == Color.Empty) return;
 
-        BitmapUtils.SetImage(coloredPreviewBox, GenerateColoredPreview(_bmp));
+        BitmapUtils.SetImage(coloredPreviewBox, GenerateColoredPreview(_previewBitmap));
     }
 
     private void NewColorBox_MouseDown(object sender, MouseEventArgs e)
@@ -468,8 +517,8 @@ public partial class MainForm : Form
             return;
         }
 
-        _colorPicker.SetColor(_newColor == Color.Empty ? _previousColor : _newColor);
-        _colorPicker.Show();
+        _colorPickerForm.SetColor(_newColor == Color.Empty ? _previousColor : _newColor);
+        _colorPickerForm.Show();
     }
 
     private void SelectMode_CheckedChanged(object sender, EventArgs e)
@@ -493,23 +542,30 @@ public partial class MainForm : Form
             FormUtils.ShowInfo("選択モードが有効になりました。はじめに背景色を右クリックで設定してください。", "選択モード");
         }
 
-        backgroundColorBox.Enabled = selectMode.Checked;
-        backgroundColorLabel.Enabled = selectMode.Checked;
-        UndoButton.Enabled = selectMode.Checked;
+        selectModePanel.Enabled = selectMode.Checked;
     }
 
     private void BalanceMode_CheckedChanged(object sender, EventArgs e)
     {
-        if (_bmp == null || _previousColor == Color.Empty || _newColor == Color.Empty) return;
+        if (_previewBitmap == null || _previousColor == Color.Empty || _newColor == Color.Empty) return;
 
-        BitmapUtils.SetImage(coloredPreviewBox, GenerateColoredPreview(_bmp));
+        BitmapUtils.SetImage(coloredPreviewBox, GenerateColoredPreview(_previewBitmap));
     }
 
     private void InverseMode_CheckedChanged(object sender, EventArgs e)
     {
-        if (InverseMode.Checked)
+        if (inverseMode.Checked)
             FormUtils.ShowInfo("選択反転モードがオンになりました。\n\n- 選択された部分の色は変わらず、それ以外の場所の色のみ変わります。\n- 透過画像作成モードでは、透過する部分が選択部分と逆になります。", "選択反転モード");
+
+        UpdateSelectedArea();
+        UpdateEstimatedMemoryUsage();
     }
+
+    private void TransMode_CheckedChanged(object sender, EventArgs e)
+        => UpdateEstimatedMemoryUsage();
+
+    private void SelectedAreaListButton_Click(object sender, EventArgs e)
+        => _selectedAreaListForm.Show();
 
     private void OpenFile_Click(object sender, EventArgs e)
     {
@@ -557,87 +613,50 @@ public partial class MainForm : Form
             return;
         }
 
-        MakeButton.Text = "作成中...";
-        MakeButton.Enabled = false;
+        makeButton.Text = "作成中...";
+        makeButton.Enabled = false;
         ApplyColorChange(newFilePath);
     }
 
     private void HelpUseButton_Click(object sender, EventArgs e)
-    {
-        string message = "このソフトの基本的な使い方:\n" +
-            "1. 画像を画面内にドラッグ＆ドロップするか、「ファイルを開く」ボタンを押して画像を読み込んでください。\n" +
-            "2. 変更前の色は、画像内をクリックまたはドラッグして選択します。\n" +
-            "3. 変更後の色は、画面下部のグレーの枠をクリックして選択してください。\n" +
-            "4. 「作成」ボタンを押すと、テクスチャの作成が始まります。";
-
-        message += "\n\n選択モードの使い方:\n" +
-            "- 選択モードでは、出力時に選択された部分のみ色が変更され、他の場所は変更されません。\n" +
-            "1. 背景色を右クリックで設定します。\n" +
-            "2. 変更したい部分を左クリックで選択してください（右側の画像に赤い枠線でプレビューされます。複数選択も可能です）。\n" +
-            "3. 選択が完了したら、「選択モード」のチェックを外してください。\n" +
-            "※「戻る」ボタンを押すと、最後に選択したエリアから順に選択を解除できます。";
-
-        message += "\n\n選択反転モードについて:\n" +
-            "- 選択された部分の色は変わらず、それ以外の場所の色のみ変わります。\n" +
-            "- 透過画像作成モードでは、透過する部分が選択部分と逆になります。\n" +
-            "耳毛など、変えたくない部分が少ない場合に有効的です。\n" +
-            "選択モードのみだと、変えたくない部分以外を全て選択した状態にしないといけないので便利です。";
-
-        message += "\n\n透過画像作成モードの使い方:\n" +
-            "- 透過画像作成モードでは、選択した部分だけが残る透過画像を生成します。\n" +
-            "1. 選択モードで、透過させたくない部分を選択します（複数選択可）。\n" +
-            "2. 「透過モード」にチェックを入れてください。\n" +
-            "3. 「作成」ボタンを押すと、選択された部分だけが残る透過画像が生成されます。";
-
-        message += "\n\nバランスモードについて:\n" +
-            "- 選択した色に近いほど強く、遠いほど弱く色を変更します。\n" +
-            "オン／オフを切り替えて、どちらがより自然か確認してから色変換を実行することをおすすめします。設定から値などを調節することができます。\n" +
-            "※上手く色が変わらない場合は、設定内の値を調整してみてください。\n" +
-            "※「重り」は変えたくない部分が変わってしまう場合は値を大きく、もっと変えたい場合は小さくしてください。0にすると通常モードと同じになります。";
-
-        FormUtils.ShowInfo(message, "ソフトの使い方一覧");
-    }
+        => _helpForm.Show();
 
     private void UndoButton_Click(object sender, EventArgs e)
-    {
-        if (_selectedHistory.Count == 0 || _bmp == null) return;
-
-        if (_selectedHistory.Count == 1)
-        {
-            _selectedHistory.Clear();
-            _selectedPoints = BitArrayUtils.GetEmpty();
-            _selectedPointsForPreview = BitArrayUtils.GetEmpty();
-
-            Text = FORM_TITLE;
-        }
-        else
-        {
-            BitArray lastHistory = _selectedHistory[^2];
-
-            _selectedHistory = _selectedHistory[..^1];
-            _selectedPoints = lastHistory;
-            _selectedPointsForPreview = BitmapUtils.ConvertSelectedAreaToPreviewBox(_selectedPoints, _bmp, previewBox);
-
-            int totalSelectedPoints = BitArrayUtils.GetCount(_selectedPoints);
-            Text = FORM_TITLE + $" - {_selectedHistory.Count} 個の選択エリア (総選択ピクセル数: {totalSelectedPoints:N0})";
-        }
-
-        BitmapUtils.SetImage(coloredPreviewBox, GenerateColoredPreview(_bmp));
-    }
+        => _selectedAreaListForm.RemoveLast();
 
     private void AboutThisSoftware_Click(object sender, EventArgs e)
     {
         string message = "Color Changer For Texture " + CURRENT_VERSION + "\n\n";
         message += "柔軟なテクスチャ色変換ツール\n指定した色の差分をもとに、テクスチャの色を簡単に変更できます。\n\n";
         message += "ツール情報:\n制作者: ぷこるふ\nTwitter: @pukorufu\nGithub: https://github.com/puk06/Color-Changer\n\n";
-        message += "このソフトウェアは、個人の趣味で作成されたものです。\nもしこのソフトウェアが役に立ったと感じたら、ぜひ支援をお願いします！\n支援先: https://pukorufu.booth.pm/items/6519471\n\n";
+        message += "このソフトウェアは、個人の趣味で作成されたものです。\nもしこのソフトウェアが役に立ったと感じたら、ぜひ支援をお願いします！\n\n";
         message += "ライセンス:\nこのソフトウェアは、MITライセンスのもとで配布されています。";
 
         FormUtils.ShowInfo(message, "Color Changer For Texture " + CURRENT_VERSION);
     }
 
     private void BalanceModeSettingsButton_Click(object sender, EventArgs e)
-        => _balanceModeSettings.Show();
+        => _balanceModeSettingsForm.Show();
+
+    private void DonationButton_Click(object sender, EventArgs e)
+    {
+        bool result = FormUtils.ShowConfirm(
+            "支援していただける場合は、以下のリンクを開きます。\n\n" +
+            "支援先: https://pukorufu.booth.pm/items/6519471\n\n" +
+            "支援は任意です。無理のない範囲でお願いします。"
+        );
+
+        if (!result) return;
+
+        try
+        {
+            Process.Start(_processStartInfo);
+        }
+        catch (Exception ex)
+        {
+            FormUtils.ShowError($"リンクを開くことができませんでした。\n{ex.Message}");
+        }
+    }
 
     private void MainForm_DragDrop(object sender, DragEventArgs e)
     {
@@ -650,6 +669,6 @@ public partial class MainForm : Form
     }
 
     private void MainForm_DragEnter(object sender, DragEventArgs e)
-        => e.Effect = _colorPicker.Visible ? DragDropEffects.None : DragDropEffects.All;
+        => e.Effect = _colorPickerForm.Visible ? DragDropEffects.None : DragDropEffects.All;
     #endregion
 }

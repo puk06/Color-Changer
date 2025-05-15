@@ -14,15 +14,13 @@ internal class BitmapUtils
     /// <param name="rawImage"></param>
     /// <param name="backgroundColor"></param>
     /// <returns></returns>
-    internal static unsafe BitArray GetSelectedArea(BitArray selectedPoints, Point clickedLocation, Bitmap rawImage, Color backgroundColor)
+    internal static unsafe BitArray GetSelectedArea(Point clickedLocation, Bitmap rawImage, Color backgroundColor)
     {
         int width = rawImage.Width;
         int height = rawImage.Height;
         int totalPixels = width * height;
 
-        BitArray selected = selectedPoints.Length == totalPixels
-            ? selectedPoints
-            : new(totalPixels, false);
+        BitArray selected = new(totalPixels, false);
 
         var queue = new Queue<PixelPoint>();
 
@@ -96,7 +94,11 @@ internal class BitmapUtils
     /// <param name="sourceImage"></paramImageProcessing
     /// <param name="previewBox"></param>
     /// <returns></returns>
-    internal static BitArray ConvertSelectedAreaToPreviewBox(BitArray selectedArea, Bitmap sourceImage, PictureBox previewBox)
+    internal static BitArray ConvertSelectedAreaToPreviewBox(
+        BitArray selectedArea,
+        Bitmap sourceImage,
+        PictureBox previewBox,
+        bool inverseMode)
     {
         int previewHeight = previewBox.Height;
         int previewWidth = previewBox.Width;
@@ -105,28 +107,33 @@ internal class BitmapUtils
         float ratioX = (float)sourceImage.Width / previewWidth;
         float ratioY = (float)sourceImage.Height / previewHeight;
 
-        BitArray bitArray = new BitArray(totalPixels, false);
+        BitArray bitArray = new BitArray(totalPixels, inverseMode);
 
         for (int y = 0; y < previewHeight; y++)
         {
+            int sourceY = (int)(y * ratioY);
+            if (sourceY >= sourceImage.Height)
+                continue;
+
+            int previewRowOffset = y * previewWidth;
+            int sourceRowOffset = sourceY * sourceImage.Width;
+
             for (int x = 0; x < previewWidth; x++)
             {
-                int originalX = (int)(x * ratioX);
-                int originalY = (int)(y * ratioY);
-                if (originalX >= sourceImage.Width || originalY >= sourceImage.Height) continue;
+                int sourceX = (int)(x * ratioX);
+                if (sourceX >= sourceImage.Width)
+                    continue;
 
-                int originalIndex = PixelUtils.GetPixelIndex(originalX, originalY, sourceImage.Width);
-                if (selectedArea[originalIndex])
-                {
-                    int previewIndex = PixelUtils.GetPixelIndex(x, y, previewWidth);
-                    bitArray[previewIndex] = true;
-                }
+                int sourceIndex = sourceRowOffset + sourceX;
+                if (!selectedArea[sourceIndex])
+                    continue;
+
+                int previewIndex = previewRowOffset + x;
+                bitArray[previewIndex] = !bitArray[previewIndex];
             }
         }
 
-        BitArray outerSelectedArea = DeleteInnerSelectedArea(bitArray, previewWidth, previewHeight);
-
-        return outerSelectedArea;
+        return bitArray;
     }
 
     /// <summary>
@@ -134,17 +141,17 @@ internal class BitmapUtils
     /// </summary>
     /// <param name="selectedArea"></param>
     /// <returns></returns>
-    private static BitArray DeleteInnerSelectedArea(BitArray selectedArea, int width, int height)
+    internal static BitArray RemoveInnerSelectedArea(BitArray selectedArea, int width, int height)
     {
-        BitArray result = new BitArray(selectedArea.Length, false);
+        BitArray result = new BitArray(selectedArea.Length);
+        int stripeInterval = 6; // 斜め線の間隔（ピクセル数）
 
+        // 内側のピクセル判定
         for (int y = 1; y < height - 1; y++)
         {
             for (int x = 1; x < width - 1; x++)
             {
                 int index = PixelUtils.GetPixelIndex(x, y, width);
-
-                if (!selectedArea[index]) continue;
 
                 int upperIndex = PixelUtils.GetPixelIndex(x, y - 2, width); // 上
                 int lowerIndex = PixelUtils.GetPixelIndex(x, y + 2, width); // 下
@@ -159,6 +166,12 @@ internal class BitmapUtils
                     continue;
                 }
 
+                if (!selectedArea[index])
+                {
+                    if ((x + y) % stripeInterval == 0) result[index] = true;
+                    continue;
+                }
+
                 bool isInner =
                     selectedArea[upperIndex] &&
                     selectedArea[lowerIndex] &&
@@ -166,6 +179,8 @@ internal class BitmapUtils
                     selectedArea[rightIndex];
 
                 if (isInner) continue;
+
+                // 外周や端のピクセルはそのまま
                 result[index] = true;
             }
         }
@@ -227,7 +242,7 @@ internal class BitmapUtils
     {
         try
         {
-            ResetImage(pictureBox, false);
+            ResetImage(pictureBox, invalidate: false);
             pictureBox.Image = disposeImage ? new Bitmap(bitmapImage) : bitmapImage;
             pictureBox.Invalidate();
             if (disposeImage) bitmapImage.Dispose();
@@ -327,5 +342,51 @@ internal class BitmapUtils
         }
 
         return null;
+    }
+
+    /// <summary>
+    /// 指定されたPixelFormatのビット数を取得する
+    /// </summary>
+    /// <param name="format"></param>
+    /// <returns></returns>
+    private static int GetBitsPerPixel(PixelFormat format)
+    {
+        return format switch
+        {
+            PixelFormat.Format1bppIndexed => 1,
+            PixelFormat.Format4bppIndexed => 4,
+            PixelFormat.Format8bppIndexed => 8,
+            PixelFormat.Format16bppGrayScale => 16,
+            PixelFormat.Format16bppRgb555 => 16,
+            PixelFormat.Format16bppRgb565 => 16,
+            PixelFormat.Format16bppArgb1555 => 16,
+            PixelFormat.Format24bppRgb => 24,
+            PixelFormat.Format32bppRgb => 32,
+            PixelFormat.Format32bppArgb => 32,
+            PixelFormat.Format32bppPArgb => 32,
+            PixelFormat.Format48bppRgb => 48,
+            PixelFormat.Format64bppArgb => 64,
+            PixelFormat.Format64bppPArgb => 64,
+            _ => 0,// Unsupported format
+        };
+    }
+
+    /// <summary>
+    /// Bitmapのメモリ使用量を推定する
+    /// </summary>
+    /// <param name="bitmap"></param>
+    /// <returns></returns>
+    internal static double CalculateEstimatedMemoryUsage(Bitmap bitmap)
+    {
+        int bytesPerPixel = GetBitsPerPixel(bitmap.PixelFormat);
+        int width = bitmap.Width;
+        int height = bitmap.Height;
+
+        long baseBytes = (long)width * height * bytesPerPixel / 8;
+        long totalBytes = baseBytes;
+
+        double totalMB = totalBytes / 1024.0 / 1024.0;
+
+        return totalMB;
     }
 }

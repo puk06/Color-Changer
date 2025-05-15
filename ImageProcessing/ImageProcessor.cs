@@ -7,7 +7,6 @@ namespace ColorChanger.ImageProcessing;
 internal class ImageProcessor
 {
     private readonly int _width;
-    private readonly int _height;
     private readonly ColorDifference _colorOffset;
     private BalanceModeConfiguration _balanceModeConfiguration = new();
     private bool _isBalanceMode = false;
@@ -15,7 +14,6 @@ internal class ImageProcessor
     internal ImageProcessor(Size bitmapSize, ColorDifference colorDifference)
     {
         _width = bitmapSize.Width;
-        _height = bitmapSize.Height;
         _colorOffset = colorDifference;
     }
 
@@ -43,32 +41,36 @@ internal class ImageProcessor
         Span<ColorPixel> source,
         Span<ColorPixel> target)
     {
-        for (int y = 0; y < _height; y++)
+        for (int i = 0; i < source.Length; i++)
         {
-            for (int x = 0; x < _width; x++)
-            {
-                int index = PixelUtils.GetPixelIndex(x, y, _width);
-                target[index] = ProcessPixel(source[index]);
-            }
+            target[i] = ProcessPixel(source[i]);
         }
     }
 
-    internal void ProcessAllPreviewPixels(
+    internal void ProcessAllPreviewPixelsWithoutAdjustment(
         Span<ColorPixel> source,
         Span<ColorPixel> target,
         (float ratioX, float ratioY) ratios,
         Size previewSize)
     {
-        for (int y = 0; y < previewSize.Height; y++)
-        {
-            for (int x = 0; x < previewSize.Width; x++)
-            {
-                int sourceX = (int)(x * ratios.ratioX);
-                int sourceY = (int)(y * ratios.ratioY);
-                int sourceIndex = PixelUtils.GetPixelIndex(sourceX, sourceY, _width);
-                int targetIndex = PixelUtils.GetPixelIndex(x, y, previewSize.Width);
+        int targetWidth = previewSize.Width;
+        int targetHeight = previewSize.Height;
 
-                target[targetIndex] = ProcessPixel(source[sourceIndex]);
+        float ratioX = ratios.ratioX;
+        float ratioY = ratios.ratioY;
+
+        for (int y = 0; y < targetHeight; y++)
+        {
+            int sourceY = (int)(y * ratioY);
+            int targetRowOffset = y * targetWidth;
+
+            for (int x = 0; x < targetWidth; x++)
+            {
+                int sourceX = (int)(x * ratioX);
+                int sourceIndex = PixelUtils.GetPixelIndex(sourceX, sourceY, _width);
+                int targetIndex = targetRowOffset + x;
+
+                target[targetIndex] = source[sourceIndex];
             }
         }
     }

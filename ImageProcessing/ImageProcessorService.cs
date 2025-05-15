@@ -24,14 +24,11 @@ internal class ImageProcessorService
         ColorDifference colorDifference,
         bool balanceMode, BalanceModeConfiguration configuration,
         BitArray selectedPoints,
-        Size previewBoxSize)
+        Size previewBoxSize,
+        bool rawMode = false)
     {
         int boxHeight = previewBoxSize.Height;
         int boxWidth = previewBoxSize.Width;
-
-        float ratioX = (float)sourceBitmap.Width / boxWidth;
-        float ratioY = (float)sourceBitmap.Height / boxHeight;
-        var ratios = (ratioX, ratioY);
 
         var previewBitmap = new Bitmap(boxWidth, boxHeight, PixelFormat.Format32bppArgb);
 
@@ -56,14 +53,30 @@ internal class ImageProcessorService
 
                 ImageProcessor imageProcessor = new ImageProcessor(sourceBitmap.Size, colorDifference);
 
+                if (rawMode)
+                {
+                    float ratioX = (float)sourceBitmap.Width / boxWidth;
+                    float ratioY = (float)sourceBitmap.Height / boxHeight;
+                    var ratios = (ratioX, ratioY);
+
+                    imageProcessor.ProcessAllPreviewPixelsWithoutAdjustment(sourcePixels, previewPixels, ratios, previewBoxSize);
+                    return previewBitmap;
+                }
+
                 if (balanceMode)
                     imageProcessor.SetBalanceSettings(configuration);
 
-                imageProcessor.ProcessAllPreviewPixels(sourcePixels, previewPixels, ratios, previewBoxSize);
+                imageProcessor.ProcessAllPixels(sourcePixels, previewPixels);
 
                 if (selectedPoints.Length != 0)
                 {
-                    ImageProcessor.ChangeSelectedPixelsColor(previewPixels, selectedPoints, PreviewOutlineColor);
+                    BitArray innerAreaMask = BitmapUtils.RemoveInnerSelectedArea(
+                        selectedPoints,
+                        previewBoxSize.Width,
+                        previewBoxSize.Height
+                    );
+
+                    ImageProcessor.ChangeSelectedPixelsColor(previewPixels, innerAreaMask, PreviewOutlineColor);
                 }
             }
         }
