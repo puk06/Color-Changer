@@ -119,42 +119,35 @@ public partial class MainForm : Form
     {
         try
         {
-            if (_bmp == null)
+            if (_bmp == null) return;
+
+            Rectangle rect = BitmapUtils.GetRectangle(_bmp);
+
+            Bitmap bitMap = new Bitmap(_bmp);
+            BitmapData? data = BitmapUtils.LockBitmap(bitMap, rect, ImageLockMode.ReadWrite);
+            if (data == null)
             {
-                FormUtils.ShowError("âÊëúÇ™ì«Ç›çûÇ‹ÇÍÇƒÇ¢Ç‹ÇπÇÒÅB");
+                bitMap.Dispose();
                 return;
             }
 
-            Rectangle rect = BitmapUtils.GetRectangle(_bmp);
-            var bitMap = new Bitmap(_bmp);
-
-            BitmapData? data = BitmapUtils.LockBitmap(bitMap, rect, ImageLockMode.ReadWrite);
-            if (data == null) return;
-
             Bitmap? rawBitmap = BitmapUtils.CreateInverseBitmap(_bmp, inverseMode.Checked);
-            BitmapData? rawBitmapData = null;
+            BitmapData? rawData = BitmapUtils.LockBitmap(rawBitmap, rect, ImageLockMode.ReadOnly);
 
-            Bitmap? transBitmap = null;
-            BitmapData? transData = null;
+            Bitmap? transBitmap = BitmapUtils.CreateTransparentBitmap(_bmp, transMode.Checked, inverseMode.Checked);
+            BitmapData? transData = BitmapUtils.LockBitmap(transBitmap, rect, ImageLockMode.ReadWrite);
 
             bool skipped = false;
 
             try
             {
-                rawBitmapData = BitmapUtils.LockBitmap(rawBitmap, rect, ImageLockMode.ReadOnly);
-                transBitmap = BitmapUtils.CreateTransparentBitmap(_bmp, transMode.Checked, inverseMode.Checked);
-                transData = BitmapUtils.LockBitmap(transBitmap, rect, ImageLockMode.ReadWrite);
-
                 unsafe
                 {
                     Span<ColorPixel> sourcePixels = BitmapUtils.GetPixelSpan(data);
-                    Span<ColorPixel> rawPixels = BitmapUtils.GetPixelSpan(rawBitmapData);
+                    Span<ColorPixel> rawPixels = BitmapUtils.GetPixelSpan(rawData);
                     Span<ColorPixel> transPixels = BitmapUtils.GetPixelSpan(transData);
 
-                    var imageProcessor = new ImageProcessor(
-                        bitMap.Size,
-                        ColorDifference
-                    );
+                    var imageProcessor = new ImageProcessor(bitMap.Size, ColorDifference);
 
                     if (balanceMode.Checked)
                         imageProcessor.SetBalanceSettings(_balanceModeSettingsForm.Configuration);
@@ -164,8 +157,8 @@ public partial class MainForm : Form
             }
             finally
             {
-                if (data != null) bitMap.UnlockBits(data);
-                if (rawBitmapData != null && rawBitmap != null) rawBitmap.UnlockBits(rawBitmapData);
+                bitMap.UnlockBits(data);
+                if (rawData != null && rawBitmap != null) rawBitmap.UnlockBits(rawData);
                 if (transData != null && transBitmap != null) transBitmap.UnlockBits(transData);
             }
 
