@@ -93,6 +93,7 @@ internal class BitmapUtils
     /// <param name="selectedArea"></param>
     /// <param name="sourceImage"></paramImageProcessing
     /// <param name="previewBox"></param>
+    /// <param name="inverseMode"></param>
     /// <returns></returns>
     internal static BitArray ConvertSelectedAreaToPreviewBox(
         BitArray selectedArea,
@@ -140,6 +141,8 @@ internal class BitmapUtils
     /// 選択範囲の内側の点を削除する
     /// </summary>
     /// <param name="selectedArea"></param>
+    /// <param name="width"></param>
+    /// <param name="height"></param>
     /// <returns></returns>
     internal static BitArray RemoveInnerSelectedArea(BitArray selectedArea, int width, int height)
     {
@@ -238,6 +241,7 @@ internal class BitmapUtils
     /// </summary>
     /// <param name="pictureBox"></param>
     /// <param name="bitmapImage"></param>
+    /// <param name="disposeImage"></param>
     internal static void SetImage(PictureBox pictureBox, Bitmap bitmapImage, bool disposeImage = true)
     {
         try
@@ -268,6 +272,10 @@ internal class BitmapUtils
     /// <summary>
     /// クリックした座標を元の画像の座標に変換する
     /// </summary>
+    /// <param name="e"></param>
+    /// <param name="pictureBox"></param>
+    /// <param name="image"></param>
+    /// <returns></returns>
     internal static Point ConvertToOriginalCoordinates(MouseEventArgs e, PictureBox pictureBox, Bitmap image)
     {
         int x = e.X;
@@ -295,6 +303,7 @@ internal class BitmapUtils
     /// </summary>
     /// <param name="bmp"></param>
     /// <param name="rect"></param>
+    /// <param name="imageLockMode"></param>
     /// <returns></returns>
     internal static BitmapData? LockBitmap(Bitmap? bmp, Rectangle rect, ImageLockMode imageLockMode)
         => bmp?.LockBits(rect, imageLockMode, PixelFormat.Format32bppArgb);
@@ -328,12 +337,12 @@ internal class BitmapUtils
     /// </summary>
     /// <param name="bitmap"></param>
     /// <param name="transMode"></param>
-    /// <param name="InverseMode"></param>
+    /// <param name="inverseMode"></param>
     /// <returns></returns>
-    internal static Bitmap? CreateTransparentBitmap(Bitmap bitmap, bool transMode, bool InverseMode)
+    internal static Bitmap? CreateTransparentBitmap(Bitmap bitmap, bool transMode, bool inverseMode)
     {
         if (bitmap == null) return null;
-        if (transMode && !InverseMode)
+        if (transMode && !inverseMode)
         {
             var bmp = new Bitmap(bitmap.Width, bitmap.Height, PixelFormat.Format32bppArgb);
             using var g = Graphics.FromImage(bmp);

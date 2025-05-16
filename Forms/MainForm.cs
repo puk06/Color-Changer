@@ -114,8 +114,6 @@ public partial class MainForm : Form
     /// <summary>
     /// 色を変更する
     /// </summary>
-    /// <param name="previousColor"></param>
-    /// <param name="newColor"></param>
     /// <param name="filePath"></param>
     private void ApplyColorChange(string filePath)
     {
@@ -128,45 +126,55 @@ public partial class MainForm : Form
             }
 
             Rectangle rect = BitmapUtils.GetRectangle(_bmp);
-
             var bitMap = new Bitmap(_bmp);
+
             BitmapData? data = BitmapUtils.LockBitmap(bitMap, rect, ImageLockMode.ReadWrite);
             if (data == null) return;
 
             Bitmap? rawBitmap = BitmapUtils.CreateInverseBitmap(_bmp, inverseMode.Checked);
-            BitmapData? rawBitmapData = BitmapUtils.LockBitmap(rawBitmap, rect, ImageLockMode.ReadOnly);
+            BitmapData? rawBitmapData = null;
 
-            Bitmap? transBitmap = BitmapUtils.CreateTransparentBitmap(_bmp, transMode.Checked, inverseMode.Checked);
-            BitmapData? transData = BitmapUtils.LockBitmap(transBitmap, rect, ImageLockMode.ReadWrite);
+            Bitmap? transBitmap = null;
+            BitmapData? transData = null;
 
             bool skipped = false;
 
-            unsafe
+            try
             {
-                Span<ColorPixel> sourcePixels = BitmapUtils.GetPixelSpan(data);
-                Span<ColorPixel> rawPixels = BitmapUtils.GetPixelSpan(rawBitmapData);
-                Span<ColorPixel> transPixels = BitmapUtils.GetPixelSpan(transData);
+                rawBitmapData = BitmapUtils.LockBitmap(rawBitmap, rect, ImageLockMode.ReadOnly);
+                transBitmap = BitmapUtils.CreateTransparentBitmap(_bmp, transMode.Checked, inverseMode.Checked);
+                transData = BitmapUtils.LockBitmap(transBitmap, rect, ImageLockMode.ReadWrite);
 
-                var imageProcessor = new ImageProcessor(
-                    bitMap.Size,
-                    ColorDifference
-                );
+                unsafe
+                {
+                    Span<ColorPixel> sourcePixels = BitmapUtils.GetPixelSpan(data);
+                    Span<ColorPixel> rawPixels = BitmapUtils.GetPixelSpan(rawBitmapData);
+                    Span<ColorPixel> transPixels = BitmapUtils.GetPixelSpan(transData);
 
-                if (balanceMode.Checked)
-                    imageProcessor.SetBalanceSettings(_balanceModeSettingsForm.Configuration);
+                    var imageProcessor = new ImageProcessor(
+                        bitMap.Size,
+                        ColorDifference
+                    );
 
-                skipped = ProcessImage(sourcePixels, rawPixels, transPixels, imageProcessor);
+                    if (balanceMode.Checked)
+                        imageProcessor.SetBalanceSettings(_balanceModeSettingsForm.Configuration);
+
+                    skipped = ProcessImage(sourcePixels, rawPixels, transPixels, imageProcessor);
+                }
+            }
+            finally
+            {
+                if (data != null) bitMap.UnlockBits(data);
+                if (rawBitmapData != null && rawBitmap != null) rawBitmap.UnlockBits(rawBitmapData);
+                if (transData != null && transBitmap != null) transBitmap.UnlockBits(transData);
             }
 
-            bitMap.UnlockBits(data);
-            if (rawBitmapData != null) rawBitmap?.UnlockBits(rawBitmapData);
             rawBitmap?.Dispose();
 
             if (!skipped && transMode.Checked && !inverseMode.Checked)
             {
-                if (transBitmap != null && transData != null)
+                if (transBitmap != null)
                 {
-                    transBitmap.UnlockBits(transData);
                     transBitmap.Save(filePath);
                     transBitmap.Dispose();
                 }
@@ -261,6 +269,7 @@ public partial class MainForm : Form
     /// プレビュー用のビットマップを生成する
     /// </summary>
     /// <param name="sourceBitmap"></param>
+    /// <param name="rawMode"></param>
     /// <returns></returns>
     private Bitmap GenerateColoredPreview(Bitmap sourceBitmap, bool rawMode = false)
     {

@@ -252,14 +252,14 @@ internal class ColorUtils
     /// 重みから色の変化率を計算する
     /// </summary>
     /// <param name="hasIntersection"></param>
-    /// <param name="IntersectionDistance"></param>
+    /// <param name="intersectionDistance"></param>
     /// <param name="distance"></param>
     /// <param name="graphWeight"></param>
     /// <returns></returns>
-    internal static double CalculateColorChangeRate(bool hasIntersection, double IntersectionDistance, double distance, double graphWeight, double minValue)
+    internal static double CalculateColorChangeRate(bool hasIntersection, double intersectionDistance, double distance, double graphWeight, double minValue)
     {
-        if (!hasIntersection || IntersectionDistance == 0) return 1;
-        double changeRate = Math.Pow(1 - (distance / IntersectionDistance), graphWeight);
+        if (!hasIntersection || intersectionDistance == 0) return 1;
+        double changeRate = Math.Pow(1 - (distance / intersectionDistance), graphWeight);
         return Math.Max(minValue, changeRate);
     }
 

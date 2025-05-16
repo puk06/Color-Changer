@@ -18,6 +18,7 @@ internal class ImageProcessorService
     /// <param name="configuration"></param>
     /// <param name="selectedPoints"></param>
     /// <param name="previewBoxSize"></param>
+    /// <param name="rawMode"></param>
     /// <returns></returns>
     internal static Bitmap GeneratePreview(
         Bitmap sourceBitmap,

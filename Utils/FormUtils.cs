@@ -58,8 +58,7 @@ internal class FormUtils
     /// ラベルの位置を指定された場所から右寄せにする
     /// </summary>
     /// <param name="label"></param>
-    /// <param name="x"></param>
-    /// <param name="y"></param>
+    /// <param name="point"></param>
     internal static void AlignTextRight(Label label, Point point)
     {
         int x = point.X;

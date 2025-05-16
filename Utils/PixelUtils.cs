@@ -30,8 +30,8 @@ internal class PixelUtils
     /// 指定されたピクセルインデックスが有効かどうかを確認する
     /// </summary>
     /// <param name="bitArray"></param>
-    /// <param name="Index"></param>
+    /// <param name="indexValue"></param>
     /// <returns></returns>
-    internal static bool IsValid(BitArray bitArray, int Index)
-        => Index >= 0 && Index < bitArray.Length;
+    internal static bool IsValid(BitArray bitArray, int indexValue)
+        => indexValue >= 0 && indexValue < bitArray.Length;
 }
