@@ -40,17 +40,17 @@ internal partial class ColorPickerForm : Form
     /// <param name="disableMove"></param>
     private void HandleColorSelection(MouseEventArgs e, bool disableMove)
     {
-        if (ColorPalleteBox.Image is not Bitmap bmp) return;
+        if (colorPaletteBox.Image is not Bitmap bmp) return;
         if (e.Button != MouseButtons.Left) return;
 
-        var originalCoords = BitmapUtils.GetOriginalCoordinates(e.Location, bmp.Size, ColorPalleteBox.Size);
+        var originalCoords = BitmapUtils.GetOriginalCoordinates(e.Location, bmp.Size, colorPaletteBox.Size);
         if (!BitmapUtils.IsValidCoordinate(originalCoords, bmp.Size)) return;
 
         var color = bmp.GetPixel(originalCoords.X, originalCoords.Y);
         UpdateSelectedColor(color, disableMove);
 
         _clickedPoint = e.Location;
-        ColorPalleteBox.Invalidate();
+        colorPaletteBox.Invalidate();
     }
 
     /// <summary>
@@ -65,24 +65,24 @@ internal partial class ColorPickerForm : Form
         previewColorBox.BackColor = color;
 
         // Update UI
-        RedBar.Value = color.R;
-        GreenBar.Value = color.G;
-        BlueBar.Value = color.B;
+        redBar.Value = color.R;
+        greenBar.Value = color.G;
+        blueBar.Value = color.B;
 
-        RedTextBox.Text = color.R.ToString();
-        GreenTextBox.Text = color.G.ToString();
-        BlueTextBox.Text = color.B.ToString();
+        redTextBox.Text = color.R.ToString();
+        greenTextBox.Text = color.G.ToString();
+        blueTextBox.Text = color.B.ToString();
 
         colorCodeTextBox.Text = ColorUtils.GetColorCodeFromColor(color);
 
-        if (ColorPalleteBox.Image is not Bitmap || disableMove) return;
+        if (colorPaletteBox.Image is not Bitmap || disableMove) return;
 
-        Point closestPoint = ColorUtils.GetClosestColorPoint(color, (Bitmap)ColorPalleteBox.Image);
+        Point closestPoint = ColorUtils.GetClosestColorPoint(color, (Bitmap)colorPaletteBox.Image);
         _clickedPoint = new Point(
-            (int)(closestPoint.X * (float)ColorPalleteBox.Width / ((Bitmap)ColorPalleteBox.Image).Width),
-            (int)(closestPoint.Y * (float)ColorPalleteBox.Height / ((Bitmap)ColorPalleteBox.Image).Height)
+            (int)(closestPoint.X * (float)colorPaletteBox.Width / ((Bitmap)colorPaletteBox.Image).Width),
+            (int)(closestPoint.Y * (float)colorPaletteBox.Height / ((Bitmap)colorPaletteBox.Image).Height)
         );
-        ColorPalleteBox.Invalidate();
+        colorPaletteBox.Invalidate();
     }
 
     /// <summary>
@@ -90,9 +90,9 @@ internal partial class ColorPickerForm : Form
     /// </summary>
     private void SetColorFromTextFields()
     {
-        int r = MathUtils.ParseAndClamp(RedTextBox.Text);
-        int g = MathUtils.ParseAndClamp(GreenTextBox.Text);
-        int b = MathUtils.ParseAndClamp(BlueTextBox.Text);
+        int r = MathUtils.ParseAndClamp(redTextBox.Text);
+        int g = MathUtils.ParseAndClamp(greenTextBox.Text);
+        int b = MathUtils.ParseAndClamp(blueTextBox.Text);
 
         UpdateSelectedColor(Color.FromArgb(r, g, b));
     }
@@ -101,7 +101,7 @@ internal partial class ColorPickerForm : Form
     #region イベントハンドラー
     private void ColorPaletteBox_Paint(object sender, PaintEventArgs e)
     {
-        if (ColorPalleteBox.Image is not Bitmap) return;
+        if (colorPaletteBox.Image is not Bitmap) return;
         if (_clickedPoint == Point.Empty) return;
 
         Color inverseColor = Color.FromArgb(255 - SelectedColor.R, 255 - SelectedColor.G, 255 - SelectedColor.B);
@@ -110,14 +110,14 @@ internal partial class ColorPickerForm : Form
         e.Graphics.DrawLine(pen, _clickedPoint.X, _clickedPoint.Y - 5, _clickedPoint.X, _clickedPoint.Y + 5);
     }
 
-    private void ColorPalleteBox_MouseEvent(object _, MouseEventArgs e, bool disableMove)
+    private void ColorPaletteBox_MouseEvent(object _, MouseEventArgs e, bool disableMove)
         => HandleColorSelection(e, disableMove);
 
     private void HandleSliderChanged(object sender, EventArgs e) =>
-        UpdateSelectedColor(Color.FromArgb(RedBar.Value, GreenBar.Value, BlueBar.Value), true);
+        UpdateSelectedColor(Color.FromArgb(redBar.Value, greenBar.Value, blueBar.Value), true);
 
     private void HandleSliderEnd(object sender, EventArgs e) =>
-        UpdateSelectedColor(Color.FromArgb(RedBar.Value, GreenBar.Value, BlueBar.Value));
+        UpdateSelectedColor(Color.FromArgb(redBar.Value, greenBar.Value, blueBar.Value));
 
     private void HandleTextKeyDown(object sender, KeyEventArgs e)
     {

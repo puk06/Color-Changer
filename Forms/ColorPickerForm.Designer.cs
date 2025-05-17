@@ -28,75 +28,75 @@
         /// </summary>
         private void InitializeComponent()
         {
-            RedBar = new TrackBar();
-            ColorPalleteBox = new PictureBox();
-            BlueBar = new TrackBar();
-            GreenBar = new TrackBar();
+            redBar = new TrackBar();
+            colorPaletteBox = new PictureBox();
+            blueBar = new TrackBar();
+            greenBar = new TrackBar();
             previewColorBox = new PictureBox();
             label1 = new Label();
             label2 = new Label();
             label3 = new Label();
             selectButton = new Button();
-            RedTextBox = new TextBox();
-            GreenTextBox = new TextBox();
-            BlueTextBox = new TextBox();
+            redTextBox = new TextBox();
+            greenTextBox = new TextBox();
+            blueTextBox = new TextBox();
             label4 = new Label();
             label5 = new Label();
             colorCodeTextBox = new TextBox();
             label6 = new Label();
-            ((System.ComponentModel.ISupportInitialize)RedBar).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)ColorPalleteBox).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)BlueBar).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)GreenBar).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)redBar).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)colorPaletteBox).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)blueBar).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)greenBar).BeginInit();
             ((System.ComponentModel.ISupportInitialize)previewColorBox).BeginInit();
             SuspendLayout();
             // 
             // RedBar
             // 
-            RedBar.Location = new Point(55, 307);
-            RedBar.Maximum = 255;
-            RedBar.Name = "RedBar";
-            RedBar.Size = new Size(222, 45);
-            RedBar.TabIndex = 0;
-            RedBar.TickFrequency = 85;
-            RedBar.Scroll += HandleSliderChanged;
-            RedBar.MouseUp += HandleSliderEnd;
+            redBar.Location = new Point(55, 307);
+            redBar.Maximum = 255;
+            redBar.Name = "RedBar";
+            redBar.Size = new Size(222, 45);
+            redBar.TabIndex = 0;
+            redBar.TickFrequency = 85;
+            redBar.Scroll += HandleSliderChanged;
+            redBar.MouseUp += HandleSliderEnd;
             // 
-            // ColorPalleteBox
+            // ColorPaletteBox
             // 
-            ColorPalleteBox.Image = Properties.Resources.RGB;
-            ColorPalleteBox.Location = new Point(26, 25);
-            ColorPalleteBox.Name = "ColorPalleteBox";
-            ColorPalleteBox.Size = new Size(315, 202);
-            ColorPalleteBox.SizeMode = PictureBoxSizeMode.StretchImage;
-            ColorPalleteBox.TabIndex = 1;
-            ColorPalleteBox.TabStop = false;
-            ColorPalleteBox.Paint += ColorPaletteBox_Paint;
-            ColorPalleteBox.MouseDown += (s, e) => ColorPalleteBox_MouseEvent(s, e, true);
-            ColorPalleteBox.MouseMove += (s, e) => ColorPalleteBox_MouseEvent(s, e, true);
-            ColorPalleteBox.MouseUp += (s, e) => ColorPalleteBox_MouseEvent(s, e, false);
+            colorPaletteBox.Image = Properties.Resources.RGB;
+            colorPaletteBox.Location = new Point(26, 25);
+            colorPaletteBox.Name = "ColorPaletteBox";
+            colorPaletteBox.Size = new Size(315, 202);
+            colorPaletteBox.SizeMode = PictureBoxSizeMode.StretchImage;
+            colorPaletteBox.TabIndex = 1;
+            colorPaletteBox.TabStop = false;
+            colorPaletteBox.Paint += ColorPaletteBox_Paint;
+            colorPaletteBox.MouseDown += (s, e) => ColorPaletteBox_MouseEvent(s, e, true);
+            colorPaletteBox.MouseMove += (s, e) => ColorPaletteBox_MouseEvent(s, e, true);
+            colorPaletteBox.MouseUp += (s, e) => ColorPaletteBox_MouseEvent(s, e, false);
             // 
             // BlueBar
             // 
-            BlueBar.Location = new Point(56, 409);
-            BlueBar.Maximum = 255;
-            BlueBar.Name = "BlueBar";
-            BlueBar.Size = new Size(221, 45);
-            BlueBar.TabIndex = 2;
-            BlueBar.TickFrequency = 85;
-            BlueBar.Scroll += HandleSliderChanged;
-            BlueBar.MouseUp += HandleSliderEnd;
+            blueBar.Location = new Point(56, 409);
+            blueBar.Maximum = 255;
+            blueBar.Name = "BlueBar";
+            blueBar.Size = new Size(221, 45);
+            blueBar.TabIndex = 2;
+            blueBar.TickFrequency = 85;
+            blueBar.Scroll += HandleSliderChanged;
+            blueBar.MouseUp += HandleSliderEnd;
             // 
             // GreenBar
             // 
-            GreenBar.Location = new Point(56, 358);
-            GreenBar.Maximum = 255;
-            GreenBar.Name = "GreenBar";
-            GreenBar.Size = new Size(221, 45);
-            GreenBar.TabIndex = 3;
-            GreenBar.TickFrequency = 85;
-            GreenBar.Scroll += HandleSliderChanged;
-            GreenBar.MouseUp += HandleSliderEnd;
+            greenBar.Location = new Point(56, 358);
+            greenBar.Maximum = 255;
+            greenBar.Name = "GreenBar";
+            greenBar.Size = new Size(221, 45);
+            greenBar.TabIndex = 3;
+            greenBar.TickFrequency = 85;
+            greenBar.Scroll += HandleSliderChanged;
+            greenBar.MouseUp += HandleSliderEnd;
             // 
             // previewColorBox
             // 
@@ -148,39 +148,39 @@
             // 
             // RedTextBox
             // 
-            RedTextBox.Font = new Font("Yu Gothic UI", 11F);
-            RedTextBox.Location = new Point(283, 306);
-            RedTextBox.Name = "RedTextBox";
-            RedTextBox.Size = new Size(59, 27);
-            RedTextBox.TabIndex = 10;
-            RedTextBox.Text = "0";
-            RedTextBox.TextAlign = HorizontalAlignment.Center;
-            RedTextBox.KeyDown += HandleTextKeyDown;
-            RedTextBox.Leave += OnColorTextChanged;
+            redTextBox.Font = new Font("Yu Gothic UI", 11F);
+            redTextBox.Location = new Point(283, 306);
+            redTextBox.Name = "RedTextBox";
+            redTextBox.Size = new Size(59, 27);
+            redTextBox.TabIndex = 10;
+            redTextBox.Text = "0";
+            redTextBox.TextAlign = HorizontalAlignment.Center;
+            redTextBox.KeyDown += HandleTextKeyDown;
+            redTextBox.Leave += OnColorTextChanged;
             // 
             // GreenTextBox
             // 
-            GreenTextBox.Font = new Font("Yu Gothic UI", 11F);
-            GreenTextBox.Location = new Point(283, 357);
-            GreenTextBox.Name = "GreenTextBox";
-            GreenTextBox.Size = new Size(59, 27);
-            GreenTextBox.TabIndex = 11;
-            GreenTextBox.Text = "0";
-            GreenTextBox.TextAlign = HorizontalAlignment.Center;
-            GreenTextBox.KeyDown += HandleTextKeyDown;
-            GreenTextBox.Leave += OnColorTextChanged;
+            greenTextBox.Font = new Font("Yu Gothic UI", 11F);
+            greenTextBox.Location = new Point(283, 357);
+            greenTextBox.Name = "GreenTextBox";
+            greenTextBox.Size = new Size(59, 27);
+            greenTextBox.TabIndex = 11;
+            greenTextBox.Text = "0";
+            greenTextBox.TextAlign = HorizontalAlignment.Center;
+            greenTextBox.KeyDown += HandleTextKeyDown;
+            greenTextBox.Leave += OnColorTextChanged;
             // 
             // BlueTextBox
             // 
-            BlueTextBox.Font = new Font("Yu Gothic UI", 11F);
-            BlueTextBox.Location = new Point(283, 408);
-            BlueTextBox.Name = "BlueTextBox";
-            BlueTextBox.Size = new Size(59, 27);
-            BlueTextBox.TabIndex = 12;
-            BlueTextBox.Text = "0";
-            BlueTextBox.TextAlign = HorizontalAlignment.Center;
-            BlueTextBox.KeyDown += HandleTextKeyDown;
-            BlueTextBox.Leave += OnColorTextChanged;
+            blueTextBox.Font = new Font("Yu Gothic UI", 11F);
+            blueTextBox.Location = new Point(283, 408);
+            blueTextBox.Name = "BlueTextBox";
+            blueTextBox.Size = new Size(59, 27);
+            blueTextBox.TabIndex = 12;
+            blueTextBox.Text = "0";
+            blueTextBox.TextAlign = HorizontalAlignment.Center;
+            blueTextBox.KeyDown += HandleTextKeyDown;
+            blueTextBox.Leave += OnColorTextChanged;
             // 
             // label4
             // 
@@ -231,18 +231,18 @@
             Controls.Add(colorCodeTextBox);
             Controls.Add(label5);
             Controls.Add(label4);
-            Controls.Add(BlueTextBox);
-            Controls.Add(GreenTextBox);
-            Controls.Add(RedTextBox);
+            Controls.Add(blueTextBox);
+            Controls.Add(greenTextBox);
+            Controls.Add(redTextBox);
             Controls.Add(selectButton);
             Controls.Add(label3);
             Controls.Add(label2);
             Controls.Add(label1);
             Controls.Add(previewColorBox);
-            Controls.Add(GreenBar);
-            Controls.Add(BlueBar);
-            Controls.Add(ColorPalleteBox);
-            Controls.Add(RedBar);
+            Controls.Add(greenBar);
+            Controls.Add(blueBar);
+            Controls.Add(colorPaletteBox);
+            Controls.Add(redBar);
             FormBorderStyle = FormBorderStyle.FixedSingle;
             Icon = new Icon(new MemoryStream(Properties.Resources.AppIcon));
             MaximizeBox = false;
@@ -251,10 +251,10 @@
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Color Picker by Color Changer";
             FormClosing += ColorPicker_FormClosing;
-            ((System.ComponentModel.ISupportInitialize)RedBar).EndInit();
-            ((System.ComponentModel.ISupportInitialize)ColorPalleteBox).EndInit();
-            ((System.ComponentModel.ISupportInitialize)BlueBar).EndInit();
-            ((System.ComponentModel.ISupportInitialize)GreenBar).EndInit();
+            ((System.ComponentModel.ISupportInitialize)redBar).EndInit();
+            ((System.ComponentModel.ISupportInitialize)colorPaletteBox).EndInit();
+            ((System.ComponentModel.ISupportInitialize)blueBar).EndInit();
+            ((System.ComponentModel.ISupportInitialize)greenBar).EndInit();
             ((System.ComponentModel.ISupportInitialize)previewColorBox).EndInit();
             ResumeLayout(false);
             PerformLayout();
@@ -262,18 +262,18 @@
 
         #endregion
 
-        private TrackBar RedBar;
-        private PictureBox ColorPalleteBox;
-        private TrackBar BlueBar;
-        private TrackBar GreenBar;
+        private TrackBar redBar;
+        private PictureBox colorPaletteBox;
+        private TrackBar blueBar;
+        private TrackBar greenBar;
         private PictureBox previewColorBox;
         private Label label1;
         private Label label2;
         private Label label3;
         private Button selectButton;
-        private TextBox RedTextBox;
-        private TextBox GreenTextBox;
-        private TextBox BlueTextBox;
+        private TextBox redTextBox;
+        private TextBox greenTextBox;
+        private TextBox blueTextBox;
         private Label label4;
         private Label label5;
         private TextBox colorCodeTextBox;
