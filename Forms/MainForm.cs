@@ -11,11 +11,11 @@ public partial class MainForm : Form
 {
     private const string CURRENT_VERSION = "v1.0.12";
     private static readonly string FORM_TITLE = $"Color Changer For Texture {CURRENT_VERSION}";
-
     private static readonly string ITEM_URL = "https://pukorufu.booth.pm/items/6519471";
-    private static readonly Point VERSION_LABEL_POSITION = new(275, 54);
 
-    private readonly ProcessStartInfo _processStartInfo = new()
+    private static readonly Point VERSION_LABEL_POSITION = new Point(275, 54);
+
+    private readonly ProcessStartInfo _processStartInfo = new ProcessStartInfo()
     {
         FileName = ITEM_URL,
         UseShellExecute = true
