@@ -12,7 +12,6 @@ public partial class MainForm : Form
     private const string CURRENT_VERSION = "v1.0.12";
     private static readonly string FORM_TITLE = $"Color Changer For Texture {CURRENT_VERSION}";
     private static readonly string ITEM_URL = "https://pukorufu.booth.pm/items/6519471";
-
     private static readonly Point VERSION_LABEL_POSITION = new Point(275, 54);
 
     private readonly ProcessStartInfo _processStartInfo = new ProcessStartInfo()
@@ -36,6 +35,7 @@ public partial class MainForm : Form
     private readonly BalanceModeSettingsForm _balanceModeSettingsForm = new BalanceModeSettingsForm();
     private readonly SelectedAreaListForm _selectedAreaListForm = new SelectedAreaListForm();
     private readonly HelpForm _helpForm = new HelpForm();
+    private readonly AdvancedColorSettingsForm _advancedColorSettingsForm = new AdvancedColorSettingsForm();
 
     private readonly ColorDifference _colorDifference = new ColorDifference(Color.Empty, Color.Empty);
     private ColorDifference ColorDifference
@@ -123,7 +123,7 @@ public partial class MainForm : Form
 
             Rectangle rect = BitmapUtils.GetRectangle(_bmp);
 
-            Bitmap bitMap = new Bitmap(_bmp);
+            Bitmap bitMap = BitmapUtils.CopyBitmap(_bmp);
             BitmapData? data = BitmapUtils.LockBitmap(bitMap, rect, ImageLockMode.ReadWrite);
             if (data == null)
             {
@@ -151,6 +151,9 @@ public partial class MainForm : Form
 
                     if (balanceMode.Checked)
                         imageProcessor.SetBalanceSettings(_balanceModeSettingsForm.Configuration);
+
+                    if (_advancedColorSettingsForm.Configuration.Enabled)
+                        imageProcessor.SetColorSettings(_advancedColorSettingsForm.Configuration);
 
                     skipped = ProcessImage(sourcePixels, rawPixels, transPixels, imageProcessor);
                 }
@@ -207,7 +210,8 @@ public partial class MainForm : Form
         Span<ColorPixel> sourcePixels,
         Span<ColorPixel> rawPixels,
         Span<ColorPixel> transPixels,
-        ImageProcessor processor)
+        ImageProcessor processor
+    )
     {
         bool skipped = false;
 
@@ -247,7 +251,7 @@ public partial class MainForm : Form
             }
             else
             {
-                processor.ProcessInverseSelectedPixels(sourcePixels, rawPixels, selectedPoints);
+                ImageProcessor.ProcessInverseSelectedPixels(sourcePixels, rawPixels, selectedPoints);
             }
         }
         else
@@ -272,6 +276,7 @@ public partial class MainForm : Form
                 sourceBitmap,
                 ColorDifference,
                 balanceMode.Checked, _balanceModeSettingsForm.Configuration,
+                _advancedColorSettingsForm.Configuration,
                 _selectedPointsForPreview,
                 coloredPreviewBox.Size,
                 rawMode
@@ -385,13 +390,13 @@ public partial class MainForm : Form
         string previousFormTitle = Text;
         Text = FORM_TITLE + " - 選択処理中...";
 
-        BitArray values = BitmapUtils.GetSelectedArea(
+        BitArray? values = BitmapUtils.GetSelectedArea(
             originalCoordinates,
             _bmp,
             _backgroundColor
         );
 
-        if (values.Length == 0)
+        if (values == null || values.Length == 0)
         {
             FormUtils.ShowError("選択エリアがありません。");
             Text = previousFormTitle;
@@ -431,6 +436,15 @@ public partial class MainForm : Form
 
         _selectedAreaListForm.OnCheckedChanged += (s, e)
             => UpdateSelectedArea();
+
+        _advancedColorSettingsForm.ConfigurationChanged += (s, e) =>
+        {
+            _advancedColorSettingsForm.Configuration.UpdateComponentActivationStatus();
+            advancedColorConfigStatus.Text = _advancedColorSettingsForm.Configuration.Enabled ? "有効" : "無効";
+            
+            if (_previewBitmap == null || _previousColor == Color.Empty || _newColor == Color.Empty) return;
+            BitmapUtils.SetImage(coloredPreviewBox, GenerateColoredPreview(_previewBitmap));
+        };
     }
 
     /// <summary>
@@ -569,6 +583,9 @@ public partial class MainForm : Form
     private void SelectedAreaListButton_Click(object sender, EventArgs e)
         => _selectedAreaListForm.Show();
 
+    private void AdvancedColorSettingsButton_Click(object sender, EventArgs e)
+        => _advancedColorSettingsForm.Show();
+
     private void OpenFile_Click(object sender, EventArgs e)
     {
         OpenFileDialog dialog = new OpenFileDialog()
@@ -595,7 +612,7 @@ public partial class MainForm : Form
             return;
         }
 
-        var result = FormUtils.ShowConfirm("画像を作成しますか？");
+        bool result = FormUtils.ShowConfirm("画像を作成しますか？");
         if (!result) return;
 
         SaveFileDialog dialog = new SaveFileDialog()
@@ -607,7 +624,7 @@ public partial class MainForm : Form
         };
 
         if (dialog.ShowDialog() != DialogResult.OK) return;
-        var newFilePath = dialog.FileName;
+        string newFilePath = dialog.FileName;
 
         if (newFilePath == string.Empty)
         {

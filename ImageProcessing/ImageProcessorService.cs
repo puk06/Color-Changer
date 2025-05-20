@@ -24,9 +24,11 @@ internal class ImageProcessorService
         Bitmap sourceBitmap,
         ColorDifference colorDifference,
         bool balanceMode, BalanceModeConfiguration configuration,
+        AdvancedColorConfiguration advancedColorConfiguration,
         BitArray selectedPoints,
         Size previewBoxSize,
-        bool rawMode = false)
+        bool rawMode = false
+    )
     {
         int boxHeight = previewBoxSize.Height;
         int boxWidth = previewBoxSize.Width;
@@ -66,6 +68,9 @@ internal class ImageProcessorService
 
                 if (balanceMode)
                     imageProcessor.SetBalanceSettings(configuration);
+
+                if (advancedColorConfiguration.Enabled)
+                    imageProcessor.SetColorSettings(advancedColorConfiguration);
 
                 imageProcessor.ProcessAllPixels(sourcePixels, previewPixels);
 

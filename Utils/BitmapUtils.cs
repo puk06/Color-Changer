@@ -5,7 +5,7 @@ namespace ColorChanger.Utils;
 
 internal class BitmapUtils
 {
-    const int COLOR_PIXEL_SIZE = 4; // 32ビットARGB形式のピクセルサイズ
+    private const int COLOR_PIXEL_SIZE = 4; // 32ビットARGB形式のピクセルサイズ
 
     /// <summary>
     /// 選択範囲を取得する
@@ -14,17 +14,17 @@ internal class BitmapUtils
     /// <param name="rawImage"></param>
     /// <param name="backgroundColor"></param>
     /// <returns></returns>
-    internal static unsafe BitArray GetSelectedArea(Point clickedLocation, Bitmap rawImage, Color backgroundColor)
+    internal static unsafe BitArray? GetSelectedArea(Point clickedLocation, Bitmap rawImage, Color backgroundColor)
     {
         int width = rawImage.Width;
         int height = rawImage.Height;
         int totalPixels = width * height;
 
-        BitArray selected = new(totalPixels, false);
+        BitArray selected = new BitArray(totalPixels, false);
 
         var queue = new Queue<PixelPoint>();
 
-        var rect = GetRectangle(rawImage);
+        Rectangle rect = GetRectangle(rawImage);
         BitmapData bmpData = rawImage.LockBits(rect, ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
 
         try
@@ -39,7 +39,7 @@ internal class BitmapUtils
 
             if (startX < 0 || startY < 0 || startX >= width || startY >= height)
             {
-                return BitArrayUtils.GetEmpty();
+                return null;
             }
 
             int startIndex = PixelUtils.GetPixelIndex(startX, startY, width);
@@ -47,7 +47,7 @@ internal class BitmapUtils
 
             if (targetPixel.Equals(backgroundColor))
             {
-                return BitArrayUtils.GetEmpty();
+                return null;
             }
 
             selected[startIndex] = true;
@@ -58,7 +58,7 @@ internal class BitmapUtils
 
             while (queue.Count > 0)
             {
-                var point = queue.Dequeue();
+                PixelPoint point = queue.Dequeue();
                 var (x, y) = point;
 
                 for (int i = 0; i < 4; i++)
@@ -222,7 +222,7 @@ internal class BitmapUtils
     /// <returns></returns>
     internal static Rectangle GetRectangle(Bitmap bitmap)
     {
-        var size = bitmap.Size;
+        Size size = bitmap.Size;
         return new Rectangle(0, 0, size.Width, size.Height);
     }
 
@@ -329,7 +329,7 @@ internal class BitmapUtils
     internal static Bitmap? CreateInverseBitmap(Bitmap? bitmap, bool inverseMode)
     {
         if (bitmap == null) return null;
-        return inverseMode ? new Bitmap(bitmap) : null;
+        return inverseMode ? CopyBitmap(bitmap) : null;
     }
 
     /// <summary>
@@ -344,8 +344,8 @@ internal class BitmapUtils
         if (bitmap == null) return null;
         if (transMode && !inverseMode)
         {
-            var bmp = new Bitmap(bitmap.Width, bitmap.Height, PixelFormat.Format32bppArgb);
-            using var g = Graphics.FromImage(bmp);
+            Bitmap bmp = new Bitmap(bitmap.Width, bitmap.Height, PixelFormat.Format32bppArgb);
+            using Graphics g = Graphics.FromImage(bmp);
             g.Clear(Color.Transparent);
             return bmp;
         }
@@ -388,14 +388,56 @@ internal class BitmapUtils
     internal static double CalculateEstimatedMemoryUsage(Bitmap bitmap)
     {
         int bytesPerPixel = GetBitsPerPixel(bitmap.PixelFormat);
+
         int width = bitmap.Width;
         int height = bitmap.Height;
 
         long baseBytes = (long)width * height * bytesPerPixel / 8;
-        long totalBytes = baseBytes;
 
-        double totalMB = totalBytes / 1024.0 / 1024.0;
+        double totalMB = baseBytes / 1024.0 / 1024.0;
 
         return totalMB;
+    }
+
+    /// <summary>
+    /// Bitmapのコピーを生成する
+    /// </summary>
+    /// <param name="source"></param>
+    /// <returns></returns>
+    internal static unsafe Bitmap CopyBitmap(Bitmap source)
+    {
+        Rectangle rect = GetRectangle(source);
+        Bitmap dest = new Bitmap(source.Width, source.Height, source.PixelFormat);
+
+        BitmapData? srcData = null;
+        BitmapData? dstData = null;
+
+        try
+        {
+            srcData = source.LockBits(rect, ImageLockMode.ReadOnly, source.PixelFormat);
+            dstData = dest.LockBits(rect, ImageLockMode.WriteOnly, dest.PixelFormat);
+
+            int height = source.Height;
+            int stride = srcData.Stride;
+
+            byte* srcPtr = (byte*)srcData.Scan0;
+            byte* dstPtr = (byte*)dstData.Scan0;
+
+            for (int y = 0; y < height; y++)
+            {
+                Buffer.MemoryCopy(
+                    srcPtr + y * stride,
+                    dstPtr + y * stride,
+                    stride, stride
+                );
+            }
+        }
+        finally
+        {
+            if (srcData != null) source.UnlockBits(srcData);
+            if (dstData != null) dest.UnlockBits(dstData);
+        }
+
+        return dest;
     }
 }

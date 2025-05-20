@@ -50,11 +50,15 @@
             openFile = new ToolStripMenuItem();
             balanceModeSettingsButton = new ToolStripMenuItem();
             selectedAreaListButton = new ToolStripMenuItem();
+            AdvancedColorSettingsButton = new ToolStripMenuItem();
             helpUseButton = new ToolStripMenuItem();
             aboutThisSoftware = new ToolStripMenuItem();
             donationButton = new ToolStripMenuItem();
             label5 = new Label();
             panel1 = new Panel();
+            label14 = new Label();
+            advancedColorConfigStatus = new Label();
+            label17 = new Label();
             versionLabel = new Label();
             label11 = new Label();
             estimatedMemoryUsageTotal = new Label();
@@ -179,7 +183,7 @@
             previousRGBLabel.AutoSize = true;
             previousRGBLabel.Font = new Font("Yu Gothic UI", 15F);
             previousRGBLabel.ForeColor = Color.White;
-            previousRGBLabel.Location = new Point(87, 131);
+            previousRGBLabel.Location = new Point(87, 126);
             previousRGBLabel.Name = "previousRGBLabel";
             previousRGBLabel.Size = new Size(0, 28);
             previousRGBLabel.TabIndex = 19;
@@ -189,7 +193,7 @@
             newRGBLabel.AutoSize = true;
             newRGBLabel.Font = new Font("Yu Gothic UI", 15F);
             newRGBLabel.ForeColor = Color.White;
-            newRGBLabel.Location = new Point(87, 159);
+            newRGBLabel.Location = new Point(87, 154);
             newRGBLabel.Name = "newRGBLabel";
             newRGBLabel.Size = new Size(0, 28);
             newRGBLabel.TabIndex = 20;
@@ -199,7 +203,7 @@
             calculatedRGBLabel.AutoSize = true;
             calculatedRGBLabel.Font = new Font("Yu Gothic UI", 15F);
             calculatedRGBLabel.ForeColor = Color.White;
-            calculatedRGBLabel.Location = new Point(87, 187);
+            calculatedRGBLabel.Location = new Point(87, 182);
             calculatedRGBLabel.Name = "calculatedRGBLabel";
             calculatedRGBLabel.Size = new Size(0, 28);
             calculatedRGBLabel.TabIndex = 21;
@@ -251,7 +255,7 @@
             transMode.AutoSize = true;
             transMode.Font = new Font("Yu Gothic UI", 13F);
             transMode.ForeColor = Color.White;
-            transMode.Location = new Point(9, 412);
+            transMode.Location = new Point(9, 425);
             transMode.Name = "transMode";
             transMode.Size = new Size(177, 29);
             transMode.TabIndex = 28;
@@ -264,7 +268,7 @@
             balanceMode.AutoSize = true;
             balanceMode.Font = new Font("Yu Gothic UI", 13F);
             balanceMode.ForeColor = Color.White;
-            balanceMode.Location = new Point(9, 447);
+            balanceMode.Location = new Point(9, 460);
             balanceMode.Name = "balanceMode";
             balanceMode.Size = new Size(123, 29);
             balanceMode.TabIndex = 29;
@@ -287,7 +291,7 @@
             // menuToolBar
             // 
             menuToolBar.Font = new Font("Yu Gothic UI", 19F);
-            menuToolBar.Items.AddRange(new ToolStripItem[] { openFile, balanceModeSettingsButton, selectedAreaListButton, helpUseButton, aboutThisSoftware, donationButton });
+            menuToolBar.Items.AddRange(new ToolStripItem[] { openFile, balanceModeSettingsButton, selectedAreaListButton, AdvancedColorSettingsButton, helpUseButton, aboutThisSoftware, donationButton });
             menuToolBar.Location = new Point(0, 0);
             menuToolBar.Name = "menuToolBar";
             menuToolBar.Size = new Size(1256, 24);
@@ -318,6 +322,14 @@
             selectedAreaListButton.Text = "選択エリアリスト";
             selectedAreaListButton.Click += SelectedAreaListButton_Click;
             // 
+            // AdvancedColorSettingsButton
+            // 
+            AdvancedColorSettingsButton.Font = new Font("Yu Gothic UI", 9F);
+            AdvancedColorSettingsButton.Name = "AdvancedColorSettingsButton";
+            AdvancedColorSettingsButton.Size = new Size(89, 20);
+            AdvancedColorSettingsButton.Text = "色の追加設定";
+            AdvancedColorSettingsButton.Click += AdvancedColorSettingsButton_Click;
+            // 
             // helpUseButton
             // 
             helpUseButton.Font = new Font("Yu Gothic UI", 9F);
@@ -347,7 +359,7 @@
             label5.AutoSize = true;
             label5.Font = new Font("Yu Gothic UI", 16F, FontStyle.Bold);
             label5.ForeColor = Color.White;
-            label5.Location = new Point(3, 379);
+            label5.Location = new Point(3, 392);
             label5.Name = "label5";
             label5.Size = new Size(183, 30);
             label5.TabIndex = 39;
@@ -356,6 +368,9 @@
             // panel1
             // 
             panel1.BackColor = SystemColors.WindowFrame;
+            panel1.Controls.Add(label14);
+            panel1.Controls.Add(advancedColorConfigStatus);
+            panel1.Controls.Add(label17);
             panel1.Controls.Add(versionLabel);
             panel1.Controls.Add(label11);
             panel1.Controls.Add(estimatedMemoryUsageTotal);
@@ -380,6 +395,38 @@
             panel1.Name = "panel1";
             panel1.Size = new Size(287, 641);
             panel1.TabIndex = 40;
+            // 
+            // label14
+            // 
+            label14.AutoSize = true;
+            label14.Font = new Font("Yu Gothic UI", 15F);
+            label14.ForeColor = Color.White;
+            label14.Location = new Point(9, 210);
+            label14.Name = "label14";
+            label14.Size = new Size(137, 28);
+            label14.TabIndex = 59;
+            label14.Text = "色の追加設定 :";
+            // 
+            // advancedColorConfigStatus
+            // 
+            advancedColorConfigStatus.AutoSize = true;
+            advancedColorConfigStatus.Font = new Font("Yu Gothic UI", 15F);
+            advancedColorConfigStatus.ForeColor = Color.White;
+            advancedColorConfigStatus.Location = new Point(138, 210);
+            advancedColorConfigStatus.Name = "advancedColorConfigStatus";
+            advancedColorConfigStatus.Size = new Size(52, 28);
+            advancedColorConfigStatus.TabIndex = 58;
+            advancedColorConfigStatus.Text = "無効";
+            // 
+            // label17
+            // 
+            label17.AutoSize = true;
+            label17.Font = new Font("Yu Gothic UI", 15F);
+            label17.ForeColor = Color.White;
+            label17.Location = new Point(16, 503);
+            label17.Name = "label17";
+            label17.Size = new Size(0, 28);
+            label17.TabIndex = 57;
             // 
             // versionLabel
             // 
@@ -409,7 +456,7 @@
             estimatedMemoryUsageTotal.AutoSize = true;
             estimatedMemoryUsageTotal.Font = new Font("Yu Gothic UI", 15F);
             estimatedMemoryUsageTotal.ForeColor = Color.White;
-            estimatedMemoryUsageTotal.Location = new Point(68, 325);
+            estimatedMemoryUsageTotal.Location = new Point(65, 344);
             estimatedMemoryUsageTotal.Name = "estimatedMemoryUsageTotal";
             estimatedMemoryUsageTotal.Size = new Size(0, 28);
             estimatedMemoryUsageTotal.TabIndex = 50;
@@ -419,7 +466,7 @@
             label15.AutoSize = true;
             label15.Font = new Font("Yu Gothic UI", 15F);
             label15.ForeColor = Color.White;
-            label15.Location = new Point(9, 325);
+            label15.Location = new Point(9, 344);
             label15.Name = "label15";
             label15.Size = new Size(61, 28);
             label15.TabIndex = 49;
@@ -430,7 +477,7 @@
             estimatedMemoryUsageCount.AutoSize = true;
             estimatedMemoryUsageCount.Font = new Font("Yu Gothic UI", 15F);
             estimatedMemoryUsageCount.ForeColor = Color.White;
-            estimatedMemoryUsageCount.Location = new Point(108, 297);
+            estimatedMemoryUsageCount.Location = new Point(104, 316);
             estimatedMemoryUsageCount.Name = "estimatedMemoryUsageCount";
             estimatedMemoryUsageCount.Size = new Size(0, 28);
             estimatedMemoryUsageCount.TabIndex = 48;
@@ -440,7 +487,7 @@
             label13.AutoSize = true;
             label13.Font = new Font("Yu Gothic UI", 15F);
             label13.ForeColor = Color.White;
-            label13.Location = new Point(9, 297);
+            label13.Location = new Point(9, 316);
             label13.Name = "label13";
             label13.Size = new Size(101, 28);
             label13.TabIndex = 47;
@@ -451,7 +498,7 @@
             estimatedMemoryUsageBase.AutoSize = true;
             estimatedMemoryUsageBase.Font = new Font("Yu Gothic UI", 15F);
             estimatedMemoryUsageBase.ForeColor = Color.White;
-            estimatedMemoryUsageBase.Location = new Point(81, 269);
+            estimatedMemoryUsageBase.Location = new Point(68, 288);
             estimatedMemoryUsageBase.Name = "estimatedMemoryUsageBase";
             estimatedMemoryUsageBase.Size = new Size(0, 28);
             estimatedMemoryUsageBase.TabIndex = 46;
@@ -461,7 +508,7 @@
             estimatedMemoryUsage.AutoSize = true;
             estimatedMemoryUsage.Font = new Font("Yu Gothic UI", 15F);
             estimatedMemoryUsage.ForeColor = Color.White;
-            estimatedMemoryUsage.Location = new Point(9, 269);
+            estimatedMemoryUsage.Location = new Point(9, 288);
             estimatedMemoryUsage.Name = "estimatedMemoryUsage";
             estimatedMemoryUsage.Size = new Size(66, 28);
             estimatedMemoryUsage.TabIndex = 45;
@@ -472,7 +519,7 @@
             label10.AutoSize = true;
             label10.Font = new Font("Yu Gothic UI", 16F, FontStyle.Bold);
             label10.ForeColor = Color.White;
-            label10.Location = new Point(0, 239);
+            label10.Location = new Point(0, 258);
             label10.Name = "label10";
             label10.Size = new Size(172, 30);
             label10.TabIndex = 44;
@@ -494,7 +541,7 @@
             label8.AutoSize = true;
             label8.Font = new Font("Yu Gothic UI", 15F);
             label8.ForeColor = Color.White;
-            label8.Location = new Point(9, 187);
+            label8.Location = new Point(9, 182);
             label8.Name = "label8";
             label8.Size = new Size(81, 28);
             label8.TabIndex = 42;
@@ -505,7 +552,7 @@
             label7.AutoSize = true;
             label7.Font = new Font("Yu Gothic UI", 15F);
             label7.ForeColor = Color.White;
-            label7.Location = new Point(9, 159);
+            label7.Location = new Point(9, 154);
             label7.Name = "label7";
             label7.Size = new Size(81, 28);
             label7.TabIndex = 41;
@@ -516,7 +563,7 @@
             label6.AutoSize = true;
             label6.Font = new Font("Yu Gothic UI", 15F);
             label6.ForeColor = Color.White;
-            label6.Location = new Point(9, 131);
+            label6.Location = new Point(9, 126);
             label6.Name = "label6";
             label6.Size = new Size(81, 28);
             label6.TabIndex = 40;
@@ -643,5 +690,9 @@
         private ToolStripMenuItem donationButton;
         private Panel selectModePanel;
         private Label label12;
+        private Label label17;
+        private ToolStripMenuItem AdvancedColorSettingsButton;
+        private Label label14;
+        private Label advancedColorConfigStatus;
     }
 }

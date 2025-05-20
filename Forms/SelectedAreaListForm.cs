@@ -41,19 +41,6 @@ public partial class SelectedAreaListForm : Form
         InitializeComponent();
     }
 
-    private void SelectedValuesList_ItemCheck(object? sender, ItemCheckEventArgs e)
-    {
-        bool isChecked = e.NewValue == CheckState.Checked;
-        int index = e.Index;
-
-        if (index < 0 || index >= _selectedAreas.Count) return;
-
-        var selectedArea = _selectedAreas[index];
-        selectedArea.Enabled = isChecked;
-
-        TriggerCheckedChanged();
-    }
-
     internal void Clear()
     {
         _selectedAreas.Clear();
@@ -91,8 +78,23 @@ public partial class SelectedAreaListForm : Form
         selectedValuesList.Items.Add(title, true);
     }
 
+    #region イベントハンドラー
+    private void SelectedValuesList_ItemCheck(object? sender, ItemCheckEventArgs e)
+    {
+        bool isChecked = e.NewValue == CheckState.Checked;
+        int index = e.Index;
+
+        if (index < 0 || index >= _selectedAreas.Count) return;
+
+        var selectedArea = _selectedAreas[index];
+        selectedArea.Enabled = isChecked;
+
+        TriggerCheckedChanged();
+    }
+
     private void TriggerCheckedChanged()
         => OnCheckedChanged?.Invoke(this, EventArgs.Empty);
+    #endregion
 
     #region フォーム関連
     private void SelectedAreaListForm_FormClosing(object sender, FormClosingEventArgs e)

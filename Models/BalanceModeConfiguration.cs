@@ -2,13 +2,13 @@
 
 internal class BalanceModeConfiguration
 {
-    internal int modeVersion = 1; // 1: v1, 2: v2
+    internal int ModeVersion { get; set; } = 1; // 1: v1, 2: v2
 
-    internal double v1Weight = 1.0;
-    internal double v1MinimumValue = 0.0;
+    internal double V1Weight { get; set; } = 1.0;
+    internal double V1MinimumValue { get; set; } = 0.0;
 
-    internal double v2Weight = 1.0;
-    internal double v2Radius = 0.0;
-    internal double v2MinimumValue = 0.0;
-    internal bool v2IncludeOutside = false;
+    internal double V2Weight { get; set; } = 1.0;
+    internal double V2Radius { get; set; } = 0.0;
+    internal double V2MinimumValue { get; set; } = 0.0;
+    internal bool V2IncludeOutside { get; set; } = false;
 }

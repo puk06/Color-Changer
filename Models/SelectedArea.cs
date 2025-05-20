@@ -11,7 +11,5 @@ internal class SelectedArea(int index, bool enabled, BitArray selectedPoints)
     internal BitArray SelectedPoints { get; private set; } = selectedPoints;
 
     public override string ToString()
-    {
-        return $"選択エリア{Index} : ピクセル数 {Count:N0}";
-    }
+        => $"選択エリア{Index} : ピクセル数 {Count:N0}";
 }

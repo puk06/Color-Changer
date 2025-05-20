@@ -7,14 +7,11 @@ internal class ColorDifference(Color previousColor, Color newColor)
     internal int DiffG { get; private set; } = newColor.G - previousColor.G;
     internal int DiffB { get; private set; } = newColor.B - previousColor.B;
 
-    public override string ToString()
-    {
-        string diffRStr = DiffR > 0 ? $"+{DiffR}" : DiffR.ToString();
-        string diffGStr = DiffG > 0 ? $"+{DiffG}" : DiffG.ToString();
-        string diffBStr = DiffB > 0 ? $"+{DiffB}" : DiffB.ToString();
-        return $"{diffRStr}, {diffGStr}, {diffBStr}";
-    }
-
+    /// <summary>
+    /// ColorDifferenceを与えられた値を基に更新する
+    /// </summary>
+    /// <param name="previousColor"></param>
+    /// <param name="newColor"></param>
     internal void Set(Color previousColor, Color newColor)
     {
         PreviousColor = previousColor;
@@ -22,4 +19,16 @@ internal class ColorDifference(Color previousColor, Color newColor)
         DiffG = newColor.G - previousColor.G;
         DiffB = newColor.B - previousColor.B;
     }
+
+    public override string ToString()
+    {
+        string diffRStr = FormatDiff(DiffR);
+        string diffGStr = FormatDiff(DiffG);
+        string diffBStr = FormatDiff(DiffB);
+        
+        return $"{diffRStr}, {diffGStr}, {diffBStr}";
+    }
+
+    private static string FormatDiff(int diff)
+        => diff > 0 ? $"+{diff}" : diff.ToString();
 }

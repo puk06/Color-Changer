@@ -13,18 +13,17 @@ internal struct ColorPixel(byte r, byte g, byte b, byte a)
 
     internal readonly bool IsTransparent => A == 0;
 
-    public static ColorPixel operator +(ColorPixel pixel, ColorDifference color)
-    {
-        return new ColorPixel(
-            (byte)MathUtils.ClampColorValue(pixel.R + color.DiffR),
-            (byte)MathUtils.ClampColorValue(pixel.G + color.DiffG),
-            (byte)MathUtils.ClampColorValue(pixel.B + color.DiffB),
-            pixel.A
-        );
-    }
-
-    public readonly bool Equals(Color other) =>
+    internal readonly bool Equals(Color other) =>
         R == other.R && G == other.G && B == other.B && A == other.A;
+
+    public static ColorPixel operator +(ColorPixel pixel, ColorDifference colorDiff)
+    {
+        pixel.R = MathUtils.ClampColorValue(pixel.R + colorDiff.DiffR);
+        pixel.G = MathUtils.ClampColorValue(pixel.G + colorDiff.DiffG);
+        pixel.B = MathUtils.ClampColorValue(pixel.B + colorDiff.DiffB);
+
+        return pixel;
+    }
 }
 
 internal class ColorUtils
@@ -48,7 +47,15 @@ internal class ColorUtils
     {
         try
         {
-            if (colorCode.Length != 7) return Color.Empty;
+            if (string.IsNullOrWhiteSpace(colorCode))
+                return Color.Empty;
+
+            if (!colorCode.StartsWith('#'))
+                colorCode = "#" + colorCode;
+
+            if (colorCode.Length != 7)
+                return Color.Empty;
+
             return ColorTranslator.FromHtml(colorCode);
         }
         catch
@@ -64,13 +71,7 @@ internal class ColorUtils
     /// <param name="color2"></param>
     /// <returns></returns>
     internal static double GetColorDistance(Color color1, Color color2)
-    {
-        double r = Math.Pow(color1.R - color2.R, 2);
-        double g = Math.Pow(color1.G - color2.G, 2);
-        double b = Math.Pow(color1.B - color2.B, 2);
-
-        return Math.Sqrt(r + g + b);
-    }
+        => GetColorDistanceInternal((color1.R, color1.G, color1.B), (color2.R, color2.G, color2.B));
 
     /// <summary>
     /// 2つの色の距離を計算する
@@ -79,10 +80,13 @@ internal class ColorUtils
     /// <param name="color2"></param>
     /// <returns></returns>
     internal static double GetColorDistance(ColorPixel color1, Color color2)
+        => GetColorDistanceInternal((color1.R, color1.G, color1.B), (color2.R, color2.G, color2.B));
+
+    private static double GetColorDistanceInternal((int R, int G, int B) c1, (int R, int G, int B) c2)
     {
-        double r = Math.Pow(color1.R - color2.R, 2);
-        double g = Math.Pow(color1.G - color2.G, 2);
-        double b = Math.Pow(color1.B - color2.B, 2);
+        double r = Math.Pow(c1.R - c2.R, 2);
+        double g = Math.Pow(c1.G - c2.G, 2);
+        double b = Math.Pow(c1.B - c2.B, 2);
 
         return Math.Sqrt(r + g + b);
     }
@@ -133,7 +137,7 @@ internal class ColorUtils
 
         double adjustmentFactor = 0.0;
 
-        switch (balanceModeConfiguration.modeVersion)
+        switch (balanceModeConfiguration.ModeVersion)
         {
             case 1:
                 var (hasIntersection, intersectionDistance) = GetRGBIntersectionDistance(diff.PreviousColor, pixel);
@@ -142,34 +146,34 @@ internal class ColorUtils
                     hasIntersection,
                     intersectionDistance,
                     distance,
-                    balanceModeConfiguration.v1Weight,
-                    balanceModeConfiguration.v1MinimumValue
+                    balanceModeConfiguration.V1Weight,
+                    balanceModeConfiguration.V1MinimumValue
                 );
                 break;
 
             case 2:
-                if (distance <= balanceModeConfiguration.v2Radius)
+                if (distance <= balanceModeConfiguration.V2Radius)
                 {
                     adjustmentFactor = CalculateColorChangeRate(
                         true,
-                        balanceModeConfiguration.v2Radius,
+                        balanceModeConfiguration.V2Radius,
                         distance,
-                        balanceModeConfiguration.v2Weight,
-                        balanceModeConfiguration.v2MinimumValue
+                        balanceModeConfiguration.V2Weight,
+                        balanceModeConfiguration.V2MinimumValue
                     );
                 }
-                else if (balanceModeConfiguration.v2IncludeOutside)
+                else if (balanceModeConfiguration.V2IncludeOutside)
                 {
-                    adjustmentFactor = balanceModeConfiguration.v1MinimumValue;
+                    adjustmentFactor = balanceModeConfiguration.V1MinimumValue;
                 }
                 break;
         }
 
-        int adjustedR = MathUtils.ClampColorValue(pixel.R + (int)(diff.DiffR * adjustmentFactor));
-        int adjustedG = MathUtils.ClampColorValue(pixel.G + (int)(diff.DiffG * adjustmentFactor));
-        int adjustedB = MathUtils.ClampColorValue(pixel.B + (int)(diff.DiffB * adjustmentFactor));
+        pixel.R = MathUtils.ClampColorValue(pixel.R + (int)(diff.DiffR * adjustmentFactor));
+        pixel.G = MathUtils.ClampColorValue(pixel.G + (int)(diff.DiffG * adjustmentFactor));
+        pixel.B = MathUtils.ClampColorValue(pixel.B + (int)(diff.DiffB * adjustmentFactor));
 
-        return new ColorPixel((byte)adjustedR, (byte)adjustedG, (byte)adjustedB, pixel.A);
+        return pixel;
     }
 
     /// <summary>
@@ -189,7 +193,6 @@ internal class ColorUtils
         int target_r = targetColor.R;
         int target_g = targetColor.G;
         int target_b = targetColor.B;
-
 
         // 方向ベクトル
         int dx = target_r - base_r;
@@ -262,6 +265,63 @@ internal class ColorUtils
         double changeRate = Math.Pow(1 - (distance / intersectionDistance), graphWeight);
         return Math.Max(minValue, changeRate);
     }
+
+    /// <summary>
+    /// 色の追加設定を行う
+    /// </summary>
+    /// <param name="pixel"></param>
+    /// <param name="advancedColorConfiguration"></param>
+    /// <returns></returns>
+    internal static ColorPixel AdvancedColorAdjustment(
+        ColorPixel pixel,
+        AdvancedColorConfiguration advancedColorConfiguration
+    )
+    {
+        if (advancedColorConfiguration.BrightnessEnabled)
+            pixel = ApplyBrightness(pixel, advancedColorConfiguration.Brightness);
+
+        if (advancedColorConfiguration.ContrastEnabled)
+            pixel = ApplyContrast(pixel, advancedColorConfiguration.Contrast);
+
+        if (advancedColorConfiguration.GammaEnabled)
+            pixel = ApplyGamma(pixel, advancedColorConfiguration.Gamma);
+
+        if (advancedColorConfiguration.ExposureEnabled)
+            pixel = ApplyExposure(pixel, advancedColorConfiguration.Exposure);
+
+        return pixel;
+    }
+
+    #region 色の追加設定用メソッド
+    private static ColorPixel ApplyBrightness(ColorPixel pixel, double brightness)
+    {
+        pixel.R = MathUtils.ClampColorValue((int)(pixel.R * brightness));
+        pixel.G = MathUtils.ClampColorValue((int)(pixel.G * brightness));
+        pixel.B = MathUtils.ClampColorValue((int)(pixel.B * brightness));
+        return pixel;
+    }
+    private static ColorPixel ApplyContrast(ColorPixel pixel, double contrast)
+    {
+        pixel.R = MathUtils.ClampColorValue((int)((pixel.R - 128) * contrast + 128));
+        pixel.G = MathUtils.ClampColorValue((int)((pixel.G - 128) * contrast + 128));
+        pixel.B = MathUtils.ClampColorValue((int)((pixel.B - 128) * contrast + 128));
+        return pixel;
+    }
+    private static ColorPixel ApplyGamma(ColorPixel pixel, double gamma)
+    {
+        pixel.R = MathUtils.ClampColorValue((int)(Math.Pow(pixel.R / 255.0, gamma) * 255));
+        pixel.G = MathUtils.ClampColorValue((int)(Math.Pow(pixel.G / 255.0, gamma) * 255));
+        pixel.B = MathUtils.ClampColorValue((int)(Math.Pow(pixel.B / 255.0, gamma) * 255));
+        return pixel;
+    }
+    private static ColorPixel ApplyExposure(ColorPixel pixel, double exposure)
+    {
+        pixel.R = MathUtils.ClampColorValue((int)(pixel.R * Math.Pow(2, exposure)));
+        pixel.G = MathUtils.ClampColorValue((int)(pixel.G * Math.Pow(2, exposure)));
+        pixel.B = MathUtils.ClampColorValue((int)(pixel.B * Math.Pow(2, exposure)));
+        return pixel;
+    }
+    #endregion
 
     /// <summary>
     /// 色を反転させる

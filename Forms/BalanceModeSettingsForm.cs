@@ -13,9 +13,14 @@ internal partial class BalanceModeSettingsForm : Form
     /// <summary>
     /// 現在のバランスモードの設定値
     /// </summary>
+    private readonly BalanceModeConfiguration _configuration = new BalanceModeConfiguration();
     internal BalanceModeConfiguration Configuration
     {
-        get => CreateConfigurationFromInputs();
+        get {
+            SetConfigurationFromInputs();
+            ApplyConfigurationToInputs(_configuration);
+            return _configuration;
+        }
         set => ApplyConfigurationToInputs(value);
     }
 
@@ -28,30 +33,27 @@ internal partial class BalanceModeSettingsForm : Form
     }
 
     #region Configuration関連
-    private BalanceModeConfiguration CreateConfigurationFromInputs()
+    private void SetConfigurationFromInputs()
     {
-        return new BalanceModeConfiguration
-        {
-            modeVersion = balanceModeComboBox.SelectedIndex + 1,
-            v1Weight = MathUtils.ParseDoubleOrDefault(v1weight.Text),
-            v1MinimumValue = MathUtils.ParseDoubleOrDefault(v1minValue.Text),
-            v2Weight = MathUtils.ParseDoubleOrDefault(v2weight.Text),
-            v2Radius = MathUtils.ParseDoubleOrDefault(v2radius.Text),
-            v2MinimumValue = MathUtils.ParseDoubleOrDefault(v2minValue.Text),
-            v2IncludeOutside = v2includeOutside.Checked
-        };
+        _configuration.ModeVersion = balanceModeComboBox.SelectedIndex + 1;
+        _configuration.V1Weight = MathUtils.ParseDoubleOrDefault(v1weight.Text);
+        _configuration.V1MinimumValue = MathUtils.ParseDoubleOrDefault(v1minValue.Text);
+        _configuration.V2Weight = MathUtils.ParseDoubleOrDefault(v2weight.Text);
+        _configuration.V2Radius = MathUtils.ParseDoubleOrDefault(v2radius.Text);
+        _configuration.V2MinimumValue = MathUtils.ParseDoubleOrDefault(v2minValue.Text);
+        _configuration.V2IncludeOutside = v2includeOutside.Checked;
     }
 
     private void ApplyConfigurationToInputs(BalanceModeConfiguration config)
     {
-        balanceModeComboBox.SelectedIndex = config.modeVersion - 1;
-        v1weight.Text = config.v1Weight.ToString("F2");
-        v1minValue.Text = config.v1MinimumValue.ToString("F2");
-        v2weight.Text = config.v2Weight.ToString("F2");
-        v2radius.Text = config.v2Radius.ToString("F2");
-        v2radiusBar.Value = (int)config.v2Radius;
-        v2minValue.Text = config.v2MinimumValue.ToString("F2");
-        v2includeOutside.Checked = config.v2IncludeOutside;
+        balanceModeComboBox.SelectedIndex = config.ModeVersion - 1;
+        v1weight.Text = config.V1Weight.ToString("F2");
+        v1minValue.Text = config.V1MinimumValue.ToString("F2");
+        v2weight.Text = config.V2Weight.ToString("F2");
+        v2radius.Text = config.V2Radius.ToString("F2");
+        v2radiusBar.Value = (int)config.V2Radius;
+        v2minValue.Text = config.V2MinimumValue.ToString("F2");
+        v2includeOutside.Checked = config.V2IncludeOutside;
     }
     #endregion
 
@@ -67,14 +69,14 @@ internal partial class BalanceModeSettingsForm : Form
                 description +=
                     "従来のバランスモードの計算式を使った色変換モードです。\n\n" +
                     "計算式について: \n" +
-                    "RGB空間上で選択されている色からそれぞれのピクセルの色までの距離と、その延長線上の点までの距離を元に色を計算し、色の変化率のグラフを作成します。" +
+                    "RGB空間上で選択されている色の点からそれぞれのピクセルの色までの距離と、その延長線上の点までの距離を元に色を計算し、色の変化率のグラフを作成します。" +
                     "このモードは、色がRGB空間上の壁に近いと色があまり変化しないというデメリットがあります。";
                 break;
             case 2:
                 description +=
                     "新しいバランスモードの計算式を使った色変換モードです。\n\n" +
                     "計算式について: \n" +
-                    "RGB空間上に選択した色から球状に広がるように色の変化率を計算します。" +
+                    "RGB空間上で、選択した色の点から球状に広がるように色の変化率を計算します。球の半径の場所から色の変化率を計算するようになります。" +
                     "このモードはRGB空間上で壁に関係なく均等に色を変えることが出来ますが、v1と比べて値の設定が複雑で難しいというデメリットがあります。";
                 break;
         }
@@ -87,7 +89,8 @@ internal partial class BalanceModeSettingsForm : Form
 
     private void HandleKeyDown(object sender, KeyEventArgs e)
     {
-        if (e.KeyCode == Keys.Enter) NotifyConfigurationChanged();
+        if (e.KeyCode != Keys.Enter) return;
+        NotifyConfigurationChanged();
     }
 
     private void V2radiusBar_MouseUp(object sender, MouseEventArgs e)
@@ -99,12 +102,15 @@ internal partial class BalanceModeSettingsForm : Form
     private void V2includeOutside_CheckedChanged(object sender, EventArgs e)
         => NotifyConfigurationChanged();
 
+    private void NotifyConfigurationChanged() 
+        => ConfigurationChanged?.Invoke(this, EventArgs.Empty);
+    #endregion
+
+    #region フォーム関連
     private void BalanceModeSettings_FormClosing(object sender, FormClosingEventArgs e)
     {
         Visible = false;
         e.Cancel = true;
     }
-
-    private void NotifyConfigurationChanged() => ConfigurationChanged?.Invoke(this, EventArgs.Empty);
     #endregion
 }

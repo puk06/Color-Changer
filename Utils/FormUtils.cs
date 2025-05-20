@@ -28,9 +28,7 @@ internal class FormUtils
     /// <param name="message"></param>
     /// <param name="title"></param>
     internal static void ShowError(string message, string title = "エラー")
-    {
-        MessageBox.Show(message, title, MessageBoxButtons.OK, MessageBoxIcon.Error);
-    }
+        => MessageBox.Show(message, title, MessageBoxButtons.OK, MessageBoxIcon.Error);
 
     /// <summary>
     /// 情報メッセージを表示する
@@ -38,19 +36,17 @@ internal class FormUtils
     /// <param name="message"></param>
     /// <param name="title"></param>
     internal static void ShowInfo(string message, string title = "情報")
-    {
-        MessageBox.Show(message, title, MessageBoxButtons.OK, MessageBoxIcon.Information);
-    }
+        => MessageBox.Show(message, title, MessageBoxButtons.OK, MessageBoxIcon.Information);
 
     /// <summary>
-    /// 確認メッセージを表示する
+    /// Yes / No 形式の確認メッセージを表示する
     /// </summary>
     /// <param name="message"></param>
     /// <param name="title"></param>
     /// <returns></returns>
     internal static bool ShowConfirm(string message, string title = "確認")
     {
-        var result = MessageBox.Show(message, title, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+        DialogResult result = MessageBox.Show(message, title, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
         return result == DialogResult.Yes;
     }
 
@@ -64,7 +60,9 @@ internal class FormUtils
         int x = point.X;
         int y = point.Y;
 
-        int textWidthSize = TextRenderer.MeasureText(label.Text, label.Font).Width;
+        Size textSize = TextRenderer.MeasureText(label.Text, label.Font);
+        int textWidthSize = textSize.Width;
+
         label.Location = new Point(x - textWidthSize, y);
     }
 }

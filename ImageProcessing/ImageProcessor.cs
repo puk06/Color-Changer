@@ -8,8 +8,12 @@ internal class ImageProcessor
 {
     private readonly int _width;
     private readonly ColorDifference _colorOffset;
-    private BalanceModeConfiguration _balanceModeConfiguration = new();
+
     private bool _isBalanceMode = false;
+    private BalanceModeConfiguration _balanceModeConfiguration = new();
+
+    private bool _isAdvancedColorMode = false;
+    private AdvancedColorConfiguration _advancedColorConfiguration = new();
 
     internal ImageProcessor(Size bitmapSize, ColorDifference colorDifference)
     {
@@ -27,19 +31,40 @@ internal class ImageProcessor
         _isBalanceMode = true;
     }
 
+    /// <summary>
+    /// 色の追加設定を適用する
+    /// </summary>
+    /// <param name="source"></param>
+    /// <returns></returns>
+    internal void SetColorSettings(AdvancedColorConfiguration advancedColorConfiguration)
+    {
+        _advancedColorConfiguration = advancedColorConfiguration;
+        _isAdvancedColorMode = advancedColorConfiguration.Enabled;
+    }
+
     private ColorPixel ProcessPixel(ColorPixel source)
     {
         if (source.IsTransparent) return source;
 
         if (_isBalanceMode)
-            return ColorUtils.BalanceColorAdjustment(source, _colorOffset, _balanceModeConfiguration);
+        {
+            source = ColorUtils.BalanceColorAdjustment(source, _colorOffset, _balanceModeConfiguration);
+        }
+        else
+        {
+            source += _colorOffset;
+        }
 
-        return source + _colorOffset;
+        if (_isAdvancedColorMode)
+            source = ColorUtils.AdvancedColorAdjustment(source, _advancedColorConfiguration);
+
+        return source;
     }
 
     internal void ProcessAllPixels(
         Span<ColorPixel> source,
-        Span<ColorPixel> target)
+        Span<ColorPixel> target
+    )
     {
         for (int i = 0; i < source.Length; i++)
         {
@@ -51,7 +76,8 @@ internal class ImageProcessor
         Span<ColorPixel> source,
         Span<ColorPixel> target,
         (float ratioX, float ratioY) ratios,
-        Size previewSize)
+        Size previewSize
+    )
     {
         int targetWidth = previewSize.Width;
         int targetHeight = previewSize.Height;
@@ -78,7 +104,8 @@ internal class ImageProcessor
     internal void ProcessSelectedPixels(
         Span<ColorPixel> source,
         Span<ColorPixel> target,
-        BitArray selectedPoints)
+        BitArray selectedPoints
+    )
     {
         for (int i = 0; i < selectedPoints.Length; i++)
         {
@@ -87,10 +114,11 @@ internal class ImageProcessor
         }
     }
 
-    internal void ProcessInverseSelectedPixels(
+    internal static void ProcessInverseSelectedPixels(
         Span<ColorPixel> source,
         Span<ColorPixel> raw,
-        BitArray selectedPoints)
+        BitArray selectedPoints
+    )
     {
         for (int i = 0; i < selectedPoints.Length; i++)
         {
@@ -107,7 +135,8 @@ internal class ImageProcessor
     internal void ProcessTransparentSelectedPixels(
         Span<ColorPixel> source,
         Span<ColorPixel> trans,
-        BitArray selectedPoints)
+        BitArray selectedPoints
+    )
     {
         Span<ColorPixel> target = !trans.IsEmpty ? trans : source;
 
@@ -120,7 +149,8 @@ internal class ImageProcessor
 
     internal void ProcessTransparentAndInversePixels(
         Span<ColorPixel> source,
-        BitArray selectedPoints)
+        BitArray selectedPoints
+    )
     {
         ProcessAllPixels(source, source);
 
@@ -134,7 +164,8 @@ internal class ImageProcessor
     internal static void ChangeSelectedPixelsColor(
         Span<ColorPixel> source,
         BitArray selectedPoints,
-        ColorPixel color)
+        ColorPixel color
+    )
     {
         for (int i = 0; i < selectedPoints.Length; i++)
         {

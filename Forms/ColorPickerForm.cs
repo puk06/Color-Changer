@@ -4,6 +4,8 @@ namespace ColorChanger.Forms;
 
 internal partial class ColorPickerForm : Form
 {
+    private const int COLOR_UPDATE_DEBOUNCE_MS = 16;
+
     /// <summary>
     /// 色が変更されたときに発生するイベント
     /// </summary>
@@ -15,6 +17,7 @@ internal partial class ColorPickerForm : Form
     internal Color SelectedColor { get; private set; } = Color.Empty;
 
     private Point _clickedPoint = Point.Empty;
+    private DateTime _lastUpdateCall = DateTime.MinValue;
 
     internal ColorPickerForm()
     {
@@ -37,17 +40,21 @@ internal partial class ColorPickerForm : Form
     /// 色を選択する
     /// </summary>
     /// <param name="e"></param>
-    /// <param name="disableMove"></param>
-    private void HandleColorSelection(MouseEventArgs e, bool disableMove)
+    /// <param name="suppressMove"></param>
+    private void HandleColorSelection(MouseEventArgs e, bool suppressMove)
     {
         if (colorPaletteBox.Image is not Bitmap bmp) return;
         if (e.Button != MouseButtons.Left) return;
 
-        var originalCoords = BitmapUtils.GetOriginalCoordinates(e.Location, bmp.Size, colorPaletteBox.Size);
+        if (suppressMove && (DateTime.Now - _lastUpdateCall).TotalMilliseconds <= COLOR_UPDATE_DEBOUNCE_MS) return;
+
+        Point originalCoords = BitmapUtils.GetOriginalCoordinates(e.Location, bmp.Size, colorPaletteBox.Size);
         if (!BitmapUtils.IsValidCoordinate(originalCoords, bmp.Size)) return;
 
-        var color = bmp.GetPixel(originalCoords.X, originalCoords.Y);
-        UpdateSelectedColor(color, disableMove);
+        Color color = bmp.GetPixel(originalCoords.X, originalCoords.Y);
+
+        _lastUpdateCall = DateTime.Now;
+        UpdateSelectedColor(color, suppressMove);
 
         _clickedPoint = e.Location;
         colorPaletteBox.Invalidate();
@@ -57,14 +64,15 @@ internal partial class ColorPickerForm : Form
     /// 色を更新する
     /// </summary>
     /// <param name="color"></param>
-    /// <param name="disableMove"></param>
-    private void UpdateSelectedColor(Color color, bool disableMove = false)
+    /// <param name="suppressMove"></param>
+    private void UpdateSelectedColor(Color color, bool suppressMove = false)
     {
         SelectedColor = color;
-        if (!disableMove) NotifyColorChanged();
+
+        if (!suppressMove) NotifyColorChanged();
+
         previewColorBox.BackColor = color;
 
-        // Update UI
         redBar.Value = color.R;
         greenBar.Value = color.G;
         blueBar.Value = color.B;
@@ -75,13 +83,18 @@ internal partial class ColorPickerForm : Form
 
         colorCodeTextBox.Text = ColorUtils.GetColorCodeFromColor(color);
 
-        if (colorPaletteBox.Image is not Bitmap || disableMove) return;
+        if (suppressMove || colorPaletteBox.Image is not Bitmap bitmap) return;
 
-        Point closestPoint = ColorUtils.GetClosestColorPoint(color, (Bitmap)colorPaletteBox.Image);
+        Point closestPoint = ColorUtils.GetClosestColorPoint(color, bitmap);
+
+        float scaleX = (float)colorPaletteBox.Width / bitmap.Width;
+        float scaleY = (float)colorPaletteBox.Height / bitmap.Height;
+
         _clickedPoint = new Point(
-            (int)(closestPoint.X * (float)colorPaletteBox.Width / ((Bitmap)colorPaletteBox.Image).Width),
-            (int)(closestPoint.Y * (float)colorPaletteBox.Height / ((Bitmap)colorPaletteBox.Image).Height)
+            (int)(closestPoint.X * scaleX),
+            (int)(closestPoint.Y * scaleY)
         );
+
         colorPaletteBox.Invalidate();
     }
 
@@ -105,13 +118,14 @@ internal partial class ColorPickerForm : Form
         if (_clickedPoint == Point.Empty) return;
 
         Color inverseColor = Color.FromArgb(255 - SelectedColor.R, 255 - SelectedColor.G, 255 - SelectedColor.B);
+        
         using Pen pen = new Pen(inverseColor, 2);
         e.Graphics.DrawLine(pen, _clickedPoint.X - 5, _clickedPoint.Y, _clickedPoint.X + 5, _clickedPoint.Y);
         e.Graphics.DrawLine(pen, _clickedPoint.X, _clickedPoint.Y - 5, _clickedPoint.X, _clickedPoint.Y + 5);
     }
 
-    private void ColorPaletteBox_MouseEvent(object _, MouseEventArgs e, bool disableMove)
-        => HandleColorSelection(e, disableMove);
+    private void ColorPaletteBox_MouseEvent(object _, MouseEventArgs e, bool suppressMove)
+        => HandleColorSelection(e, suppressMove);
 
     private void HandleSliderChanged(object sender, EventArgs e) =>
         UpdateSelectedColor(Color.FromArgb(redBar.Value, greenBar.Value, blueBar.Value), true);
