@@ -148,12 +148,10 @@ public partial class MainForm : Form
                     Span<ColorPixel> transPixels = BitmapUtils.GetPixelSpan(transData);
 
                     var imageProcessor = new ImageProcessor(bitMap.Size, ColorDifference);
+                    imageProcessor.SetColorSettings(_advancedColorSettingsForm.Configuration);
 
                     if (balanceMode.Checked)
                         imageProcessor.SetBalanceSettings(_balanceModeSettingsForm.Configuration);
-
-                    if (_advancedColorSettingsForm.Configuration.Enabled)
-                        imageProcessor.SetColorSettings(_advancedColorSettingsForm.Configuration);
 
                     skipped = ProcessImage(sourcePixels, rawPixels, transPixels, imageProcessor);
                 }

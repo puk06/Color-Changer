@@ -426,8 +426,8 @@ internal class BitmapUtils
             for (int y = 0; y < height; y++)
             {
                 Buffer.MemoryCopy(
-                    srcPtr + y * stride,
-                    dstPtr + y * stride,
+                    srcPtr + (y * stride),
+                    dstPtr + (y * stride),
                     stride, stride
                 );
             }

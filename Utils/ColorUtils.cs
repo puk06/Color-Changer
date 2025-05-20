@@ -302,9 +302,9 @@ internal class ColorUtils
     }
     private static ColorPixel ApplyContrast(ColorPixel pixel, double contrast)
     {
-        pixel.R = MathUtils.ClampColorValue((int)((pixel.R - 128) * contrast + 128));
-        pixel.G = MathUtils.ClampColorValue((int)((pixel.G - 128) * contrast + 128));
-        pixel.B = MathUtils.ClampColorValue((int)((pixel.B - 128) * contrast + 128));
+        pixel.R = MathUtils.ClampColorValue((int)(((pixel.R - 128) * contrast) + 128));
+        pixel.G = MathUtils.ClampColorValue((int)(((pixel.G - 128) * contrast) + 128));
+        pixel.B = MathUtils.ClampColorValue((int)(((pixel.B - 128) * contrast) + 128));
         return pixel;
     }
     private static ColorPixel ApplyGamma(ColorPixel pixel, double gamma)
