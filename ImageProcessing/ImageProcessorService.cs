@@ -33,7 +33,7 @@ internal class ImageProcessorService
         int boxHeight = previewBoxSize.Height;
         int boxWidth = previewBoxSize.Width;
 
-        var previewBitmap = new Bitmap(boxWidth, boxHeight, PixelFormat.Format32bppArgb);
+        Bitmap previewBitmap = new Bitmap(boxWidth, boxHeight, PixelFormat.Format32bppArgb);
 
         Rectangle sourceRect = BitmapUtils.GetRectangle(sourceBitmap);
         BitmapData? sourceBitmapData = BitmapUtils.LockBitmap(sourceBitmap, sourceRect, ImageLockMode.ReadOnly);

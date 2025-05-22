@@ -44,6 +44,7 @@
             label5 = new Label();
             colorCodeTextBox = new TextBox();
             label6 = new Label();
+            resetButton = new Button();
             ((System.ComponentModel.ISupportInitialize)redBar).BeginInit();
             ((System.ComponentModel.ISupportInitialize)colorPaletteBox).BeginInit();
             ((System.ComponentModel.ISupportInitialize)blueBar).BeginInit();
@@ -51,22 +52,22 @@
             ((System.ComponentModel.ISupportInitialize)previewColorBox).BeginInit();
             SuspendLayout();
             // 
-            // RedBar
+            // redBar
             // 
             redBar.Location = new Point(55, 307);
             redBar.Maximum = 255;
-            redBar.Name = "RedBar";
+            redBar.Name = "redBar";
             redBar.Size = new Size(222, 45);
             redBar.TabIndex = 0;
             redBar.TickFrequency = 85;
             redBar.Scroll += HandleSliderChanged;
             redBar.MouseUp += HandleSliderEnd;
             // 
-            // ColorPaletteBox
+            // colorPaletteBox
             // 
             colorPaletteBox.Image = Properties.Resources.RGB;
             colorPaletteBox.Location = new Point(26, 25);
-            colorPaletteBox.Name = "ColorPaletteBox";
+            colorPaletteBox.Name = "colorPaletteBox";
             colorPaletteBox.Size = new Size(315, 202);
             colorPaletteBox.SizeMode = PictureBoxSizeMode.StretchImage;
             colorPaletteBox.TabIndex = 1;
@@ -76,22 +77,22 @@
             colorPaletteBox.MouseMove += (s, e) => ColorPaletteBox_MouseEvent(s, e, true);
             colorPaletteBox.MouseUp += (s, e) => ColorPaletteBox_MouseEvent(s, e, false);
             // 
-            // BlueBar
+            // blueBar
             // 
             blueBar.Location = new Point(56, 409);
             blueBar.Maximum = 255;
-            blueBar.Name = "BlueBar";
+            blueBar.Name = "blueBar";
             blueBar.Size = new Size(221, 45);
             blueBar.TabIndex = 2;
             blueBar.TickFrequency = 85;
             blueBar.Scroll += HandleSliderChanged;
             blueBar.MouseUp += HandleSliderEnd;
             // 
-            // GreenBar
+            // greenBar
             // 
             greenBar.Location = new Point(56, 358);
             greenBar.Maximum = 255;
-            greenBar.Name = "GreenBar";
+            greenBar.Name = "greenBar";
             greenBar.Size = new Size(221, 45);
             greenBar.TabIndex = 3;
             greenBar.TickFrequency = 85;
@@ -138,6 +139,7 @@
             // 
             // selectButton
             // 
+            selectButton.Font = new Font("Yu Gothic UI", 11F);
             selectButton.Location = new Point(240, 460);
             selectButton.Name = "selectButton";
             selectButton.Size = new Size(118, 33);
@@ -146,11 +148,11 @@
             selectButton.UseVisualStyleBackColor = true;
             selectButton.Click += SelectButton_Click;
             // 
-            // RedTextBox
+            // redTextBox
             // 
             redTextBox.Font = new Font("Yu Gothic UI", 11F);
             redTextBox.Location = new Point(283, 306);
-            redTextBox.Name = "RedTextBox";
+            redTextBox.Name = "redTextBox";
             redTextBox.Size = new Size(59, 27);
             redTextBox.TabIndex = 10;
             redTextBox.Text = "0";
@@ -158,11 +160,11 @@
             redTextBox.KeyDown += HandleTextKeyDown;
             redTextBox.Leave += OnColorTextChanged;
             // 
-            // GreenTextBox
+            // greenTextBox
             // 
             greenTextBox.Font = new Font("Yu Gothic UI", 11F);
             greenTextBox.Location = new Point(283, 357);
-            greenTextBox.Name = "GreenTextBox";
+            greenTextBox.Name = "greenTextBox";
             greenTextBox.Size = new Size(59, 27);
             greenTextBox.TabIndex = 11;
             greenTextBox.Text = "0";
@@ -170,11 +172,11 @@
             greenTextBox.KeyDown += HandleTextKeyDown;
             greenTextBox.Leave += OnColorTextChanged;
             // 
-            // BlueTextBox
+            // blueTextBox
             // 
             blueTextBox.Font = new Font("Yu Gothic UI", 11F);
             blueTextBox.Location = new Point(283, 408);
-            blueTextBox.Name = "BlueTextBox";
+            blueTextBox.Name = "blueTextBox";
             blueTextBox.Size = new Size(59, 27);
             blueTextBox.TabIndex = 12;
             blueTextBox.Text = "0";
@@ -222,11 +224,23 @@
             label6.TabIndex = 16;
             label6.Text = "プレビュー";
             // 
-            // ColorPicker
+            // resetButton
+            // 
+            resetButton.Font = new Font("Yu Gothic UI", 11F);
+            resetButton.Location = new Point(12, 461);
+            resetButton.Name = "resetButton";
+            resetButton.Size = new Size(118, 33);
+            resetButton.TabIndex = 17;
+            resetButton.Text = "リセット";
+            resetButton.UseVisualStyleBackColor = true;
+            resetButton.Click += ResetButton_Click;
+            // 
+            // ColorPickerForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(370, 506);
+            Controls.Add(resetButton);
             Controls.Add(label6);
             Controls.Add(colorCodeTextBox);
             Controls.Add(label5);
@@ -247,7 +261,7 @@
             Icon = new Icon(new MemoryStream(Properties.Resources.AppIcon));
             MaximizeBox = false;
             MinimizeBox = false;
-            Name = "ColorPicker";
+            Name = "ColorPickerForm";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Color Picker by Color Changer";
             FormClosing += ColorPicker_FormClosing;
@@ -278,5 +292,6 @@
         private Label label5;
         private TextBox colorCodeTextBox;
         private Label label6;
+        private Button resetButton;
     }
 }

@@ -85,6 +85,9 @@ internal class ImageProcessor
         float ratioX = ratios.ratioX;
         float ratioY = ratios.ratioY;
 
+        int sourceSize = source.Length;
+        int targetSize = target.Length;
+
         for (int y = 0; y < targetHeight; y++)
         {
             int sourceY = (int)(y * ratioY);
@@ -95,6 +98,9 @@ internal class ImageProcessor
                 int sourceX = (int)(x * ratioX);
                 int sourceIndex = PixelUtils.GetPixelIndex(sourceX, sourceY, _width);
                 int targetIndex = targetRowOffset + x;
+
+                if (sourceIndex < 0 || sourceIndex >= sourceSize) continue;
+                if (targetIndex < 0 || targetIndex >= targetSize) continue;
 
                 target[targetIndex] = source[sourceIndex];
             }
@@ -123,12 +129,7 @@ internal class ImageProcessor
         for (int i = 0; i < selectedPoints.Length; i++)
         {
             if (!selectedPoints[i]) continue;
-            source[i] = new ColorPixel(
-                raw[i].R,
-                raw[i].G,
-                raw[i].B,
-                source[i].A
-            );
+            source[i] = raw[i];
         }
     }
 

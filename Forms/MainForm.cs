@@ -87,6 +87,8 @@ public partial class MainForm : Form
 
         previousColorBox.BackColor = selectedColor;
         _previousColor = selectedColor;
+        _colorPickerForm.SetInitialColor(selectedColor);
+
         previousRGBLabel.Text = $"{selectedColor.R}, {selectedColor.G}, {selectedColor.B}";
         UpdateCalculatedRGBValue();
 
@@ -309,6 +311,8 @@ public partial class MainForm : Form
             _previewBitmap = GenerateColoredPreview(_bmp, rawMode: true);
 
             BitmapUtils.SetImage(previewBox, _previewBitmap, disposeImage: false);
+
+            _imageFilePath = path;
         }
         catch (Exception exception)
         {
@@ -324,12 +328,12 @@ public partial class MainForm : Form
             BitmapUtils.DisposeBitmap(ref _bmp);
             BitmapUtils.DisposeBitmap(ref _previewBitmap);
             BitmapUtils.ResetImage(previewBox);
+
+            _imageFilePath = null;
         }
         finally
         {
             BitmapUtils.ResetImage(coloredPreviewBox);
-
-            _imageFilePath = path;
 
             _previousColor = Color.Empty;
             _newColor = Color.Empty;
@@ -394,10 +398,11 @@ public partial class MainForm : Form
             _backgroundColor
         );
 
+        Text = previousFormTitle;
+
         if (values == null || values.Length == 0)
         {
             FormUtils.ShowError("選択エリアがありません。");
-            Text = previousFormTitle;
             return;
         }
 

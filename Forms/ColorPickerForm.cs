@@ -16,6 +16,7 @@ internal partial class ColorPickerForm : Form
     /// </summary>
     internal Color SelectedColor { get; private set; } = Color.Empty;
 
+    private Color _initialColor = Color.Empty;
     private Point _clickedPoint = Point.Empty;
     private DateTime _lastUpdateCall = DateTime.MinValue;
 
@@ -35,6 +36,13 @@ internal partial class ColorPickerForm : Form
         SelectedColor = newColor == Color.Empty ? Color.White : newColor;
         UpdateSelectedColor(SelectedColor);
     }
+
+    /// <summary>
+    /// デフォルトの色を設定する
+    /// </summary>
+    /// <param name="initialColor"></param>
+    internal void SetInitialColor(Color initialColor)
+        => _initialColor = initialColor;
 
     /// <summary>
     /// 色を選択する
@@ -118,7 +126,7 @@ internal partial class ColorPickerForm : Form
         if (_clickedPoint == Point.Empty) return;
 
         Color inverseColor = Color.FromArgb(255 - SelectedColor.R, 255 - SelectedColor.G, 255 - SelectedColor.B);
-        
+
         using Pen pen = new Pen(inverseColor, 2);
         e.Graphics.DrawLine(pen, _clickedPoint.X - 5, _clickedPoint.Y, _clickedPoint.X + 5, _clickedPoint.Y);
         e.Graphics.DrawLine(pen, _clickedPoint.X, _clickedPoint.Y - 5, _clickedPoint.X, _clickedPoint.Y + 5);
@@ -154,6 +162,9 @@ internal partial class ColorPickerForm : Form
 
     private void OnColorTextChanged(object sender, EventArgs e)
         => SetColorFromTextFields();
+
+    private void ResetButton_Click(object sender, EventArgs e)
+        => UpdateSelectedColor(_initialColor);
 
     private void SelectButton_Click(object sender, EventArgs e)
     {
