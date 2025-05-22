@@ -338,6 +338,7 @@ public partial class MainForm : Form
             _previousColor = Color.Empty;
             _newColor = Color.Empty;
             _backgroundColor = Color.Empty;
+            _colorPickerForm.SetInitialColor(Color.Empty);
 
             previousColorBox.BackColor = ColorUtils.DefaultBackgroundColor;
             newColorBox.BackColor = ColorUtils.DefaultBackgroundColor;
