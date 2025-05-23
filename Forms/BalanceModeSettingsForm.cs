@@ -24,6 +24,18 @@ internal partial class BalanceModeSettingsForm : Form
         set => ApplyConfigurationToInputs(value);
     }
 
+    private static readonly string V1SettingsDescription = "このモードの説明:\n" +
+        "従来のバランスモードの計算式を使った色変換モードです。\n\n" +
+        "計算式について: \n" +
+        "RGB空間上で選択されている色の点からそれぞれのピクセルの色までの距離と、その延長線上の点までの距離を元に色を計算し、色の変化率のグラフを作成します。" +
+        "このモードは、色がRGB空間上の壁に近いと色があまり変化しないというデメリットがあります。";
+
+    private static readonly string V2SettingsDescription = "このモードの説明:\n" +
+        "新しいバランスモードの計算式を使った色変換モードです。\n\n" +
+        "計算式について: \n" +
+        "RGB空間上で、選択した色の点から球状に広がるように色の変化率を計算します。球の半径の場所から色の変化率を計算するようになります。" +
+        "このモードはRGB空間上で壁に関係なく均等に色を変えることが出来ますが、v1と比べて値の設定が複雑で難しいというデメリットがあります。";
+
     internal BalanceModeSettingsForm()
     {
         InitializeComponent();
@@ -60,29 +72,19 @@ internal partial class BalanceModeSettingsForm : Form
     #region イベントハンドラー
     private void BalanceModeComboBox_SelectedIndexChanged(object sender, EventArgs e)
     {
-        string description = "このモードの説明:\n";
         int version = balanceModeComboBox.SelectedIndex + 1;
 
         switch (version)
         {
             case 1:
-                description +=
-                    "従来のバランスモードの計算式を使った色変換モードです。\n\n" +
-                    "計算式について: \n" +
-                    "RGB空間上で選択されている色の点からそれぞれのピクセルの色までの距離と、その延長線上の点までの距離を元に色を計算し、色の変化率のグラフを作成します。" +
-                    "このモードは、色がRGB空間上の壁に近いと色があまり変化しないというデメリットがあります。";
+                balanceModeDescription.Text = V1SettingsDescription;
                 break;
             case 2:
-                description +=
-                    "新しいバランスモードの計算式を使った色変換モードです。\n\n" +
-                    "計算式について: \n" +
-                    "RGB空間上で、選択した色の点から球状に広がるように色の変化率を計算します。球の半径の場所から色の変化率を計算するようになります。" +
-                    "このモードはRGB空間上で壁に関係なく均等に色を変えることが出来ますが、v1と比べて値の設定が複雑で難しいというデメリットがあります。";
+                balanceModeDescription.Text = V2SettingsDescription;
                 break;
         }
 
         balanceModeSettingsTab.SelectedIndex = balanceModeComboBox.SelectedIndex;
-        balanceModeDescription.Text = description;
 
         NotifyConfigurationChanged();
     }

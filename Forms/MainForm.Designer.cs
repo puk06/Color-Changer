@@ -335,7 +335,7 @@
             helpUseButton.Font = new Font("Yu Gothic UI", 9F);
             helpUseButton.Name = "helpUseButton";
             helpUseButton.Size = new Size(48, 20);
-            helpUseButton.Text = "ヘルプ";
+            helpUseButton.Text = "使い方";
             helpUseButton.Click += HelpUseButton_Click;
             // 
             // aboutThisSoftware

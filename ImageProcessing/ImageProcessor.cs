@@ -48,7 +48,7 @@ internal class ImageProcessor
 
         if (_isBalanceMode)
         {
-            source = ColorUtils.BalanceColorAdjustment(source, _colorOffset, _balanceModeConfiguration);
+            ColorUtils.BalanceColorAdjustment(ref source, _colorOffset, _balanceModeConfiguration);
         }
         else
         {
@@ -56,7 +56,7 @@ internal class ImageProcessor
         }
 
         if (_isAdvancedColorMode)
-            source = ColorUtils.AdvancedColorAdjustment(source, _advancedColorConfiguration);
+            ColorUtils.AdvancedColorAdjustment(ref source, _advancedColorConfiguration);
 
         return source;
     }

@@ -34,6 +34,13 @@ public partial class HelpForm : Form
         "画面上部の「バランスモードの設定」からさまざまな値などを調節することができます。\n" +
         "※「重り」は変えたくない部分が変わってしまう場合は値を大きく、もっと変えたい場合は小さくしてください。0にすると通常モードと同じになります。";
 
+    private static readonly string AdvancedColorSettingsMessage = "色の追加設定:\n" +
+        "- ピクセル処理が終わったあとに反映される色の追加設定のことです。\n\n" +
+        "変更できる値は、「明度、コントラスト、ガンマ補正、露出」の4つです。\n" +
+        "値を変更したらEnterを押すことで更新することができます。\n" +
+        "値が変わっていた場合、値の順番に色の計算がされていきます。\n" +
+        "※小数点以下の値の調整(1.2など)が想定されており、3などの大きな値の変化は想定されていません。";
+
     public HelpForm()
     {
         InitializeComponent();
@@ -63,6 +70,11 @@ public partial class HelpForm : Form
     private void Button5_Click(object sender, EventArgs e)
     {
         descriptionText.Text = BalanceModeMessage;
+    }
+
+    private void Button6_Click(object sender, EventArgs e)
+    {
+        descriptionText.Text = AdvancedColorSettingsMessage;
     }
     #endregion
 

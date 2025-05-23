@@ -65,9 +65,9 @@
             // brightness
             // 
             brightness.Font = new Font("Yu Gothic UI", 14F);
-            brightness.Location = new Point(102, 9);
+            brightness.Location = new Point(166, 9);
             brightness.Name = "brightness";
-            brightness.Size = new Size(176, 32);
+            brightness.Size = new Size(112, 32);
             brightness.TabIndex = 2;
             brightness.TextAlign = HorizontalAlignment.Center;
             brightness.KeyDown += HandleKeyDown;
@@ -75,9 +75,9 @@
             // contrast
             // 
             contrast.Font = new Font("Yu Gothic UI", 14F);
-            contrast.Location = new Point(102, 47);
+            contrast.Location = new Point(166, 47);
             contrast.Name = "contrast";
-            contrast.Size = new Size(176, 32);
+            contrast.Size = new Size(112, 32);
             contrast.TabIndex = 4;
             contrast.TextAlign = HorizontalAlignment.Center;
             contrast.KeyDown += HandleKeyDown;
@@ -95,19 +95,19 @@
             // gamma
             // 
             gamma.Font = new Font("Yu Gothic UI", 14F);
-            gamma.Location = new Point(102, 85);
+            gamma.Location = new Point(166, 85);
             gamma.Name = "gamma";
-            gamma.Size = new Size(176, 32);
+            gamma.Size = new Size(112, 32);
             gamma.TabIndex = 10;
             gamma.TextAlign = HorizontalAlignment.Center;
             gamma.KeyDown += HandleKeyDown;
             // 
-            // label6
+            // label4
             // 
             label4.AutoSize = true;
             label4.Font = new Font("Yu Gothic UI", 14F);
             label4.Location = new Point(3, 88);
-            label4.Name = "label6";
+            label4.Name = "label4";
             label4.Size = new Size(93, 25);
             label4.TabIndex = 9;
             label4.Text = "ガンマ補正";
@@ -115,19 +115,19 @@
             // exposure
             // 
             exposure.Font = new Font("Yu Gothic UI", 14F);
-            exposure.Location = new Point(102, 123);
+            exposure.Location = new Point(166, 123);
             exposure.Name = "exposure";
-            exposure.Size = new Size(176, 32);
+            exposure.Size = new Size(112, 32);
             exposure.TabIndex = 12;
             exposure.TextAlign = HorizontalAlignment.Center;
             exposure.KeyDown += HandleKeyDown;
             // 
-            // label7
+            // label5
             // 
             label5.AutoSize = true;
             label5.Font = new Font("Yu Gothic UI", 14F);
             label5.Location = new Point(3, 126);
-            label5.Name = "label7";
+            label5.Name = "label5";
             label5.Size = new Size(50, 25);
             label5.TabIndex = 11;
             label5.Text = "露出";

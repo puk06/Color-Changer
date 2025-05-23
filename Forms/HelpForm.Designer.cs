@@ -35,6 +35,7 @@
             button5 = new Button();
             descriptionText = new Label();
             label1 = new Label();
+            button6 = new Button();
             SuspendLayout();
             // 
             // button1
@@ -111,11 +112,23 @@
             label1.TabIndex = 6;
             label1.Text = "機能の説明";
             // 
+            // button6
+            // 
+            button6.Font = new Font("Yu Gothic UI", 12F);
+            button6.Location = new Point(12, 289);
+            button6.Name = "button6";
+            button6.Size = new Size(149, 50);
+            button6.TabIndex = 7;
+            button6.Text = "色の追加設定";
+            button6.UseVisualStyleBackColor = true;
+            button6.Click += Button6_Click;
+            // 
             // HelpForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(803, 584);
+            Controls.Add(button6);
             Controls.Add(label1);
             Controls.Add(descriptionText);
             Controls.Add(button5);
@@ -129,7 +142,7 @@
             MinimizeBox = false;
             Name = "HelpForm";
             StartPosition = FormStartPosition.CenterScreen;
-            Text = "Help - How to use Color Changer";
+            Text = "How to use Color Changer";
             FormClosing += HelpForm_FormClosing;
             ResumeLayout(false);
             PerformLayout();
@@ -144,5 +157,6 @@
         private Button button5;
         private Label descriptionText;
         private Label label1;
+        private Button button6;
     }
 }

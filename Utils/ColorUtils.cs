@@ -127,8 +127,8 @@ internal class ColorUtils
     /// <param name="diff"></param>
     /// <param name="balanceModeConfiguration"></param>
     /// <returns></returns>
-    internal static ColorPixel BalanceColorAdjustment(
-        ColorPixel pixel,
+    internal static void BalanceColorAdjustment(
+        ref ColorPixel pixel,
         ColorDifference diff,
         BalanceModeConfiguration balanceModeConfiguration
     )
@@ -172,8 +172,6 @@ internal class ColorUtils
         pixel.R = MathUtils.ClampColorValue(pixel.R + (int)(diff.DiffR * adjustmentFactor));
         pixel.G = MathUtils.ClampColorValue(pixel.G + (int)(diff.DiffG * adjustmentFactor));
         pixel.B = MathUtils.ClampColorValue(pixel.B + (int)(diff.DiffB * adjustmentFactor));
-
-        return pixel;
     }
 
     /// <summary>
@@ -272,54 +270,48 @@ internal class ColorUtils
     /// <param name="pixel"></param>
     /// <param name="advancedColorConfiguration"></param>
     /// <returns></returns>
-    internal static ColorPixel AdvancedColorAdjustment(
-        ColorPixel pixel,
+    internal static void AdvancedColorAdjustment(
+        ref ColorPixel pixel,
         AdvancedColorConfiguration advancedColorConfiguration
     )
     {
         if (advancedColorConfiguration.BrightnessEnabled)
-            pixel = ApplyBrightness(pixel, advancedColorConfiguration.Brightness);
+            ApplyBrightness(ref pixel, advancedColorConfiguration.Brightness);
 
         if (advancedColorConfiguration.ContrastEnabled)
-            pixel = ApplyContrast(pixel, advancedColorConfiguration.Contrast);
+            ApplyContrast(ref pixel, advancedColorConfiguration.Contrast);
 
         if (advancedColorConfiguration.GammaEnabled)
-            pixel = ApplyGamma(pixel, advancedColorConfiguration.Gamma);
+            ApplyGamma(ref pixel, advancedColorConfiguration.Gamma);
 
         if (advancedColorConfiguration.ExposureEnabled)
-            pixel = ApplyExposure(pixel, advancedColorConfiguration.Exposure);
-
-        return pixel;
+            ApplyExposure(ref pixel, advancedColorConfiguration.Exposure);
     }
 
     #region 色の追加設定用メソッド
-    private static ColorPixel ApplyBrightness(ColorPixel pixel, double brightness)
+    private static void ApplyBrightness(ref ColorPixel pixel, double brightness)
     {
         pixel.R = MathUtils.ClampColorValue((int)(pixel.R * brightness));
         pixel.G = MathUtils.ClampColorValue((int)(pixel.G * brightness));
         pixel.B = MathUtils.ClampColorValue((int)(pixel.B * brightness));
-        return pixel;
     }
-    private static ColorPixel ApplyContrast(ColorPixel pixel, double contrast)
+    private static void ApplyContrast(ref ColorPixel pixel, double contrast)
     {
         pixel.R = MathUtils.ClampColorValue((int)(((pixel.R - 128) * contrast) + 128));
         pixel.G = MathUtils.ClampColorValue((int)(((pixel.G - 128) * contrast) + 128));
         pixel.B = MathUtils.ClampColorValue((int)(((pixel.B - 128) * contrast) + 128));
-        return pixel;
     }
-    private static ColorPixel ApplyGamma(ColorPixel pixel, double gamma)
+    private static void ApplyGamma(ref ColorPixel pixel, double gamma)
     {
         pixel.R = MathUtils.ClampColorValue((int)(Math.Pow(pixel.R / 255.0, gamma) * 255));
         pixel.G = MathUtils.ClampColorValue((int)(Math.Pow(pixel.G / 255.0, gamma) * 255));
         pixel.B = MathUtils.ClampColorValue((int)(Math.Pow(pixel.B / 255.0, gamma) * 255));
-        return pixel;
     }
-    private static ColorPixel ApplyExposure(ColorPixel pixel, double exposure)
+    private static void ApplyExposure(ref ColorPixel pixel, double exposure)
     {
         pixel.R = MathUtils.ClampColorValue((int)(pixel.R * Math.Pow(2, exposure)));
         pixel.G = MathUtils.ClampColorValue((int)(pixel.G * Math.Pow(2, exposure)));
         pixel.B = MathUtils.ClampColorValue((int)(pixel.B * Math.Pow(2, exposure)));
-        return pixel;
     }
     #endregion
 
