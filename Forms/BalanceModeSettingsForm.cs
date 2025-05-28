@@ -63,7 +63,7 @@ internal partial class BalanceModeSettingsForm : Form
         v1minValue.Text = config.V1MinimumValue.ToString("F2");
         v2weight.Text = config.V2Weight.ToString("F2");
         v2radius.Text = config.V2Radius.ToString("F2");
-        v2radiusBar.Value = (int)config.V2Radius;
+        v2radiusBar.Value = Math.Clamp(Convert.ToInt32(config.V2Radius), v2radiusBar.Minimum, v2radiusBar.Maximum);
         v2minValue.Text = config.V2MinimumValue.ToString("F2");
         v2includeOutside.Checked = config.V2IncludeOutside;
     }
