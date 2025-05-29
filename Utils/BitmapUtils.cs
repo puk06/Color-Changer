@@ -147,44 +147,45 @@ internal class BitmapUtils
     internal static BitArray RemoveInnerSelectedArea(BitArray selectedArea, int width, int height)
     {
         BitArray result = new BitArray(selectedArea.Length);
-        int stripeInterval = 6; // 斜め線の間隔（ピクセル数）
+        int stripeInterval = 7;
+        int lineWidth = 3;
 
-        // 内側のピクセル判定
-        for (int y = 1; y < height - 1; y++)
+        for (int y = 0; y < height; y++)
         {
-            for (int x = 1; x < width - 1; x++)
+            for (int x = 0; x < width; x++)
             {
                 int index = PixelUtils.GetPixelIndex(x, y, width);
 
-                int upperIndex = PixelUtils.GetPixelIndex(x, y - 2, width); // 上
-                int lowerIndex = PixelUtils.GetPixelIndex(x, y + 2, width); // 下
-                int leftIndex = PixelUtils.GetPixelIndex(x - 2, y, width);  // 左
-                int rightIndex = PixelUtils.GetPixelIndex(x + 2, y, width); // 右
-
-                if (!PixelUtils.IsValid(selectedArea, upperIndex) ||
-                    !PixelUtils.IsValid(selectedArea, lowerIndex) ||
-                    !PixelUtils.IsValid(selectedArea, leftIndex) ||
-                    !PixelUtils.IsValid(selectedArea, rightIndex))
-                {
-                    continue;
-                }
-
+                // 選択されていない部分には斜線を引く
                 if (!selectedArea[index])
                 {
-                    if ((x + y) % stripeInterval == 0) result[index] = true;
+                    if ((x + y) % stripeInterval == 0)
+                        result[index] = true;
+
                     continue;
                 }
 
+                // lineWidthドット外の上下左右が画像外なら枠を描く
+                if (x < lineWidth || x >= width - lineWidth || y < lineWidth || y >= height - lineWidth)
+                {
+                    result[index] = true;
+                    continue;
+                }
+
+                // 上下左右のlineWidthドット離れたピクセルをチェック
+                int up = PixelUtils.GetPixelIndex(x, y - lineWidth, width);
+                int down = PixelUtils.GetPixelIndex(x, y + lineWidth, width);
+                int left = PixelUtils.GetPixelIndex(x - lineWidth, y, width);
+                int right = PixelUtils.GetPixelIndex(x + lineWidth, y, width);
+
                 bool isInner =
-                    selectedArea[upperIndex] &&
-                    selectedArea[lowerIndex] &&
-                    selectedArea[leftIndex] &&
-                    selectedArea[rightIndex];
+                    selectedArea[up] &&
+                    selectedArea[down] &&
+                    selectedArea[left] &&
+                    selectedArea[right];
 
-                if (isInner) continue;
-
-                // 外周や端のピクセルはそのまま
-                result[index] = true;
+                if (!isInner)
+                    result[index] = true;
             }
         }
 
@@ -342,6 +343,7 @@ internal class BitmapUtils
     internal static Bitmap? CreateTransparentBitmap(Bitmap bitmap, bool transMode, bool inverseMode)
     {
         if (bitmap == null) return null;
+
         if (transMode && !inverseMode)
         {
             Bitmap bmp = new Bitmap(bitmap.Width, bitmap.Height, PixelFormat.Format32bppArgb);
@@ -354,49 +356,20 @@ internal class BitmapUtils
     }
 
     /// <summary>
-    /// 指定されたPixelFormatのビット数を取得する
-    /// </summary>
-    /// <param name="format"></param>
-    /// <returns></returns>
-    private static int GetBitsPerPixel(PixelFormat format)
-    {
-        return format switch
-        {
-            PixelFormat.Format1bppIndexed => 1,
-            PixelFormat.Format4bppIndexed => 4,
-            PixelFormat.Format8bppIndexed => 8,
-            PixelFormat.Format16bppGrayScale => 16,
-            PixelFormat.Format16bppRgb555 => 16,
-            PixelFormat.Format16bppRgb565 => 16,
-            PixelFormat.Format16bppArgb1555 => 16,
-            PixelFormat.Format24bppRgb => 24,
-            PixelFormat.Format32bppRgb => 32,
-            PixelFormat.Format32bppArgb => 32,
-            PixelFormat.Format32bppPArgb => 32,
-            PixelFormat.Format48bppRgb => 48,
-            PixelFormat.Format64bppArgb => 64,
-            PixelFormat.Format64bppPArgb => 64,
-            _ => 0,// Unsupported format
-        };
-    }
-
-    /// <summary>
     /// Bitmapのメモリ使用量を推定する
     /// </summary>
     /// <param name="bitmap"></param>
     /// <returns></returns>
     internal static double CalculateEstimatedMemoryUsage(Bitmap bitmap)
     {
-        int bytesPerPixel = GetBitsPerPixel(bitmap.PixelFormat);
+        int bytesPerPixel = Image.GetPixelFormatSize(bitmap.PixelFormat);
 
         int width = bitmap.Width;
         int height = bitmap.Height;
 
-        long baseBytes = (long)width * height * bytesPerPixel / 8;
+        long totalBytes = (long)width * height * bytesPerPixel / 8;
 
-        double totalMB = baseBytes / 1024.0 / 1024.0;
-
-        return totalMB;
+        return totalBytes / 1024.0 / 1024.0;
     }
 
     /// <summary>

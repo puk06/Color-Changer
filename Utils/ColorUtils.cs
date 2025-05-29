@@ -334,4 +334,16 @@ internal class ColorUtils
     /// </summary>
     internal static Color DefaultBackgroundColor
         => Color.LightGray;
+
+    /// <summary>
+    /// デフォルトの色を取得する
+    /// </summary>
+    internal static Color DefaultForeColor
+        => Color.LightGreen;
+
+    /// <summary>
+    /// デフォルトの未選択時の色を取得する
+    /// </summary>
+    internal static Color DefaultUnselectedColor
+        => Color.LightCoral;
 }

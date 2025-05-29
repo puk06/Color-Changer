@@ -38,6 +38,7 @@ internal class BitArrayUtils
     internal static void Merge(ref BitArray bitArray1, BitArray bitArray2)
     {
         if (bitArray1.Length == 0) bitArray1 = new BitArray(bitArray2.Length);
+
         for (int i = 0; i < bitArray2.Count; i++)
         {
             if (bitArray2[i])

@@ -51,17 +51,17 @@ internal partial class ColorPickerForm : Form
     /// <param name="suppressMove"></param>
     private void HandleColorSelection(MouseEventArgs e, bool suppressMove)
     {
-        if (colorPaletteBox.Image is not Bitmap bmp) return;
         if (e.Button != MouseButtons.Left) return;
+        if (colorPaletteBox.Image is not Bitmap bmp) return;
 
         if (suppressMove && (DateTime.Now - _lastUpdateCall).TotalMilliseconds <= COLOR_UPDATE_DEBOUNCE_MS) return;
+        _lastUpdateCall = DateTime.Now;
 
         Point originalCoords = BitmapUtils.GetOriginalCoordinates(e.Location, bmp.Size, colorPaletteBox.Size);
         if (!BitmapUtils.IsValidCoordinate(originalCoords, bmp.Size)) return;
 
         Color color = bmp.GetPixel(originalCoords.X, originalCoords.Y);
 
-        _lastUpdateCall = DateTime.Now;
         UpdateSelectedColor(color, suppressMove);
 
         _clickedPoint = e.Location;
