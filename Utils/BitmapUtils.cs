@@ -148,7 +148,7 @@ internal class BitmapUtils
     {
         BitArray result = new BitArray(selectedArea.Length);
         int stripeInterval = 7;
-        int lineWidth = 3;
+        int lineWidth = 2;
 
         for (int y = 0; y < height; y++)
         {
