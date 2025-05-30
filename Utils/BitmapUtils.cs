@@ -146,9 +146,13 @@ internal class BitmapUtils
     /// <returns></returns>
     internal static BitArray RemoveInnerSelectedArea(BitArray selectedArea, int width, int height)
     {
-        BitArray result = new BitArray(selectedArea.Length);
+        // 斜線の間隔
         int stripeInterval = 7;
+
+        // 枠の太さ
         int lineWidth = 2;
+
+        BitArray result = new BitArray(selectedArea.Length);
 
         for (int y = 0; y < height; y++)
         {
