@@ -65,8 +65,14 @@ public partial class AdvancedColorSettingsForm : Form
 
     private void HandleKeyDown(object sender, KeyEventArgs e)
     {
-        if (e.KeyCode == Keys.Enter) NotifyConfigurationChanged();
+        if (!FormUtils.IsNavigationKey(e)) return;
+
+        NotifyConfigurationChanged();
+        SelectNextControl((Control)sender, true, true, true, true);
     }
+
+    private void OnValueTextChanged(object sender, EventArgs e)
+        => NotifyConfigurationChanged();
 
     private void NotifyConfigurationChanged() 
         => ConfigurationChanged?.Invoke(this, EventArgs.Empty);

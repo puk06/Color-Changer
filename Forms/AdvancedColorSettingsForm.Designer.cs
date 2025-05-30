@@ -71,6 +71,7 @@
             brightness.TabIndex = 2;
             brightness.TextAlign = HorizontalAlignment.Center;
             brightness.KeyDown += HandleKeyDown;
+            brightness.Leave += OnValueTextChanged;
             // 
             // contrast
             // 
@@ -81,6 +82,7 @@
             contrast.TabIndex = 4;
             contrast.TextAlign = HorizontalAlignment.Center;
             contrast.KeyDown += HandleKeyDown;
+            contrast.Leave += OnValueTextChanged;
             // 
             // label3
             // 
@@ -101,6 +103,7 @@
             gamma.TabIndex = 10;
             gamma.TextAlign = HorizontalAlignment.Center;
             gamma.KeyDown += HandleKeyDown;
+            gamma.Leave += OnValueTextChanged;
             // 
             // label4
             // 
@@ -121,6 +124,7 @@
             exposure.TabIndex = 12;
             exposure.TextAlign = HorizontalAlignment.Center;
             exposure.KeyDown += HandleKeyDown;
+            exposure.Leave += OnValueTextChanged;
             // 
             // label5
             // 
