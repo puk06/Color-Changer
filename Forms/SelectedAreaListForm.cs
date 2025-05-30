@@ -71,7 +71,7 @@ public partial class SelectedAreaListForm : Form
         }
 
         int itemIndex = selectedValuesList.Items.Count + 1;
-        var selectedArea = new SelectedArea(itemIndex, true, values);
+        SelectedArea selectedArea = new SelectedArea(itemIndex, true, values);
 
         _selectedAreas.Add(selectedArea);
         string title = selectedArea.ToString();
@@ -86,7 +86,7 @@ public partial class SelectedAreaListForm : Form
 
         if (index < 0 || index >= _selectedAreas.Count) return;
 
-        var selectedArea = _selectedAreas[index];
+        SelectedArea selectedArea = _selectedAreas[index];
         selectedArea.Enabled = isChecked;
 
         TriggerCheckedChanged();
