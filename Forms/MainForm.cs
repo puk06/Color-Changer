@@ -347,6 +347,8 @@ public partial class MainForm : Form
 
             UpdateTextureData();
             UpdateColorData();
+
+            _colorPickerForm.Hide();
         }
     }
 
@@ -582,6 +584,7 @@ public partial class MainForm : Form
 
         _colorPickerForm.SetColor(_newColor == Color.Empty ? _previousColor : _newColor);
         _colorPickerForm.Show();
+        _colorPickerForm.BringToFront();
     }
 
     private void SelectMode_CheckedChanged(object sender, EventArgs e)
@@ -624,10 +627,16 @@ public partial class MainForm : Form
     }
 
     private void SelectedAreaListButton_Click(object sender, EventArgs e)
-        => _selectedAreaListForm.Show();
+    {
+        _selectedAreaListForm.Show();
+        _selectedAreaListForm.BringToFront();
+    }
 
     private void AdvancedColorSettingsButton_Click(object sender, EventArgs e)
-        => _advancedColorSettingsForm.Show();
+    {
+        _advancedColorSettingsForm.Show();
+        _advancedColorSettingsForm.BringToFront();
+    }
 
     private void OpenFile_Click(object sender, EventArgs e)
     {
@@ -681,7 +690,10 @@ public partial class MainForm : Form
     }
 
     private void HelpUseButton_Click(object sender, EventArgs e)
-        => _helpForm.Show();
+    {
+        _helpForm.Show();
+        _helpForm.BringToFront();
+    }
 
     private void UndoButton_Click(object sender, EventArgs e)
         => _selectedAreaListForm.RemoveLast();
@@ -698,7 +710,10 @@ public partial class MainForm : Form
     }
 
     private void BalanceModeSettingsButton_Click(object sender, EventArgs e)
-        => _balanceModeSettingsForm.Show();
+    {
+        _balanceModeSettingsForm.Show();
+        _balanceModeSettingsForm.BringToFront();
+    }
 
     private void DonationButton_Click(object sender, EventArgs e)
     {
@@ -731,6 +746,6 @@ public partial class MainForm : Form
     }
 
     private void MainForm_DragEnter(object sender, DragEventArgs e)
-        => e.Effect = _colorPickerForm.Visible ? DragDropEffects.None : DragDropEffects.All;
+        => e.Effect = DragDropEffects.All;
     #endregion
 }
