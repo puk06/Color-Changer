@@ -25,13 +25,4 @@ internal class PixelUtils
     /// <returns></returns>
     internal static int GetPixelIndex(int x, int y, int width)
         => (y * width) + x;
-
-    /// <summary>
-    /// 指定されたピクセルインデックスが有効かどうかを確認する
-    /// </summary>
-    /// <param name="bitArray"></param>
-    /// <param name="indexValue"></param>
-    /// <returns></returns>
-    internal static bool IsValid(BitArray bitArray, int indexValue)
-        => indexValue >= 0 && indexValue < bitArray.Length;
 }
