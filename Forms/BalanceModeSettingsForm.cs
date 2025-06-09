@@ -16,13 +16,17 @@ internal partial class BalanceModeSettingsForm : Form
     private readonly BalanceModeConfiguration _configuration = new BalanceModeConfiguration();
     internal BalanceModeConfiguration Configuration
     {
-        get {
+        get
+        {
             SetConfigurationFromInputs();
             ApplyConfigurationToInputs(_configuration);
             return _configuration;
         }
         set => ApplyConfigurationToInputs(value);
     }
+
+    private readonly ColorPickerForm _colorPickerForm = new ColorPickerForm();
+    private readonly MainForm _mainForm;
 
     private static readonly string V1SettingsDescription = "このモードの説明:\n" +
         "従来のバランスモードの計算式を使った色変換モードです。\n\n" +
@@ -36,9 +40,21 @@ internal partial class BalanceModeSettingsForm : Form
         "RGB空間上で、選択した色の点から球状に広がるように色の変化率を計算します。球の半径の場所から色の変化率を計算するようになります。" +
         "このモードはRGB空間上で壁に関係なく均等に色を変えることが出来ますが、v1と比べて値の設定が複雑で難しいというデメリットがあります。";
 
-    internal BalanceModeSettingsForm()
+    private static readonly string V3SettingsDescription = "このモードの説明:\n" +
+        "ピクセルのグレースケール値を用いた色変換モードです。\n\n" +
+        "計算式について: \n" +
+        "ピクセルのグレースケール値に基づいて、事前に作成したグラーデーション内で色の変化率を計算します。" +
+        "このモードは前の色関係なく綺麗に色を変えることができますが、一度グレーにして全体で色が統一されるので、変わってほしくない色まで変わってしまう可能性があります。";
+
+    internal BalanceModeSettingsForm(MainForm mainForm)
     {
+        _mainForm = mainForm;
+
         InitializeComponent();
+        SetupEventHandlers();
+
+        _colorPickerForm.SetInitialColor(Color.FromArgb(255, 255, 255));
+        _colorPickerForm.SetColor(Color.FromArgb(255, 255, 255));
 
         v2radiusBar.Maximum = (int)Math.Sqrt(3 * 255 * 255) + 1;
         Configuration = new BalanceModeConfiguration();
@@ -54,6 +70,10 @@ internal partial class BalanceModeSettingsForm : Form
         _configuration.V2Radius = MathUtils.ParseDoubleOrDefault(v2radius.Text);
         _configuration.V2MinimumValue = MathUtils.ParseDoubleOrDefault(v2minValue.Text);
         _configuration.V2IncludeOutside = v2includeOutside.Checked;
+        _configuration.V3GradientColor = _colorPickerForm.SelectedColor;
+        _configuration.V3GradientStart = v3gradientStart.Value;
+        _configuration.V3GradientEnd = v3gradientEnd.Value;
+        GenerateGradientPreview();
     }
 
     private void ApplyConfigurationToInputs(BalanceModeConfiguration config)
@@ -66,10 +86,41 @@ internal partial class BalanceModeSettingsForm : Form
         v2radiusBar.Value = Math.Clamp(Convert.ToInt32(config.V2Radius), v2radiusBar.Minimum, v2radiusBar.Maximum);
         v2minValue.Text = config.V2MinimumValue.ToString("F2");
         v2includeOutside.Checked = config.V2IncludeOutside;
+        v3gradientStart.Value = config.V3GradientStart;
+        v3gradientEnd.Value = config.V3GradientEnd;
+    }
+
+    private void GenerateGradientPreview()
+    {
+        Color CurrentSelectedColor = _mainForm.ColorPickerForm.SelectedColor;
+        if (CurrentSelectedColor == Color.Empty) return;
+
+        Bitmap gradientPreviewImage = ColorUtils.GenerateGradientPreview(
+            CurrentSelectedColor,
+            _configuration.V3GradientColor,
+            _configuration.V3GradientStart,
+            _configuration.V3GradientEnd,
+            gradientPrebiew.Size
+        );
+
+        gradientPrebiew.Image?.Dispose();
+        gradientPrebiew.Image = gradientPreviewImage;
     }
     #endregion
 
     #region イベントハンドラー
+    /// <summary>
+    /// イベントハンドラのセットアップ
+    /// </summary>
+    private void SetupEventHandlers()
+    {
+        _colorPickerForm.ColorChanged += (s, e) =>
+        {
+            v3gradientColor.BackColor = _colorPickerForm.SelectedColor;
+            NotifyConfigurationChanged();
+        };
+    }
+
     private void BalanceModeComboBox_SelectedIndexChanged(object sender, EventArgs e)
     {
         int version = balanceModeComboBox.SelectedIndex + 1;
@@ -81,6 +132,9 @@ internal partial class BalanceModeSettingsForm : Form
                 break;
             case 2:
                 balanceModeDescription.Text = V2SettingsDescription;
+                break;
+            case 3:
+                balanceModeDescription.Text = V3SettingsDescription;
                 break;
         }
 
@@ -104,7 +158,13 @@ internal partial class BalanceModeSettingsForm : Form
     private void V2includeOutside_CheckedChanged(object sender, EventArgs e)
         => NotifyConfigurationChanged();
 
-    private void NotifyConfigurationChanged() 
+    private void V3GradientColor_Click(object sender, EventArgs e)
+        => _colorPickerForm.Show();
+
+    private void V3gradient_MouseUp(object sender, MouseEventArgs e)
+        => NotifyConfigurationChanged();
+
+    private void NotifyConfigurationChanged()
         => ConfigurationChanged?.Invoke(this, EventArgs.Empty);
     #endregion
 

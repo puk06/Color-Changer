@@ -19,6 +19,14 @@ internal class MathUtils
         => (byte)Math.Clamp(value, 0, 255);
 
     /// <summary>
+    /// 数値を0〜1にクランプする
+    /// </summary>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    internal static double ClampZeroToOne(double value)
+        => Math.Clamp(value, 0, 1);
+
+    /// <summary>
     /// 文字列をdoubleにパースし、失敗した場合はデフォルト値を返す
     /// </summary>
     /// <param name="input"></param>

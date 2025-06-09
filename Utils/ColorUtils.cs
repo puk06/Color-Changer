@@ -1,4 +1,5 @@
 ﻿using ColorChanger.Models;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 
 namespace ColorChanger.Utils;
@@ -62,6 +63,59 @@ internal class ColorUtils
         {
             return Color.Empty;
         }
+    }
+
+    /// <summary>
+    /// グラデーションのプレビューを生成する
+    /// </summary>
+    /// <param name="startColor"></param>
+    /// <param name="endColor"></param>
+    /// <param name="start"></param>
+    /// <param name="end"></param>
+    /// <param name="size"></param>
+    /// <returns></returns>
+    internal static Bitmap GenerateGradientPreview(
+        Color startColor, Color endColor,
+        int start, int end,
+        Size size
+    )
+    {
+        double gradientStart = start / 100.0;
+        double gradientEnd = end / 100.0;
+
+        Bitmap bmp = new Bitmap(size.Width, size.Height);
+        using (Graphics graphics = Graphics.FromImage(bmp))
+        {
+            for (int x = 0; x < size.Width; x++)
+            {
+                double grayRatio = MathUtils.ClampZeroToOne((double)x / size.Width);
+
+                int r = CalculateGradientValue(
+                    startColor.R, endColor.R,
+                    gradientStart, gradientEnd,
+                    grayRatio
+                );
+
+                int g = CalculateGradientValue(
+                    startColor.G, endColor.G,
+                    gradientStart, gradientEnd,
+                    grayRatio
+                );
+
+                int b = CalculateGradientValue(
+                    startColor.B, endColor.B,
+                    gradientStart, gradientEnd,
+                    grayRatio
+                );
+
+                Color color = Color.FromArgb(r, g, b);
+
+                using Brush brush = new SolidBrush(color);
+                graphics.FillRectangle(brush, x, 0, 1, size.Height);
+            }
+        }
+
+        return bmp;
     }
 
     /// <summary>
@@ -167,11 +221,69 @@ internal class ColorUtils
                     adjustmentFactor = balanceModeConfiguration.V1MinimumValue;
                 }
                 break;
+
+            case 3:
+                // 赤は0.299、緑は0.587、青は0.114の重みを使ってグレースケール値を計算
+                // この値は、人間の視覚における色の感度を考慮した輝度法に基づいています
+                // コード内で使用しているグレースケールの値に関する詳細はこちらから: https://en.wikipedia.org/wiki/Grayscale
+                const double grayScaleWeightR = 0.299;
+                const double grayScaleWeightG = 0.587;
+                const double grayScaleWeightB = 0.114;
+
+                double grayScale = (
+                    grayScaleWeightR * (pixel.R / 255.0) +
+                    grayScaleWeightG * (pixel.G / 255.0) +
+                    grayScaleWeightB * (pixel.B / 255.0)
+                );
+
+                double gradientStart = balanceModeConfiguration.V3GradientStart / 100.0;
+                double gradientEnd = balanceModeConfiguration.V3GradientEnd / 100.0;
+
+                pixel.R = CalculateGradientValue(
+                    diff.NewColor.R,
+                    balanceModeConfiguration.V3GradientColor.R,
+                    gradientStart,
+                    gradientEnd,
+                    grayScale
+                );
+
+                pixel.G = CalculateGradientValue(
+                    diff.NewColor.G,
+                    balanceModeConfiguration.V3GradientColor.G,
+                    gradientStart,
+                    gradientEnd,
+                    grayScale
+
+                );
+
+                pixel.B = CalculateGradientValue(
+                    diff.NewColor.B,
+                    balanceModeConfiguration.V3GradientColor.B,
+                    gradientStart,
+                    gradientEnd,
+                    grayScale
+                );
+                return;
         }
 
         pixel.R = MathUtils.ClampColorValue(pixel.R + (int)(diff.DiffR * adjustmentFactor));
         pixel.G = MathUtils.ClampColorValue(pixel.G + (int)(diff.DiffG * adjustmentFactor));
         pixel.B = MathUtils.ClampColorValue(pixel.B + (int)(diff.DiffB * adjustmentFactor));
+    }
+
+    private static byte CalculateGradientValue(
+        byte startColorValue, byte endColorValue,
+        double gradientStart, double gradientEnd,
+        double grayRatio
+    )
+    {
+        if (grayRatio <= gradientStart) return startColorValue;
+        if (grayRatio >= gradientEnd) return endColorValue;
+
+        double interpolationFactor = (grayRatio - gradientStart) / (gradientEnd - gradientStart);
+        double interpolatedValue = startColorValue + (endColorValue - startColorValue) * interpolationFactor;
+
+        return MathUtils.ClampColorValue((int)Math.Round(interpolatedValue));
     }
 
     /// <summary>

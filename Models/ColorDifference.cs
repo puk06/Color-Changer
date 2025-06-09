@@ -3,6 +3,7 @@
 internal class ColorDifference(Color previousColor, Color newColor)
 {
     internal Color PreviousColor { get; private set; } = previousColor;
+    internal Color NewColor { get; private set; } = newColor;
     internal int DiffR { get; private set; } = newColor.R - previousColor.R;
     internal int DiffG { get; private set; } = newColor.G - previousColor.G;
     internal int DiffB { get; private set; } = newColor.B - previousColor.B;
@@ -15,6 +16,7 @@ internal class ColorDifference(Color previousColor, Color newColor)
     internal void Set(Color previousColor, Color newColor)
     {
         PreviousColor = previousColor;
+        NewColor = newColor;
         DiffR = newColor.R - previousColor.R;
         DiffG = newColor.G - previousColor.G;
         DiffB = newColor.B - previousColor.B;

@@ -9,7 +9,7 @@ namespace ColorChanger.Forms;
 
 public partial class MainForm : Form
 {
-    private const string CURRENT_VERSION = "v1.0.12";
+    private const string CURRENT_VERSION = "v1.0.13";
     private static readonly string FORM_TITLE = $"Color Changer For Texture {CURRENT_VERSION}";
     private static readonly Point VERSION_LABEL_POSITION = new Point(275, 54);
     private const int COLOR_UPDATE_DEBOUNCE_MS = 16;
@@ -33,8 +33,8 @@ public partial class MainForm : Form
     private BitArray _selectedPointsForPreview = BitArrayUtils.GetEmpty();
     private Bitmap? _previewBitmap;
 
-    private readonly ColorPickerForm _colorPickerForm = new ColorPickerForm();
-    private readonly BalanceModeSettingsForm _balanceModeSettingsForm = new BalanceModeSettingsForm();
+    internal readonly ColorPickerForm ColorPickerForm = new ColorPickerForm();
+    private readonly BalanceModeSettingsForm _balanceModeSettingsForm;
     private readonly SelectedAreaListForm _selectedAreaListForm = new SelectedAreaListForm();
     private readonly HelpForm _helpForm = new HelpForm();
     private readonly AdvancedColorSettingsForm _advancedColorSettingsForm = new AdvancedColorSettingsForm();
@@ -51,6 +51,7 @@ public partial class MainForm : Form
 
     public MainForm()
     {
+        _balanceModeSettingsForm = new BalanceModeSettingsForm(this);
         InitializeComponent();
 
         Text = FORM_TITLE;
@@ -95,7 +96,7 @@ public partial class MainForm : Form
 
         previousColorBox.BackColor = selectedColor;
         _previousColor = selectedColor;
-        _colorPickerForm.SetInitialColor(selectedColor);
+        ColorPickerForm.SetInitialColor(selectedColor);
 
         UpdateColorData();
 
@@ -331,7 +332,7 @@ public partial class MainForm : Form
             _previousColor = Color.Empty;
             _newColor = Color.Empty;
             _backgroundColor = Color.Empty;
-            _colorPickerForm.SetInitialColor(Color.Empty);
+            ColorPickerForm.SetInitialColor(Color.Empty);
 
             previousColorBox.BackColor = ColorUtils.DefaultBackgroundColor;
             newColorBox.BackColor = ColorUtils.DefaultBackgroundColor;
@@ -348,7 +349,7 @@ public partial class MainForm : Form
             UpdateTextureData();
             UpdateColorData();
 
-            _colorPickerForm.Hide();
+            ColorPickerForm.Hide();
         }
     }
 
@@ -526,11 +527,11 @@ public partial class MainForm : Form
             BitmapUtils.SetImage(coloredPreviewBox, GenerateColoredPreview(_previewBitmap));
         };
 
-        _colorPickerForm.ColorChanged += (s, e) =>
+        ColorPickerForm.ColorChanged += (s, e) =>
         {
             if (_previewBitmap == null || _previousColor == Color.Empty) return;
 
-            Color color = _colorPickerForm.SelectedColor;
+            Color color = ColorPickerForm.SelectedColor;
 
             _newColor = color;
             newColorBox.BackColor = color;
@@ -582,9 +583,9 @@ public partial class MainForm : Form
             return;
         }
 
-        _colorPickerForm.SetColor(_newColor == Color.Empty ? _previousColor : _newColor);
-        _colorPickerForm.Show();
-        _colorPickerForm.BringToFront();
+        ColorPickerForm.SetColor(_newColor == Color.Empty ? _previousColor : _newColor);
+        ColorPickerForm.Show();
+        ColorPickerForm.BringToFront();
     }
 
     private void SelectMode_CheckedChanged(object sender, EventArgs e)
