@@ -350,6 +350,7 @@ public partial class MainForm : Form
             UpdateColorData();
 
             ColorPickerForm.Hide();
+            _balanceModeSettingsForm.ResetGradientPreviewImage();
         }
     }
 

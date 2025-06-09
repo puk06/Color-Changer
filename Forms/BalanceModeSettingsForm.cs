@@ -60,6 +60,15 @@ internal partial class BalanceModeSettingsForm : Form
         Configuration = new BalanceModeConfiguration();
     }
 
+    /// <summary>
+    /// GradientPreviewImageをリセットする。
+    /// </summary>
+    internal void ResetGradientPreviewImage()
+    {
+        gradientPreview.Image?.Dispose();
+        gradientPreview.Image = null;
+    }
+
     #region Configuration関連
     private void SetConfigurationFromInputs()
     {
@@ -100,11 +109,11 @@ internal partial class BalanceModeSettingsForm : Form
             _configuration.V3GradientColor,
             _configuration.V3GradientStart,
             _configuration.V3GradientEnd,
-            gradientPrebiew.Size
+            gradientPreview.Size
         );
 
-        gradientPrebiew.Image?.Dispose();
-        gradientPrebiew.Image = gradientPreviewImage;
+        ResetGradientPreviewImage();
+        gradientPreview.Image = gradientPreviewImage;
     }
     #endregion
 

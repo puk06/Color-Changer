@@ -50,7 +50,7 @@ namespace ColorChanger.Forms
             label2 = new Label();
             v3Settings = new TabPage();
             label9 = new Label();
-            gradientPrebiew = new PictureBox();
+            gradientPreview = new PictureBox();
             label8 = new Label();
             v3gradientEnd = new TrackBar();
             label7 = new Label();
@@ -62,7 +62,7 @@ namespace ColorChanger.Forms
             v2Settings.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)v2radiusBar).BeginInit();
             v3Settings.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)gradientPrebiew).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)gradientPreview).BeginInit();
             ((System.ComponentModel.ISupportInitialize)v3gradientEnd).BeginInit();
             ((System.ComponentModel.ISupportInitialize)v3gradientStart).BeginInit();
             ((System.ComponentModel.ISupportInitialize)v3gradientColor).BeginInit();
@@ -252,7 +252,7 @@ namespace ColorChanger.Forms
             // 
             v3Settings.BackColor = Color.Transparent;
             v3Settings.Controls.Add(label9);
-            v3Settings.Controls.Add(gradientPrebiew);
+            v3Settings.Controls.Add(gradientPreview);
             v3Settings.Controls.Add(label8);
             v3Settings.Controls.Add(v3gradientEnd);
             v3Settings.Controls.Add(label7);
@@ -274,13 +274,13 @@ namespace ColorChanger.Forms
             label9.TabIndex = 12;
             label9.Text = "グラデーションプレビュー";
             // 
-            // gradientPrebiew
+            // gradientPreview
             // 
-            gradientPrebiew.Location = new Point(6, 202);
-            gradientPrebiew.Name = "gradientPrebiew";
-            gradientPrebiew.Size = new Size(257, 40);
-            gradientPrebiew.TabIndex = 11;
-            gradientPrebiew.TabStop = false;
+            gradientPreview.Location = new Point(6, 202);
+            gradientPreview.Name = "gradientPreview";
+            gradientPreview.Size = new Size(257, 40);
+            gradientPreview.TabIndex = 11;
+            gradientPreview.TabStop = false;
             // 
             // label8
             // 
@@ -368,7 +368,7 @@ namespace ColorChanger.Forms
             ((System.ComponentModel.ISupportInitialize)v2radiusBar).EndInit();
             v3Settings.ResumeLayout(false);
             v3Settings.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)gradientPrebiew).EndInit();
+            ((System.ComponentModel.ISupportInitialize)gradientPreview).EndInit();
             ((System.ComponentModel.ISupportInitialize)v3gradientEnd).EndInit();
             ((System.ComponentModel.ISupportInitialize)v3gradientStart).EndInit();
             ((System.ComponentModel.ISupportInitialize)v3gradientColor).EndInit();
@@ -402,7 +402,7 @@ namespace ColorChanger.Forms
         private Label label7;
         private TrackBar v3gradientStart;
         private Label label9;
-        private PictureBox gradientPrebiew;
+        private PictureBox gradientPreview;
         private Label label8;
         private TrackBar v3gradientEnd;
     }
