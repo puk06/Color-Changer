@@ -231,9 +231,9 @@ internal class ColorUtils
                 const double grayScaleWeightB = 0.114;
 
                 double grayScale = (
-                    grayScaleWeightR * (pixel.R / 255.0) +
-                    grayScaleWeightG * (pixel.G / 255.0) +
-                    grayScaleWeightB * (pixel.B / 255.0)
+                    (grayScaleWeightR * (pixel.R / 255.0)) +
+                    (grayScaleWeightG * (pixel.G / 255.0)) +
+                    (grayScaleWeightB * (pixel.B / 255.0))
                 );
 
                 double gradientStart = balanceModeConfiguration.V3GradientStart / 100.0;
@@ -281,7 +281,7 @@ internal class ColorUtils
         if (grayRatio >= gradientEnd) return endColorValue;
 
         double interpolationFactor = (grayRatio - gradientStart) / (gradientEnd - gradientStart);
-        double interpolatedValue = startColorValue + (endColorValue - startColorValue) * interpolationFactor;
+        double interpolatedValue = startColorValue + ((endColorValue - startColorValue) * interpolationFactor);
 
         return MathUtils.ClampColorValue((int)Math.Round(interpolatedValue));
     }
