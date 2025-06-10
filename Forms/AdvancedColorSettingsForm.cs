@@ -32,6 +32,7 @@ public partial class AdvancedColorSettingsForm : Form
         _configuration.Contrast = MathUtils.ParseDoubleOrDefault(contrast.Text, 1.0);
         _configuration.Gamma = MathUtils.ParseDoubleOrDefault(gamma.Text, 1.0);
         _configuration.Exposure = MathUtils.ParseDoubleOrDefault(exposure.Text);
+        _configuration.Transparency = MathUtils.ParseDoubleOrDefault(transparency.Text);
     }
 
     private void ApplyConfigurationToInputs(AdvancedColorConfiguration config)
@@ -40,6 +41,7 @@ public partial class AdvancedColorSettingsForm : Form
         contrast.Text = config.Contrast.ToString("F2");
         gamma.Text = config.Gamma.ToString("F2");
         exposure.Text = config.Exposure.ToString("F2");
+        transparency.Text = config.Transparency.ToString("F2");
     }
     #endregion
 
@@ -58,6 +60,7 @@ public partial class AdvancedColorSettingsForm : Form
         contrast.Text = "1.00";
         gamma.Text = "1.00";
         exposure.Text = "0.00";
+        transparency.Text = "0.00";
         SetConfigurationFromInputs();
 
         NotifyConfigurationChanged();

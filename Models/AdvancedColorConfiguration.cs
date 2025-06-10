@@ -10,6 +10,7 @@ internal class AdvancedColorConfiguration
     internal double Contrast { get; set; } = 1.0;
     internal double Gamma { get; set; } = 1.0;
     internal double Exposure { get; set; } = 0.0;
+    internal double Transparency { get; set; } = 0.0;
 
     internal bool BrightnessEnabled { get; private set; } = false;
 
@@ -18,6 +19,8 @@ internal class AdvancedColorConfiguration
     internal bool GammaEnabled { get; private set; } = false;
 
     internal bool ExposureEnabled { get; private set; } = false;
+
+    internal bool TransparencyEnabled { get; private set; } = false;
 
     /// <summary>
     /// コンポーネントの有効/無効を更新する
@@ -28,7 +31,8 @@ internal class AdvancedColorConfiguration
         ContrastEnabled = MathUtils.EqualDouble(Contrast, 1.0) == false;
         GammaEnabled = MathUtils.EqualDouble(Gamma, 1.0) == false;
         ExposureEnabled = MathUtils.EqualDouble(Exposure, 0.0) == false;
+        TransparencyEnabled = MathUtils.EqualDouble(Transparency, 0.0) == false;
 
-        Enabled = BrightnessEnabled || ContrastEnabled || GammaEnabled || ExposureEnabled;
+        Enabled = BrightnessEnabled || ContrastEnabled || GammaEnabled || ExposureEnabled || TransparencyEnabled;
     }
 }

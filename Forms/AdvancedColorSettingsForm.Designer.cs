@@ -39,6 +39,8 @@
             label5 = new Label();
             settingsPanel = new Panel();
             resetButton = new Button();
+            transparency = new TextBox();
+            label6 = new Label();
             settingsPanel.SuspendLayout();
             SuspendLayout();
             // 
@@ -139,6 +141,8 @@
             // settingsPanel
             // 
             settingsPanel.BackColor = Color.Gainsboro;
+            settingsPanel.Controls.Add(transparency);
+            settingsPanel.Controls.Add(label6);
             settingsPanel.Controls.Add(brightness);
             settingsPanel.Controls.Add(exposure);
             settingsPanel.Controls.Add(label2);
@@ -163,6 +167,27 @@
             resetButton.UseVisualStyleBackColor = true;
             resetButton.Click += ResetButton_Click;
             // 
+            // transparency
+            // 
+            transparency.Font = new Font("Yu Gothic UI", 14F);
+            transparency.Location = new Point(166, 161);
+            transparency.Name = "transparency";
+            transparency.Size = new Size(112, 32);
+            transparency.TabIndex = 14;
+            transparency.TextAlign = HorizontalAlignment.Center;
+            transparency.KeyDown += HandleKeyDown;
+            transparency.Leave += OnValueTextChanged;
+            // 
+            // label6
+            // 
+            label6.AutoSize = true;
+            label6.Font = new Font("Yu Gothic UI", 14F);
+            label6.Location = new Point(3, 164);
+            label6.Name = "label6";
+            label6.Size = new Size(69, 25);
+            label6.TabIndex = 13;
+            label6.Text = "透明度";
+            // 
             // AdvancedColorSettingsForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -171,8 +196,8 @@
             Controls.Add(resetButton);
             Controls.Add(settingsPanel);
             Controls.Add(label1);
-            Icon = new Icon(new MemoryStream(Properties.Resources.AppIcon));
             FormBorderStyle = FormBorderStyle.FixedSingle;
+            Icon = new Icon(new MemoryStream(Properties.Resources.AppIcon));
             MaximizeBox = false;
             MinimizeBox = false;
             Name = "AdvancedColorSettingsForm";
@@ -198,5 +223,7 @@
         private Label label5;
         private Panel settingsPanel;
         private Button resetButton;
+        private TextBox transparency;
+        private Label label6;
     }
 }

@@ -398,6 +398,9 @@ internal class ColorUtils
 
         if (advancedColorConfiguration.ExposureEnabled)
             ApplyExposure(ref pixel, advancedColorConfiguration.Exposure);
+
+        if (advancedColorConfiguration.TransparencyEnabled)
+            ApplyTransparency(ref pixel, advancedColorConfiguration.Transparency);
     }
 
     #region 色の追加設定用メソッド
@@ -424,6 +427,10 @@ internal class ColorUtils
         pixel.R = MathUtils.ClampColorValue((int)(pixel.R * Math.Pow(2, exposure)));
         pixel.G = MathUtils.ClampColorValue((int)(pixel.G * Math.Pow(2, exposure)));
         pixel.B = MathUtils.ClampColorValue((int)(pixel.B * Math.Pow(2, exposure)));
+    }
+    private static void ApplyTransparency(ref ColorPixel pixel, double transparency)
+    {
+        pixel.A = MathUtils.ClampColorValue((int)(pixel.A * (1 - transparency)));
     }
     #endregion
 
