@@ -22,7 +22,6 @@ internal partial class BalanceModeSettingsForm : Form
             ApplyConfigurationToInputs(_configuration);
             return _configuration;
         }
-        set => ApplyConfigurationToInputs(value);
     }
 
     private readonly ColorPickerForm _colorPickerForm = new ColorPickerForm();
@@ -57,7 +56,7 @@ internal partial class BalanceModeSettingsForm : Form
         _colorPickerForm.SetColor(Color.FromArgb(255, 255, 255));
 
         v2radiusBar.Maximum = (int)Math.Sqrt(3 * 255 * 255) + 1;
-        Configuration = new BalanceModeConfiguration();
+        ApplyConfigurationToInputs(_configuration);
     }
 
     /// <summary>
