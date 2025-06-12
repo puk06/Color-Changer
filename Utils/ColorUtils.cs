@@ -1,5 +1,4 @@
 ﻿using ColorChanger.Models;
-using System.Diagnostics;
 using System.Runtime.InteropServices;
 
 namespace ColorChanger.Utils;
@@ -29,6 +28,8 @@ internal struct ColorPixel(byte r, byte g, byte b, byte a)
 
 internal class ColorUtils
 {
+    private static ColorPixel TransparentColorPixel = new ColorPixel(0, 0, 0, 0);
+
     /// <summary>
     /// RGB値からカラーコードを取得する
     /// </summary>
@@ -36,8 +37,6 @@ internal class ColorUtils
     /// <returns></returns>
     internal static string GetColorCodeFromColor(Color color)
         => $"#{color.R:X2}{color.G:X2}{color.B:X2}";
-
-    private static ColorPixel _transparentPixel = new ColorPixel(0, 0, 0, 0);
 
     /// <summary>
     /// カラーコードからRGB値を取得する
@@ -177,7 +176,6 @@ internal class ColorUtils
     /// 色のバランス調整を行う
     /// </summary>
     /// <param name="pixel"></param>
-    /// <param name="previousColor"></param>
     /// <param name="diff"></param>
     /// <param name="balanceModeConfiguration"></param>
     /// <returns></returns>
@@ -368,6 +366,7 @@ internal class ColorUtils
     /// <param name="intersectionDistance"></param>
     /// <param name="distance"></param>
     /// <param name="graphWeight"></param>
+    /// <param name="minValue"></param>
     /// <returns></returns>
     internal static double CalculateColorChangeRate(bool hasIntersection, double intersectionDistance, double distance, double graphWeight, double minValue)
     {
@@ -446,7 +445,7 @@ internal class ColorUtils
     /// 透明なピクセルを取得する
     /// </summary>
     internal static ColorPixel TransparentPixel
-        => _transparentPixel;
+        => TransparentColorPixel;
 
     /// <summary>
     /// デフォルトの背景色を取得する

@@ -43,7 +43,7 @@ internal partial class BalanceModeSettingsForm : Form
     private static readonly string V3SettingsDescription = "このモードの説明:\n" +
         "ピクセルのグレースケール値を用いた色変換モードです。\n\n" +
         "計算式について: \n" +
-        "ピクセルのグレースケール値に基づいて、事前に作成したグラーデーション内で色の変化率を計算します。" +
+        "変更後の色と、終了色を基に作成したグラデーション内でピクセルのグレースケール値から色の変化率を計算します。" +
         "このモードは前の色関係なく綺麗に色を変えることができますが、一度グレーにして全体で色が統一されるので、変わってほしくない色まで変わってしまう可能性があります。";
 
     internal BalanceModeSettingsForm(MainForm mainForm)
@@ -158,7 +158,7 @@ internal partial class BalanceModeSettingsForm : Form
         NotifyConfigurationChanged();
     }
 
-    private void V2radiusBar_MouseUp(object sender, MouseEventArgs e)
+    private void V2radiusBar_Change(object sender, EventArgs e)
     {
         v2radius.Text = v2radiusBar.Value.ToString("F2");
         NotifyConfigurationChanged();
@@ -170,7 +170,7 @@ internal partial class BalanceModeSettingsForm : Form
     private void V3GradientColor_Click(object sender, EventArgs e)
         => _colorPickerForm.Show();
 
-    private void V3gradient_MouseUp(object sender, MouseEventArgs e)
+    private void V3gradient_Change(object sender, EventArgs e)
         => NotifyConfigurationChanged();
 
     private void NotifyConfigurationChanged()

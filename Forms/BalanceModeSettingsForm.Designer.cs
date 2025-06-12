@@ -195,7 +195,8 @@ namespace ColorChanger.Forms
             v2radiusBar.Name = "v2radiusBar";
             v2radiusBar.Size = new Size(257, 26);
             v2radiusBar.TabIndex = 6;
-            v2radiusBar.MouseUp += V2radiusBar_MouseUp;
+            v2radiusBar.MouseUp += V2radiusBar_Change;
+            v2radiusBar.KeyDown += V2radiusBar_Change;
             // 
             // v2minValue
             // 
@@ -301,7 +302,8 @@ namespace ColorChanger.Forms
             v3gradientEnd.TabIndex = 9;
             v3gradientEnd.TickFrequency = 10;
             v3gradientEnd.Value = 100;
-            v3gradientEnd.MouseUp += V3gradient_MouseUp;
+            v3gradientEnd.MouseUp += V3gradient_Change;
+            v3gradientEnd.KeyDown += V3gradient_Change;
             // 
             // label7
             // 
@@ -321,7 +323,8 @@ namespace ColorChanger.Forms
             v3gradientStart.Size = new Size(257, 26);
             v3gradientStart.TabIndex = 7;
             v3gradientStart.TickFrequency = 10;
-            v3gradientStart.MouseUp += V3gradient_MouseUp;
+            v3gradientStart.MouseUp += V3gradient_Change;
+            v3gradientStart.KeyDown += V3gradient_Change;
             // 
             // v3gradientColor
             // 
