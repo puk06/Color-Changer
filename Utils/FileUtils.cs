@@ -1,6 +1,6 @@
 ﻿namespace ColorChanger.Utils;
 
-internal class FileUtils
+internal static class FileUtils
 {
     /// <summary>
     /// 新しいファイル名を取得する

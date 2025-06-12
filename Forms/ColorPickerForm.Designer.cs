@@ -73,9 +73,9 @@
             colorPaletteBox.TabIndex = 1;
             colorPaletteBox.TabStop = false;
             colorPaletteBox.Paint += ColorPaletteBox_Paint;
-            colorPaletteBox.MouseDown += (s, e) => ColorPaletteBox_MouseEvent(s, e, true);
-            colorPaletteBox.MouseMove += (s, e) => ColorPaletteBox_MouseEvent(s, e, true);
-            colorPaletteBox.MouseUp += (s, e) => ColorPaletteBox_MouseEvent(s, e, false);
+            colorPaletteBox.MouseDown += (_, e) => ColorPaletteBox_MouseEvent(e, true);
+            colorPaletteBox.MouseMove += (_, e) => ColorPaletteBox_MouseEvent(e, true);
+            colorPaletteBox.MouseUp += (_, e) => ColorPaletteBox_MouseEvent(e, false);
             // 
             // blueBar
             // 

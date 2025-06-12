@@ -1,4 +1,5 @@
 ﻿using ColorChanger.Utils;
+using System.Diagnostics;
 
 namespace ColorChanger.Forms;
 
@@ -18,7 +19,7 @@ internal partial class ColorPickerForm : Form
 
     private Color _initialColor = Color.Empty;
     private Point _clickedPoint = Point.Empty;
-    private DateTime _lastUpdateCall = DateTime.MinValue;
+    private readonly Stopwatch _updateDebounceStopwatch = Stopwatch.StartNew();
 
     internal ColorPickerForm()
     {
@@ -54,8 +55,8 @@ internal partial class ColorPickerForm : Form
         if (e.Button != MouseButtons.Left) return;
         if (colorPaletteBox.Image is not Bitmap bmp) return;
 
-        if (suppressMove && (DateTime.Now - _lastUpdateCall).TotalMilliseconds <= COLOR_UPDATE_DEBOUNCE_MS) return;
-        _lastUpdateCall = DateTime.Now;
+        if (suppressMove && _updateDebounceStopwatch.ElapsedMilliseconds <= COLOR_UPDATE_DEBOUNCE_MS) return;
+        _updateDebounceStopwatch.Restart();
 
         Point originalCoords = BitmapUtils.GetOriginalCoordinates(e.Location, bmp.Size, colorPaletteBox.Size);
         if (!BitmapUtils.IsValidCoordinate(originalCoords, bmp.Size)) return;
@@ -132,7 +133,7 @@ internal partial class ColorPickerForm : Form
         e.Graphics.DrawLine(pen, _clickedPoint.X, _clickedPoint.Y - 5, _clickedPoint.X, _clickedPoint.Y + 5);
     }
 
-    private void ColorPaletteBox_MouseEvent(object _, MouseEventArgs e, bool suppressMove)
+    private void ColorPaletteBox_MouseEvent(MouseEventArgs e, bool suppressMove)
         => HandleColorSelection(e, suppressMove);
 
     private void HandleSliderChanged(object sender, EventArgs e) =>

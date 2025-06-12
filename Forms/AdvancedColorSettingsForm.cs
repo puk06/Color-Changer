@@ -22,7 +22,6 @@ public partial class AdvancedColorSettingsForm : Form
             ApplyConfigurationToInputs(_configuration);
             return _configuration;
         }
-        set => ApplyConfigurationToInputs(value);
     }
 
     #region Configuration関連
@@ -48,10 +47,8 @@ public partial class AdvancedColorSettingsForm : Form
     public AdvancedColorSettingsForm()
     {
         InitializeComponent();
-
-        Configuration = new AdvancedColorConfiguration();
+        ApplyConfigurationToInputs(_configuration);
     }
-
 
     #region イベントハンドラー
     private void ResetButton_Click(object sender, EventArgs e)
@@ -77,7 +74,7 @@ public partial class AdvancedColorSettingsForm : Form
     private void OnValueTextChanged(object sender, EventArgs e)
         => NotifyConfigurationChanged();
 
-    private void NotifyConfigurationChanged() 
+    private void NotifyConfigurationChanged()
         => ConfigurationChanged?.Invoke(this, EventArgs.Empty);
     #endregion
 

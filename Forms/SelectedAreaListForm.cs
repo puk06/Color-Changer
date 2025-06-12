@@ -9,11 +9,7 @@ public partial class SelectedAreaListForm : Form
     internal EventHandler? OnCheckedChanged;
 
     private int _selectedAreaCount = 0;
-    internal int EnabledCount
-    {
-        get => _selectedAreaCount;
-        private set => _selectedAreaCount = value;
-    }
+    internal int EnabledCount => _selectedAreaCount;
 
     private readonly List<SelectedArea> _selectedAreas = new List<SelectedArea>();
     internal BitArray SelectedArea

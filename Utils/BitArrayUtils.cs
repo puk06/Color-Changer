@@ -2,7 +2,7 @@
 
 namespace ColorChanger.Utils;
 
-internal class BitArrayUtils
+internal static class BitArrayUtils
 {
     /// <summary>
     /// 指定されたBitArrayのvalue値の個数を取得する

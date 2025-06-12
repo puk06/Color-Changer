@@ -1,6 +1,4 @@
-﻿using System.Collections;
-
-namespace ColorChanger.Utils;
+﻿namespace ColorChanger.Utils;
 
 internal readonly struct PixelPoint(int x, int y)
 {
@@ -14,7 +12,7 @@ internal readonly struct PixelPoint(int x, int y)
     }
 }
 
-internal class PixelUtils
+internal static class PixelUtils
 {
     /// <summary>
     /// 指定された座標からピクセルインデックスを取得する

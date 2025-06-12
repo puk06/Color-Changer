@@ -14,7 +14,7 @@ public partial class MainForm : Form
     private static readonly Point VERSION_LABEL_POSITION = new Point(275, 54);
     private const int COLOR_UPDATE_DEBOUNCE_MS = 16;
 
-    private static readonly string ITEM_URL = "https://pukorufu.booth.pm/items/6519471";
+    private static readonly string ITEM_URL = Properties.Resources.ItemURL;
     private readonly ProcessStartInfo _processStartInfo = new ProcessStartInfo()
     {
         FileName = ITEM_URL,
@@ -25,7 +25,7 @@ public partial class MainForm : Form
     private Color _newColor = Color.Empty;
     private Color _backgroundColor = Color.Empty;
     private Point _clickedPoint = Point.Empty;
-    private DateTime _lastUpdateCall = DateTime.MinValue;
+    private readonly Stopwatch _updateDebounceStopwatch = Stopwatch.StartNew();
 
     private Bitmap? _bmp;
     private string? _imageFilePath;
@@ -82,8 +82,8 @@ public partial class MainForm : Form
 
         if (!BitmapUtils.IsValidCoordinate(e.Location, _previewBitmap.Size)) return;
 
-        if ((DateTime.Now - _lastUpdateCall).TotalMilliseconds <= COLOR_UPDATE_DEBOUNCE_MS) return;
-        _lastUpdateCall = DateTime.Now;
+        if (_updateDebounceStopwatch.ElapsedMilliseconds <= COLOR_UPDATE_DEBOUNCE_MS) return;
+        _updateDebounceStopwatch.Restart();
 
         Color selectedColor = _previewBitmap.GetPixel(e.X, e.Y);
 
@@ -266,15 +266,19 @@ public partial class MainForm : Form
     {
         try
         {
-            return ImageProcessorService.GeneratePreview(
-                sourceBitmap,
-                ColorDifference,
-                balanceMode.Checked, _balanceModeSettingsForm.Configuration,
-                _advancedColorSettingsForm.Configuration,
-                _selectedPointsForPreview,
-                coloredPreviewBox.Size,
-                rawMode
-            );
+            PreviewConfiguration previewConfig = new PreviewConfiguration
+            {
+                SourceBitmap = sourceBitmap,
+                ColorDifference = ColorDifference,
+                BalanceMode = balanceMode.Checked,
+                BalanceModeConfiguration = _balanceModeSettingsForm.Configuration,
+                AdvancedColorConfiguration = _advancedColorSettingsForm.Configuration,
+                SelectedPoints = _selectedPointsForPreview,
+                PreviewBoxSize = coloredPreviewBox.Size,
+                RawMode = rawMode
+            };
+
+            return ImageProcessorService.GeneratePreview(previewConfig);
         }
         catch (Exception ex)
         {

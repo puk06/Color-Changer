@@ -3,7 +3,7 @@ using System.Drawing.Imaging;
 
 namespace ColorChanger.Utils;
 
-internal class BitmapUtils
+internal static class BitmapUtils
 {
     private const int COLOR_PIXEL_SIZE = 4; // 32ビットARGB形式のピクセルサイズ
 
@@ -53,30 +53,17 @@ internal class BitmapUtils
             selected[startIndex] = true;
             queue.Enqueue(new PixelPoint(startX, startY));
 
-            ReadOnlySpan<int> dx = [-1, 1, 0, 0];
-            ReadOnlySpan<int> dy = [0, 0, -1, 1];
-
             while (queue.Count > 0)
             {
                 PixelPoint point = queue.Dequeue();
-                var (x, y) = point;
-
-                for (int i = 0; i < 4; i++)
-                {
-                    int nx = x + dx[i];
-                    int ny = y + dy[i];
-
-                    if (nx < 0 || nx >= width || ny < 0 || ny >= height) continue;
-
-                    int nIndex = PixelUtils.GetPixelIndex(nx, ny, width);
-                    if (selected[nIndex]) continue;
-
-                    if (!pixels[nIndex].Equals(backgroundColor))
-                    {
-                        selected[nIndex] = true;
-                        queue.Enqueue(new PixelPoint(nx, ny));
-                    }
-                }
+                EnqueueValidNeighbors(
+                    point,
+                    width, height,
+                    pixels,
+                    backgroundColor,
+                    selected,
+                    queue
+                );
             }
 
             return selected;
@@ -87,11 +74,44 @@ internal class BitmapUtils
         }
     }
 
+    private static readonly int[] Dx = [-1, 1, 0, 0];
+    private static readonly int[] Dy = [0, 0, -1, 1];
+    private static void EnqueueValidNeighbors(
+        PixelPoint point,
+        int width, int height,
+        Span<ColorPixel> pixels,
+        Color backgroundColor,
+        BitArray selected,
+        Queue<PixelPoint> queue
+    )
+    {
+        ReadOnlySpan<int> dx = Dx;
+        ReadOnlySpan<int> dy = Dy;
+        var (x, y) = point;
+
+        for (int i = 0; i < 4; i++)
+        {
+            int nx = x + dx[i];
+            int ny = y + dy[i];
+
+            if (nx < 0 || nx >= width || ny < 0 || ny >= height) continue;
+
+            int nIndex = PixelUtils.GetPixelIndex(nx, ny, width);
+            if (selected[nIndex]) continue;
+
+            if (!pixels[nIndex].Equals(backgroundColor))
+            {
+                selected[nIndex] = true;
+                queue.Enqueue(new PixelPoint(nx, ny));
+            }
+        }
+    }
+
     /// <summary>
     /// 選択範囲をプレビュー用の座標に変換する
     /// </summary>
     /// <param name="selectedArea"></param>
-    /// <param name="sourceImage"></paramImageProcessing
+    /// <param name="sourceImage"></param>
     /// <param name="previewBox"></param>
     /// <param name="inverseMode"></param>
     /// <returns></returns>
@@ -99,7 +119,8 @@ internal class BitmapUtils
         BitArray selectedArea,
         Bitmap sourceImage,
         PictureBox previewBox,
-        bool inverseMode)
+        bool inverseMode
+    )
     {
         int previewHeight = previewBox.Height;
         int previewWidth = previewBox.Width;
@@ -160,40 +181,41 @@ internal class BitmapUtils
             {
                 int index = PixelUtils.GetPixelIndex(x, y, width);
 
-                // 選択されていない部分には斜線を引く
                 if (!selectedArea[index])
                 {
                     if ((x + y) % stripeInterval == 0)
+                    {
                         result[index] = true;
-
+                    }
                     continue;
                 }
 
-                // lineWidthドット外の上下左右が画像外なら枠を描く
-                if (x < lineWidth || x >= width - lineWidth || y < lineWidth || y >= height - lineWidth)
+                if (IsEdgePixel(x, y, width, height, lineWidth) || !IsInnerPixel(selectedArea, x, y, width, lineWidth))
                 {
                     result[index] = true;
-                    continue;
                 }
-
-                // 上下左右のlineWidthドット離れたピクセルをチェック
-                int up = PixelUtils.GetPixelIndex(x, y - lineWidth, width);
-                int down = PixelUtils.GetPixelIndex(x, y + lineWidth, width);
-                int left = PixelUtils.GetPixelIndex(x - lineWidth, y, width);
-                int right = PixelUtils.GetPixelIndex(x + lineWidth, y, width);
-
-                bool isInner =
-                    selectedArea[up] &&
-                    selectedArea[down] &&
-                    selectedArea[left] &&
-                    selectedArea[right];
-
-                if (!isInner)
-                    result[index] = true;
             }
         }
 
         return result;
+    }
+
+    private static bool IsEdgePixel(int x, int y, int width, int height, int lineWidth)
+    {
+        return x < lineWidth || x >= width - lineWidth || y < lineWidth || y >= height - lineWidth;
+    }
+
+    private static bool IsInnerPixel(BitArray selectedArea, int x, int y, int width, int lineWidth)
+    {
+        int up = PixelUtils.GetPixelIndex(x, y - lineWidth, width);
+        int down = PixelUtils.GetPixelIndex(x, y + lineWidth, width);
+        int left = PixelUtils.GetPixelIndex(x - lineWidth, y, width);
+        int right = PixelUtils.GetPixelIndex(x + lineWidth, y, width);
+
+        return selectedArea[up] &&
+            selectedArea[down] &&
+            selectedArea[left] &&
+            selectedArea[right];
     }
 
     /// <summary>

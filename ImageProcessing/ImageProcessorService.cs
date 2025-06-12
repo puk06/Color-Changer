@@ -5,38 +5,24 @@ using System.Drawing.Imaging;
 
 namespace ColorChanger.ImageProcessing;
 
-internal class ImageProcessorService
+internal static class ImageProcessorService
 {
     private static readonly ColorPixel PreviewOutlineColor = new ColorPixel(255, 0, 0, 255);
 
     /// <summary>
     /// プレビュー画像を生成する
     /// </summary>
-    /// <param name="sourceBitmap"></param>
-    /// <param name="colorDifference"></param>
-    /// <param name="balanceMode"></param>
     /// <param name="configuration"></param>
-    /// <param name="selectedPoints"></param>
-    /// <param name="previewBoxSize"></param>
-    /// <param name="rawMode"></param>
     /// <returns></returns>
-    internal static Bitmap GeneratePreview(
-        Bitmap sourceBitmap,
-        ColorDifference colorDifference,
-        bool balanceMode, BalanceModeConfiguration configuration,
-        AdvancedColorConfiguration advancedColorConfiguration,
-        BitArray selectedPoints,
-        Size previewBoxSize,
-        bool rawMode = false
-    )
+    internal static Bitmap GeneratePreview(PreviewConfiguration configuration)
     {
-        int boxHeight = previewBoxSize.Height;
-        int boxWidth = previewBoxSize.Width;
+        int boxHeight = configuration.PreviewBoxSize.Height;
+        int boxWidth = configuration.PreviewBoxSize.Width;
 
         Bitmap previewBitmap = new Bitmap(boxWidth, boxHeight, PixelFormat.Format32bppArgb);
 
-        Rectangle sourceRect = BitmapUtils.GetRectangle(sourceBitmap);
-        BitmapData? sourceBitmapData = BitmapUtils.LockBitmap(sourceBitmap, sourceRect, ImageLockMode.ReadOnly);
+        Rectangle sourceRect = BitmapUtils.GetRectangle(configuration.SourceBitmap);
+        BitmapData? sourceBitmapData = BitmapUtils.LockBitmap(configuration.SourceBitmap, sourceRect, ImageLockMode.ReadOnly);
 
         Rectangle previewRect = BitmapUtils.GetRectangle(previewBitmap);
         BitmapData? previewBitmapData = BitmapUtils.LockBitmap(previewBitmap, previewRect, ImageLockMode.WriteOnly);
@@ -51,35 +37,35 @@ internal class ImageProcessorService
                 if (sourcePixels.IsEmpty || previewPixels.IsEmpty)
                 {
                     FormUtils.ShowError("画像の読み込みに失敗しました。");
-                    return sourceBitmap;
+                    return configuration.SourceBitmap;
                 }
 
-                ImageProcessor imageProcessor = new ImageProcessor(sourceBitmap.Size, colorDifference);
+                ImageProcessor imageProcessor = new ImageProcessor(configuration.SourceBitmap.Size, configuration.ColorDifference);
 
-                if (rawMode)
+                if (configuration.RawMode)
                 {
-                    float ratioX = (float)sourceBitmap.Width / boxWidth;
-                    float ratioY = (float)sourceBitmap.Height / boxHeight;
+                    float ratioX = (float)configuration.SourceBitmap.Width / boxWidth;
+                    float ratioY = (float)configuration.SourceBitmap.Height / boxHeight;
                     var ratios = (ratioX, ratioY);
 
-                    imageProcessor.ProcessAllPreviewPixelsWithoutAdjustment(sourcePixels, previewPixels, ratios, previewBoxSize);
+                    imageProcessor.ProcessAllPreviewPixelsWithoutAdjustment(sourcePixels, previewPixels, ratios, configuration.PreviewBoxSize);
                     return previewBitmap;
                 }
 
-                if (balanceMode)
-                    imageProcessor.SetBalanceSettings(configuration);
+                if (configuration.BalanceMode)
+                    imageProcessor.SetBalanceSettings(configuration.BalanceModeConfiguration);
 
-                if (advancedColorConfiguration.Enabled)
-                    imageProcessor.SetColorSettings(advancedColorConfiguration);
+                if (configuration.AdvancedColorConfiguration.Enabled)
+                    imageProcessor.SetColorSettings(configuration.AdvancedColorConfiguration);
 
                 imageProcessor.ProcessAllPixels(sourcePixels, previewPixels);
 
-                if (selectedPoints.Length != 0)
+                if (configuration.SelectedPoints.Length != 0)
                 {
                     BitArray innerAreaMask = BitmapUtils.RemoveInnerSelectedArea(
-                        selectedPoints,
-                        previewBoxSize.Width,
-                        previewBoxSize.Height
+                        configuration.SelectedPoints,
+                        configuration.PreviewBoxSize.Width,
+                        configuration.PreviewBoxSize.Height
                     );
 
                     ImageProcessor.ChangeSelectedPixelsColor(previewPixels, innerAreaMask, PreviewOutlineColor);
@@ -88,7 +74,7 @@ internal class ImageProcessorService
         }
         finally
         {
-            if (sourceBitmapData != null) sourceBitmap.UnlockBits(sourceBitmapData);
+            if (sourceBitmapData != null) configuration.SourceBitmap.UnlockBits(sourceBitmapData);
             if (previewBitmapData != null) previewBitmap.UnlockBits(previewBitmapData);
         }
 

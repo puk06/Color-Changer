@@ -1,6 +1,6 @@
 ﻿namespace ColorChanger.Utils;
 
-internal class FormUtils
+internal static class FormUtils
 {
     /// <summary>
     /// キー入力がナビゲーションキーかどうかを判定する

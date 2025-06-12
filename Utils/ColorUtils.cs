@@ -26,7 +26,7 @@ internal struct ColorPixel(byte r, byte g, byte b, byte a)
     }
 }
 
-internal class ColorUtils
+internal static class ColorUtils
 {
     private static ColorPixel TransparentColorPixel = new ColorPixel(0, 0, 0, 0);
 
@@ -340,16 +340,20 @@ internal class ColorUtils
                 double z = base_b + (t * dz);
 
                 // 点がRGB空間内にあるか（各成分が0〜255の間）
-                if (x >= 0 && x <= 255 && y >= 0 && y <= 255 && z >= 0 && z <= 255)
+                if (
+                    x >= 0 && x <= 255 &&
+                    y >= 0 && y <= 255 &&
+                    z >= 0 && z <= 255 &&
+                    t < minPositiveT
+                )
                 {
-                    if (t < minPositiveT)
-                        minPositiveT = t;
+                    minPositiveT = t;
                 }
             }
         }
 
         // 最短距離 = ベクトルの長さ * t
-        if (minPositiveT != double.MaxValue)
+        if (Math.Abs(minPositiveT - double.MaxValue) > MathUtils.EPSILON)
         {
             double length = Math.Sqrt((dx * dx) + (dy * dy) + (dz * dz));
             return (true, minPositiveT * length);
@@ -370,7 +374,7 @@ internal class ColorUtils
     /// <returns></returns>
     internal static double CalculateColorChangeRate(bool hasIntersection, double intersectionDistance, double distance, double graphWeight, double minValue)
     {
-        if (!hasIntersection || intersectionDistance == 0) return 1;
+        if (!hasIntersection || Math.Abs(intersectionDistance) < MathUtils.EPSILON) return 1;
         double changeRate = Math.Pow(1 - (distance / intersectionDistance), graphWeight);
         return Math.Max(minValue, changeRate);
     }

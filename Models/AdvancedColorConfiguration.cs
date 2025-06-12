@@ -27,11 +27,11 @@ internal class AdvancedColorConfiguration
     /// </summary>
     internal void UpdateComponentActivationStatus()
     {
-        BrightnessEnabled = MathUtils.EqualDouble(Brightness, 1.0) == false;
-        ContrastEnabled = MathUtils.EqualDouble(Contrast, 1.0) == false;
-        GammaEnabled = MathUtils.EqualDouble(Gamma, 1.0) == false;
-        ExposureEnabled = MathUtils.EqualDouble(Exposure, 0.0) == false;
-        TransparencyEnabled = MathUtils.EqualDouble(Transparency, 0.0) == false;
+        BrightnessEnabled = !MathUtils.EqualDouble(Brightness, 1.0);
+        ContrastEnabled = !MathUtils.EqualDouble(Contrast, 1.0);
+        GammaEnabled = !MathUtils.EqualDouble(Gamma, 1.0);
+        ExposureEnabled = !MathUtils.EqualDouble(Exposure, 0.0);
+        TransparencyEnabled = !MathUtils.EqualDouble(Transparency, 0.0);
 
         Enabled = BrightnessEnabled || ContrastEnabled || GammaEnabled || ExposureEnabled || TransparencyEnabled;
     }

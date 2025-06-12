@@ -1,7 +1,12 @@
 ﻿namespace ColorChanger.Utils;
 
-internal class MathUtils
+internal static class MathUtils
 {
+    /// <summary>
+    /// 浮動小数点の比較に使用する許容誤差
+    /// </summary>
+    internal const double EPSILON = 1e-6;
+
     /// <summary>
     /// 数値をパースして0〜255にクランプする
     /// </summary>
