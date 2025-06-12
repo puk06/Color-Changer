@@ -68,7 +68,6 @@ public partial class AdvancedColorSettingsForm : Form
         if (!FormUtils.IsNavigationKey(e)) return;
 
         NotifyConfigurationChanged();
-        SelectNextControl((Control)sender, true, true, true, true);
     }
 
     private void OnValueTextChanged(object sender, EventArgs e)
