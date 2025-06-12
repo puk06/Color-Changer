@@ -9,13 +9,13 @@ namespace ColorChanger.Forms;
 
 public partial class MainForm : Form
 {
-    private const string CURRENT_VERSION = "v1.0.13";
+    private const string CURRENT_VERSION = "v1.0.14";
     private static readonly string FORM_TITLE = $"Color Changer For Texture {CURRENT_VERSION}";
     private static readonly Point VERSION_LABEL_POSITION = new Point(275, 54);
-    private const int COLOR_UPDATE_DEBOUNCE_MS = 16;
+    private const int COLOR_UPDATE_DEBOUNCE_MS = 14;
 
     private static readonly string ITEM_URL = Properties.Resources.ItemURL;
-    private readonly ProcessStartInfo _processStartInfo = new ProcessStartInfo()
+    private static readonly ProcessStartInfo UrlProcessStartInfo = new ProcessStartInfo()
     {
         FileName = ITEM_URL,
         UseShellExecute = true
@@ -733,7 +733,7 @@ public partial class MainForm : Form
 
         try
         {
-            Process.Start(_processStartInfo);
+            Process.Start(UrlProcessStartInfo);
         }
         catch (Exception ex)
         {

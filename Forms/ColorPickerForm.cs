@@ -5,7 +5,7 @@ namespace ColorChanger.Forms;
 
 internal partial class ColorPickerForm : Form
 {
-    private const int COLOR_UPDATE_DEBOUNCE_MS = 16;
+    private const int COLOR_UPDATE_DEBOUNCE_MS = 14;
 
     /// <summary>
     /// 色が変更されたときに発生するイベント
