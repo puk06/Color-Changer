@@ -21,7 +21,7 @@
 - 🔁 **Global Color Change** – Apply a color shift across the entire texture.
 - 🎯 **Partial Color Change** – Change only selected regions of the texture.
 - 🖼️ **Transparent Image Creation** – Make only the selected area transparent.
-- 🎚️ **Distance-Based Blending** – Adjust the color change strength based on color similarity.
+- 🎚️ **Multiple Calculation Methods** – Various formulas for color change calculations.
 
 ---
 
