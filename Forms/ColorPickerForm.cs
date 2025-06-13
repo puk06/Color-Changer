@@ -10,7 +10,7 @@ internal partial class ColorPickerForm : Form
     /// <summary>
     /// 色が変更されたときに発生するイベント
     /// </summary>
-    internal EventHandler? ColorChanged;
+    internal event EventHandler? ColorChanged;
 
     /// <summary>
     /// 現在選択されている色

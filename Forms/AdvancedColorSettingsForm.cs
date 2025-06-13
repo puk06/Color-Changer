@@ -10,10 +10,11 @@ public partial class AdvancedColorSettingsForm : Form
     /// </summary>
     internal event EventHandler? ConfigurationChanged;
 
+    private readonly AdvancedColorConfiguration _configuration = new AdvancedColorConfiguration();
+
     /// <summary>
     /// 現在の色の設定値
     /// </summary>
-    private readonly AdvancedColorConfiguration _configuration = new AdvancedColorConfiguration();
     internal AdvancedColorConfiguration Configuration
     {
         get

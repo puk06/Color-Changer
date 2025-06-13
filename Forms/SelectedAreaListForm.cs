@@ -6,12 +6,23 @@ namespace ColorChanger.Forms;
 
 public partial class SelectedAreaListForm : Form
 {
-    internal EventHandler? OnCheckedChanged;
+    /// <summary>
+    /// 選択エリアの有効／無効が変更されたときに発生するイベント
+    /// </summary>
+    internal event EventHandler? OnCheckedChanged;
 
     private int _selectedAreaCount = 0;
+
+    /// <summary>
+    /// 現在有効な選択エリアの数
+    /// </summary>
     internal int EnabledCount => _selectedAreaCount;
 
     private readonly List<SelectedArea> _selectedAreas = new List<SelectedArea>();
+
+    /// <summary>
+    /// 現在選択されているすべてのエリア
+    /// </summary>
     internal BitArray SelectedArea
     {
         get

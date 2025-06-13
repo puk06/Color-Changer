@@ -10,10 +10,11 @@ internal partial class BalanceModeSettingsForm : Form
     /// </summary>
     internal event EventHandler? ConfigurationChanged;
 
+    private readonly BalanceModeConfiguration _configuration = new BalanceModeConfiguration();
+
     /// <summary>
     /// 現在のバランスモードの設定値
     /// </summary>
-    private readonly BalanceModeConfiguration _configuration = new BalanceModeConfiguration();
     internal BalanceModeConfiguration Configuration
     {
         get
