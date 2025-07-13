@@ -36,6 +36,7 @@
             descriptionText = new Label();
             label1 = new Label();
             button6 = new Button();
+            button7 = new Button();
             SuspendLayout();
             // 
             // button1
@@ -123,11 +124,23 @@
             button6.UseVisualStyleBackColor = true;
             button6.Click += Button6_Click;
             // 
+            // button7
+            // 
+            button7.Font = new Font("Yu Gothic UI", 12F);
+            button7.Location = new Point(12, 345);
+            button7.Name = "button7";
+            button7.Size = new Size(149, 50);
+            button7.TabIndex = 8;
+            button7.Text = "テクスチャから色選択";
+            button7.UseVisualStyleBackColor = true;
+            button7.Click += Button7_Click;
+            // 
             // HelpForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(803, 584);
+            Controls.Add(button7);
             Controls.Add(button6);
             Controls.Add(label1);
             Controls.Add(descriptionText);
@@ -158,5 +171,6 @@
         private Label descriptionText;
         private Label label1;
         private Button button6;
+        private Button button7;
     }
 }

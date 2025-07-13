@@ -3,6 +3,7 @@
 public partial class HelpForm : Form
 {
     private static readonly string BasicUsageMessage = "このソフトの基本的な使い方:\n" +
+        "- 変更前の色と変更後の色の差を全体に適用する、シンプルな色改変のやり方です。\n\n" + 
         "1. 画像を画面内にドラッグ＆ドロップするか、「ファイルを開く」ボタンを押して画像を読み込んでください。\n" +
         "2. 変更前の色は、画像内をクリックまたはドラッグして選択します。\n" +
         "3. 変更後の色は、画面下部のグレーの枠をクリックして選択してください。\n" +
@@ -41,6 +42,14 @@ public partial class HelpForm : Form
         "値が変更されていた場合、それぞれの順番に従って色の調整が適用されます。\n" +
         "※調整値は小数点以下（例：1.2など）を想定しています。3.0など大きすぎる値は、予期しない結果になる場合があります。";
 
+    private static readonly string SelectColorFromTextureMessage = "他のテクスチャ画像から色を選択:\n" +
+        "- 追加のテクスチャ画像を読み込み、その画像内で選択した色を変更後の色として適用する機能です。\n\n" +
+        "1. 通常通り画像を読み込み、あらかじめ変更前の色を設定しておいてください。\n" +
+        "2. 画面上部のツールバーから「テクスチャから色を選択」をクリックします。\n" +
+        "3. 表示されたウィンドウに画像をドラッグ＆ドロップするか、「ファイルを開く」ボタンをクリックして画像を読み込みます。\n" +
+        "4. 画像内をクリックまたはドラッグして色を選択します。\n" +
+        "5. 「この色を適用」ボタンをクリックすると、現在選択している色が変更後の色として設定されます。";
+
     public HelpForm()
     {
         InitializeComponent();
@@ -75,6 +84,11 @@ public partial class HelpForm : Form
     private void Button6_Click(object sender, EventArgs e)
     {
         descriptionText.Text = AdvancedColorSettingsMessage;
+    }
+
+    private void Button7_Click(object sender, EventArgs e)
+    {
+        descriptionText.Text = SelectColorFromTextureMessage;
     }
     #endregion
 

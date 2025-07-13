@@ -48,6 +48,8 @@
             inverseMode = new CheckBox();
             menuToolBar = new MenuStrip();
             openFile = new ToolStripMenuItem();
+            Tool = new ToolStripMenuItem();
+            SelectColorFromTexture = new ToolStripMenuItem();
             balanceModeSettingsButton = new ToolStripMenuItem();
             selectedAreaListButton = new ToolStripMenuItem();
             AdvancedColorSettingsButton = new ToolStripMenuItem();
@@ -293,7 +295,7 @@
             // menuToolBar
             // 
             menuToolBar.Font = new Font("Yu Gothic UI", 19F);
-            menuToolBar.Items.AddRange(new ToolStripItem[] { openFile, balanceModeSettingsButton, selectedAreaListButton, AdvancedColorSettingsButton, helpUseButton, aboutThisSoftware, donationButton });
+            menuToolBar.Items.AddRange(new ToolStripItem[] { openFile, balanceModeSettingsButton, selectedAreaListButton, AdvancedColorSettingsButton, Tool, helpUseButton, aboutThisSoftware, donationButton });
             menuToolBar.Location = new Point(0, 0);
             menuToolBar.Name = "menuToolBar";
             menuToolBar.Size = new Size(1256, 24);
@@ -307,6 +309,21 @@
             openFile.Size = new Size(81, 20);
             openFile.Text = "ファイルを開く";
             openFile.Click += OpenFile_Click;
+            // 
+            // Tool
+            // 
+            Tool.DropDownItems.AddRange(new ToolStripItem[] { SelectColorFromTexture });
+            Tool.Font = new Font("Yu Gothic UI", 9F);
+            Tool.Name = "Tool";
+            Tool.Size = new Size(46, 20);
+            Tool.Text = "ツール";
+            // 
+            // SelectColorFromTexture
+            // 
+            SelectColorFromTexture.Name = "SelectColorFromTexture";
+            SelectColorFromTexture.Size = new Size(180, 22);
+            SelectColorFromTexture.Text = "テクスチャから色を選択";
+            SelectColorFromTexture.Click += SelectColorFromTexture_Click;
             // 
             // balanceModeSettingsButton
             // 
@@ -700,5 +717,7 @@
         private Label memoryUsage;
         private Label label17;
         private Label textureType;
+        private ToolStripMenuItem Tool;
+        private ToolStripMenuItem SelectColorFromTexture;
     }
 }

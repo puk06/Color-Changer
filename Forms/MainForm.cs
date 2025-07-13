@@ -38,6 +38,7 @@ public partial class MainForm : Form
     private readonly SelectedAreaListForm _selectedAreaListForm = new SelectedAreaListForm();
     private readonly HelpForm _helpForm = new HelpForm();
     private readonly AdvancedColorSettingsForm _advancedColorSettingsForm = new AdvancedColorSettingsForm();
+    private readonly SelectColorFromTextureForm _selectColorFromTextureForm = new SelectColorFromTextureForm();
 
     private readonly ColorDifference _colorDifference = new ColorDifference(Color.Empty, Color.Empty);
     private ColorDifference ColorDifference
@@ -546,6 +547,20 @@ public partial class MainForm : Form
             BitmapUtils.SetImage(coloredPreviewBox, GenerateColoredPreview(_previewBitmap));
         };
 
+        _selectColorFromTextureForm.ColorChanged += (s, e) =>
+        {
+            if (_previewBitmap == null || _previousColor == Color.Empty) return;
+
+            Color color = _selectColorFromTextureForm.SelectedColor;
+
+            _newColor = color;
+            newColorBox.BackColor = color;
+
+            UpdateColorData();
+
+            BitmapUtils.SetImage(coloredPreviewBox, GenerateColoredPreview(_previewBitmap));
+        };
+
         _selectedAreaListForm.OnCheckedChanged += (s, e)
             => UpdateSelectedArea();
 
@@ -699,6 +714,11 @@ public partial class MainForm : Form
     {
         _helpForm.Show();
         _helpForm.BringToFront();
+    }
+    private void SelectColorFromTexture_Click(object sender, EventArgs e)
+    {
+        _selectColorFromTextureForm.Show();
+        _selectColorFromTextureForm.BringToFront();
     }
 
     private void UndoButton_Click(object sender, EventArgs e)
