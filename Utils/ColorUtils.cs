@@ -331,24 +331,21 @@ internal static class ColorUtils
 
         // 最小正の t を探す（延長線上、前方方向）
         double minPositiveT = double.MaxValue;
-        foreach (double t in t_values)
+        foreach (double t in t_values.Where(t => t > 0))
         {
-            if (t > 0)
-            {
-                double x = base_r + (t * dx);
-                double y = base_g + (t * dy);
-                double z = base_b + (t * dz);
+            double x = base_r + (t * dx);
+            double y = base_g + (t * dy);
+            double z = base_b + (t * dz);
 
-                // 点がRGB空間内にあるか（各成分が0〜255の間）
-                if (
-                    x >= 0 && x <= 255 &&
-                    y >= 0 && y <= 255 &&
-                    z >= 0 && z <= 255 &&
-                    t < minPositiveT
-                )
-                {
-                    minPositiveT = t;
-                }
+            // 点がRGB空間内にあるか（各成分が0〜255の間）
+            if (
+                x >= 0 && x <= 255 &&
+                y >= 0 && y <= 255 &&
+                z >= 0 && z <= 255 &&
+                t < minPositiveT
+            )
+            {
+                minPositiveT = t;
             }
         }
 
