@@ -216,7 +216,7 @@ internal static class ColorUtils
                 }
                 else if (balanceModeConfiguration.V2IncludeOutside)
                 {
-                    adjustmentFactor = balanceModeConfiguration.V1MinimumValue;
+                    adjustmentFactor = balanceModeConfiguration.V2MinimumValue;
                 }
                 break;
 

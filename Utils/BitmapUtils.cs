@@ -201,9 +201,7 @@ internal static class BitmapUtils
     }
 
     private static bool IsEdgePixel(int x, int y, int width, int height, int lineWidth)
-    {
-        return x < lineWidth || x >= width - lineWidth || y < lineWidth || y >= height - lineWidth;
-    }
+        => x < lineWidth || x >= width - lineWidth || y < lineWidth || y >= height - lineWidth;
 
     private static bool IsInnerPixel(BitArray selectedArea, int x, int y, int width, int lineWidth)
     {
