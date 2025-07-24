@@ -32,10 +32,11 @@ internal partial class ColorPickerForm : Form
     /// 色を設定する
     /// </summary>
     /// <param name="newColor"></param>
-    internal void SetColor(Color newColor)
+    /// <param name="skipUpdate"></param>
+    internal void SetColor(Color newColor, bool skipUpdate = false)
     {
         SelectedColor = newColor == Color.Empty ? Color.White : newColor;
-        UpdateSelectedColor(SelectedColor);
+        if (!skipUpdate) UpdateSelectedColor(SelectedColor);
     }
 
     /// <summary>

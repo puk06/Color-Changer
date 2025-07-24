@@ -2,25 +2,21 @@
 
 namespace ColorChanger.Models;
 
-internal class AdvancedColorConfiguration
+public class AdvancedColorConfiguration
 {
-    internal bool Enabled { get; private set; } = false;
+    public bool Enabled { get; private set; } = false;
 
-    internal double Brightness { get; set; } = 1.0;
-    internal double Contrast { get; set; } = 1.0;
-    internal double Gamma { get; set; } = 1.0;
-    internal double Exposure { get; set; } = 0.0;
-    internal double Transparency { get; set; } = 0.0;
+    public double Brightness { get; set; } = 1.0;
+    public double Contrast { get; set; } = 1.0;
+    public double Gamma { get; set; } = 1.0;
+    public double Exposure { get; set; } = 0.0;
+    public double Transparency { get; set; } = 0.0;
 
-    internal bool BrightnessEnabled { get; private set; } = false;
-
-    internal bool ContrastEnabled { get; private set; } = false;
-
-    internal bool GammaEnabled { get; private set; } = false;
-
-    internal bool ExposureEnabled { get; private set; } = false;
-
-    internal bool TransparencyEnabled { get; private set; } = false;
+    public bool BrightnessEnabled { get; private set; } = false;
+    public bool ContrastEnabled { get; private set; } = false;
+    public bool GammaEnabled { get; private set; } = false;
+    public bool ExposureEnabled { get; private set; } = false;
+    public bool TransparencyEnabled { get; private set; } = false;
 
     /// <summary>
     /// コンポーネントの有効/無効を更新する

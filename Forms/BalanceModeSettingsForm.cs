@@ -69,32 +69,47 @@ internal partial class BalanceModeSettingsForm : Form
         gradientPreview.Image = null;
     }
 
+    internal void LoadSettings(BalanceModeConfiguration balanceModeConfiguration)
+    {
+        ApplyConfigurationToInputs(balanceModeConfiguration);
+        GenerateGradientPreview();
+    }
+
     #region Configuration関連
     private void SetConfigurationFromInputs()
     {
         _configuration.ModeVersion = balanceModeComboBox.SelectedIndex + 1;
+
         _configuration.V1Weight = MathUtils.ParseDoubleOrDefault(v1weight.Text);
         _configuration.V1MinimumValue = MathUtils.ParseDoubleOrDefault(v1minValue.Text);
+
         _configuration.V2Weight = MathUtils.ParseDoubleOrDefault(v2weight.Text);
         _configuration.V2Radius = MathUtils.ParseDoubleOrDefault(v2radius.Text);
         _configuration.V2MinimumValue = MathUtils.ParseDoubleOrDefault(v2minValue.Text);
         _configuration.V2IncludeOutside = v2includeOutside.Checked;
-        _configuration.V3GradientColor = _colorPickerForm.SelectedColor;
+
+        _configuration.V3GradientColor = new SerializableColor(_colorPickerForm.SelectedColor);
         _configuration.V3GradientStart = v3gradientStart.Value;
         _configuration.V3GradientEnd = v3gradientEnd.Value;
+
         GenerateGradientPreview();
     }
 
     private void ApplyConfigurationToInputs(BalanceModeConfiguration config)
     {
         balanceModeComboBox.SelectedIndex = config.ModeVersion - 1;
+
         v1weight.Text = config.V1Weight.ToString("F2");
         v1minValue.Text = config.V1MinimumValue.ToString("F2");
+
         v2weight.Text = config.V2Weight.ToString("F2");
         v2radius.Text = config.V2Radius.ToString("F2");
         v2radiusBar.Value = Math.Clamp(Convert.ToInt32(config.V2Radius), v2radiusBar.Minimum, v2radiusBar.Maximum);
         v2minValue.Text = config.V2MinimumValue.ToString("F2");
         v2includeOutside.Checked = config.V2IncludeOutside;
+
+        _colorPickerForm.SetColor(config.V3GradientColor.ToColor(), true);
+        v3gradientColor.BackColor = config.V3GradientColor.ToColor();
         v3gradientStart.Value = config.V3GradientStart;
         v3gradientEnd.Value = config.V3GradientEnd;
     }
@@ -106,7 +121,7 @@ internal partial class BalanceModeSettingsForm : Form
 
         Bitmap gradientPreviewImage = ColorUtils.GenerateGradientPreview(
             CurrentSelectedColor,
-            _configuration.V3GradientColor,
+            _configuration.V3GradientColor.ToColor(),
             _configuration.V3GradientStart,
             _configuration.V3GradientEnd,
             gradientPreview.Size

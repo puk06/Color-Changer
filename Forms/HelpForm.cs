@@ -1,10 +1,10 @@
 ﻿namespace ColorChanger.Forms;
 
-public partial class HelpForm : Form
+internal partial class HelpForm : Form
 {
     private static readonly string BasicUsageMessage = "このソフトの基本的な使い方:\n" +
-        "- 変更前の色と変更後の色の差を全体に適用する、シンプルな色改変のやり方です。\n\n" + 
-        "1. 画像を画面内にドラッグ＆ドロップするか、「ファイルを開く」ボタンを押して画像を読み込んでください。\n" +
+        "- 変更前の色と変更後の色の差を全体に適用する、シンプルな色改変のやり方です。\n\n" +
+        "1. 画像を画面内にドラッグ＆ドロップするか、画面上部の「ファイル」メニューから「画像ファイルを開く」ボタンを押して画像を読み込んでください。\n" +
         "2. 変更前の色は、画像内をクリックまたはドラッグして選択します。\n" +
         "3. 変更後の色は、画面下部のグレーの枠をクリックして選択してください。\n" +
         "4. 「作成」ボタンを押すと、テクスチャの作成が開始されます。";
@@ -45,12 +45,25 @@ public partial class HelpForm : Form
     private static readonly string SelectColorFromTextureMessage = "他のテクスチャ画像から色を選択:\n" +
         "- 追加のテクスチャ画像を読み込み、その画像内で選択した色を変更後の色として適用する機能です。\n\n" +
         "1. 通常通り画像を読み込み、あらかじめ変更前の色を設定しておいてください。\n" +
-        "2. 画面上部のツールバーから「テクスチャから色を選択」をクリックします。\n" +
-        "3. 表示されたウィンドウに画像をドラッグ＆ドロップするか、「ファイルを開く」ボタンをクリックして画像を読み込みます。\n" +
+        "2. 画面上部の「ツール」メニューから「テクスチャから色を選択」をクリックします。\n" +
+        "3. 表示されたウィンドウに画像をドラッグ＆ドロップするか、画面上部の「ファイル」メニューから「画像ファイルを開く」ボタンをクリックして画像を読み込みます。\n" +
         "4. 画像内をクリックまたはドラッグして色を選択します。\n" +
         "5. 「この色を適用」ボタンをクリックすると、現在選択している色が変更後の色として設定されます。";
 
-    public HelpForm()
+    private static readonly string ImportOrExportColorSettingsMessage = "色変更情報を保存する / 読み込む:\n" +
+        "- 色変更情報をファイルとして保存したり、保存済みの設定を読み込んだりできます。\n" +
+        "    - 誰かと色変更情報を共有したいとき\n" +
+        "    - 後から同じ設定を再現したいとき（バックアップとして）\n" +
+        "- こんなときに便利です\n\n" +
+        "保存方法: \n" +
+        "1. 変更前の色、変更後の色、バランスモードなどを設定します。\n" +
+        "2. Ctrl + S もしくは、画面上部の「ファイル」メニューから「設定ファイルを出力」を選びます。\n" +
+        "3. 保存先とファイル名を指定して保存してください。\n\n" +
+        "読み込み方法: \n" +
+        "- 設定ファイルをソフトウィンドウにドラッグ＆ドロップ\n" +
+        "- Ctrl + O もしくは、画面上部の「ファイル」メニューから「設定ファイルを読み込む」を選んで開いてください。";
+
+    internal HelpForm()
     {
         InitializeComponent();
     }
@@ -89,6 +102,11 @@ public partial class HelpForm : Form
     private void Button7_Click(object sender, EventArgs e)
     {
         descriptionText.Text = SelectColorFromTextureMessage;
+    }
+
+    private void Button8_Click(object sender, EventArgs e)
+    {
+        descriptionText.Text = ImportOrExportColorSettingsMessage;
     }
     #endregion
 

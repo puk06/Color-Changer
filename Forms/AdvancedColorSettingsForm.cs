@@ -3,7 +3,7 @@ using ColorChanger.Utils;
 
 namespace ColorChanger.Forms;
 
-public partial class AdvancedColorSettingsForm : Form
+internal partial class AdvancedColorSettingsForm : Form
 {
     /// <summary>
     /// 設定値が変更されたときに発生するイベント
@@ -23,6 +23,31 @@ public partial class AdvancedColorSettingsForm : Form
             ApplyConfigurationToInputs(_configuration);
             return _configuration;
         }
+    }
+
+    internal AdvancedColorSettingsForm()
+    {
+        InitializeComponent();
+        ApplyConfigurationToInputs(_configuration);
+    }
+
+    internal void LoadSettings(AdvancedColorConfiguration advancedColorConfiguration)
+    {
+        ApplyConfigurationToInputs(advancedColorConfiguration);
+        NotifyConfigurationChanged();
+    }
+
+    internal void Reset()
+    {
+        brightness.Text = "1.00";
+        contrast.Text = "1.00";
+        gamma.Text = "1.00";
+        exposure.Text = "0.00";
+        transparency.Text = "0.00";
+
+        SetConfigurationFromInputs();
+
+        NotifyConfigurationChanged();
     }
 
     #region Configuration関連
@@ -45,24 +70,9 @@ public partial class AdvancedColorSettingsForm : Form
     }
     #endregion
 
-    public AdvancedColorSettingsForm()
-    {
-        InitializeComponent();
-        ApplyConfigurationToInputs(_configuration);
-    }
-
     #region イベントハンドラー
     private void ResetButton_Click(object sender, EventArgs e)
-    {
-        brightness.Text = "1.00";
-        contrast.Text = "1.00";
-        gamma.Text = "1.00";
-        exposure.Text = "0.00";
-        transparency.Text = "0.00";
-        SetConfigurationFromInputs();
-
-        NotifyConfigurationChanged();
-    }
+        => Reset();
 
     private void HandleKeyDown(object sender, KeyEventArgs e)
     {

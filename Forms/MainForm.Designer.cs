@@ -43,16 +43,19 @@
             backgroundColorBox = new PictureBox();
             backgroundColorLabel = new Label();
             undoButton = new Button();
-            transMode = new CheckBox();
+            transparentMode = new CheckBox();
             balanceMode = new CheckBox();
             inverseMode = new CheckBox();
             menuToolBar = new MenuStrip();
-            openFile = new ToolStripMenuItem();
-            Tool = new ToolStripMenuItem();
-            SelectColorFromTexture = new ToolStripMenuItem();
+            FileMenu = new ToolStripMenuItem();
+            OpenFile = new ToolStripMenuItem();
+            ImportColorSettings = new ToolStripMenuItem();
+            ExportColorSettings = new ToolStripMenuItem();
             balanceModeSettingsButton = new ToolStripMenuItem();
             selectedAreaListButton = new ToolStripMenuItem();
             AdvancedColorSettingsButton = new ToolStripMenuItem();
+            ToolMenu = new ToolStripMenuItem();
+            SelectColorFromTexture = new ToolStripMenuItem();
             helpUseButton = new ToolStripMenuItem();
             aboutThisSoftware = new ToolStripMenuItem();
             donationButton = new ToolStripMenuItem();
@@ -255,24 +258,24 @@
             undoButton.UseVisualStyleBackColor = true;
             undoButton.Click += UndoButton_Click;
             // 
-            // transMode
+            // transparentMode
             // 
-            transMode.AutoSize = true;
-            transMode.Font = new Font("Yu Gothic UI", 13F);
-            transMode.ForeColor = Color.White;
-            transMode.Location = new Point(12, 502);
-            transMode.Name = "transMode";
-            transMode.Size = new Size(177, 29);
-            transMode.TabIndex = 28;
-            transMode.Text = "透過画像作成モード";
-            transMode.UseVisualStyleBackColor = true;
+            transparentMode.AutoSize = true;
+            transparentMode.Font = new Font("Yu Gothic UI", 13F);
+            transparentMode.ForeColor = Color.White;
+            transparentMode.Location = new Point(18, 502);
+            transparentMode.Name = "transparentMode";
+            transparentMode.Size = new Size(177, 29);
+            transparentMode.TabIndex = 28;
+            transparentMode.Text = "透過画像作成モード";
+            transparentMode.UseVisualStyleBackColor = true;
             // 
             // balanceMode
             // 
             balanceMode.AutoSize = true;
             balanceMode.Font = new Font("Yu Gothic UI", 13F);
             balanceMode.ForeColor = Color.White;
-            balanceMode.Location = new Point(16, 420);
+            balanceMode.Location = new Point(18, 420);
             balanceMode.Name = "balanceMode";
             balanceMode.Size = new Size(123, 29);
             balanceMode.TabIndex = 29;
@@ -295,35 +298,41 @@
             // menuToolBar
             // 
             menuToolBar.Font = new Font("Yu Gothic UI", 19F);
-            menuToolBar.Items.AddRange(new ToolStripItem[] { openFile, balanceModeSettingsButton, selectedAreaListButton, AdvancedColorSettingsButton, Tool, helpUseButton, aboutThisSoftware, donationButton });
+            menuToolBar.Items.AddRange(new ToolStripItem[] { FileMenu, balanceModeSettingsButton, selectedAreaListButton, AdvancedColorSettingsButton, ToolMenu, helpUseButton, aboutThisSoftware, donationButton });
             menuToolBar.Location = new Point(0, 0);
             menuToolBar.Name = "menuToolBar";
             menuToolBar.Size = new Size(1256, 24);
             menuToolBar.TabIndex = 38;
             menuToolBar.Text = "menuStrip1";
             // 
-            // openFile
+            // FileMenu
             // 
-            openFile.Font = new Font("Yu Gothic UI", 9F);
-            openFile.Name = "openFile";
-            openFile.Size = new Size(81, 20);
-            openFile.Text = "ファイルを開く";
-            openFile.Click += OpenFile_Click;
+            FileMenu.DropDownItems.AddRange(new ToolStripItem[] { OpenFile, ImportColorSettings, ExportColorSettings });
+            FileMenu.Font = new Font("Yu Gothic UI", 9F);
+            FileMenu.Name = "FileMenu";
+            FileMenu.Size = new Size(53, 20);
+            FileMenu.Text = "ファイル";
             // 
-            // Tool
+            // OpenFile
             // 
-            Tool.DropDownItems.AddRange(new ToolStripItem[] { SelectColorFromTexture });
-            Tool.Font = new Font("Yu Gothic UI", 9F);
-            Tool.Name = "Tool";
-            Tool.Size = new Size(46, 20);
-            Tool.Text = "ツール";
+            OpenFile.Name = "OpenFile";
+            OpenFile.Size = new Size(186, 22);
+            OpenFile.Text = "画像ファイルを開く";
+            OpenFile.Click += OpenFile_Click;
             // 
-            // SelectColorFromTexture
+            // ImportColorSettings
             // 
-            SelectColorFromTexture.Name = "SelectColorFromTexture";
-            SelectColorFromTexture.Size = new Size(180, 22);
-            SelectColorFromTexture.Text = "テクスチャから色を選択";
-            SelectColorFromTexture.Click += SelectColorFromTexture_Click;
+            ImportColorSettings.Name = "ImportColorSettings";
+            ImportColorSettings.Size = new Size(186, 22);
+            ImportColorSettings.Text = "設定ファイルを読み込む";
+            ImportColorSettings.Click += ImportColorSettings_Click;
+            // 
+            // ExportColorSettings
+            // 
+            ExportColorSettings.Name = "ExportColorSettings";
+            ExportColorSettings.Size = new Size(186, 22);
+            ExportColorSettings.Text = "設定ファイルを出力する";
+            ExportColorSettings.Click += ExportColorSettings_Click;
             // 
             // balanceModeSettingsButton
             // 
@@ -348,6 +357,21 @@
             AdvancedColorSettingsButton.Size = new Size(89, 20);
             AdvancedColorSettingsButton.Text = "色の追加設定";
             AdvancedColorSettingsButton.Click += AdvancedColorSettingsButton_Click;
+            // 
+            // ToolMenu
+            // 
+            ToolMenu.DropDownItems.AddRange(new ToolStripItem[] { SelectColorFromTexture });
+            ToolMenu.Font = new Font("Yu Gothic UI", 9F);
+            ToolMenu.Name = "ToolMenu";
+            ToolMenu.Size = new Size(46, 20);
+            ToolMenu.Text = "ツール";
+            // 
+            // SelectColorFromTexture
+            // 
+            SelectColorFromTexture.Name = "SelectColorFromTexture";
+            SelectColorFromTexture.Size = new Size(182, 22);
+            SelectColorFromTexture.Text = "テクスチャから色を選択";
+            SelectColorFromTexture.Click += SelectColorFromTexture_Click;
             // 
             // helpUseButton
             // 
@@ -404,7 +428,7 @@
             panel1.Controls.Add(label7);
             panel1.Controls.Add(label6);
             panel1.Controls.Add(label5);
-            panel1.Controls.Add(transMode);
+            panel1.Controls.Add(transparentMode);
             panel1.Controls.Add(balanceMode);
             panel1.Controls.Add(makeButton);
             panel1.Controls.Add(previousRGBLabel);
@@ -646,6 +670,7 @@
             Controls.Add(label2);
             Controls.Add(menuToolBar);
             FormBorderStyle = FormBorderStyle.FixedSingle;
+            KeyPreview = true;
             Icon = new Icon(new MemoryStream(Properties.Resources.AppIcon));
             MainMenuStrip = menuToolBar;
             MaximizeBox = false;
@@ -654,6 +679,7 @@
             Text = "Color Changer For Texture v{version}";
             DragDrop += MainForm_DragDrop;
             DragEnter += MainForm_DragEnter;
+            KeyDown += MainForm_KeyDown;
             ((System.ComponentModel.ISupportInitialize)previewBox).EndInit();
             ((System.ComponentModel.ISupportInitialize)previousColorBox).EndInit();
             ((System.ComponentModel.ISupportInitialize)newColorBox).EndInit();
@@ -685,11 +711,11 @@
         private PictureBox backgroundColorBox;
         private Label backgroundColorLabel;
         private Button undoButton;
-        private CheckBox transMode;
+        private CheckBox transparentMode;
         private CheckBox balanceMode;
         private CheckBox inverseMode;
         private MenuStrip menuToolBar;
-        private ToolStripMenuItem openFile;
+        private ToolStripMenuItem FileMenu;
         private ToolStripMenuItem helpUseButton;
         private ToolStripMenuItem aboutThisSoftware;
         private Label label5;
@@ -717,7 +743,10 @@
         private Label memoryUsage;
         private Label label17;
         private Label textureType;
-        private ToolStripMenuItem Tool;
+        private ToolStripMenuItem ToolMenu;
         private ToolStripMenuItem SelectColorFromTexture;
+        private ToolStripMenuItem OpenFile;
+        private ToolStripMenuItem ImportColorSettings;
+        private ToolStripMenuItem ExportColorSettings;
     }
 }

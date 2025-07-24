@@ -4,12 +4,13 @@ using ColorChanger.Utils;
 using System.Collections;
 using System.Diagnostics;
 using System.Drawing.Imaging;
+using System.Text.Json;
 
 namespace ColorChanger.Forms;
 
 public partial class MainForm : Form
 {
-    private const string CURRENT_VERSION = "v1.0.15";
+    private const string CURRENT_VERSION = "v1.0.16";
     private static readonly string FORM_TITLE = $"Color Changer For Texture {CURRENT_VERSION}";
     private static readonly Point VERSION_LABEL_POSITION = new Point(275, 54);
     private const int COLOR_UPDATE_DEBOUNCE_MS = 14;
@@ -131,7 +132,7 @@ public partial class MainForm : Form
             Bitmap? rawBitmap = BitmapUtils.CreateInverseBitmap(_bmp, inverseMode.Checked);
             BitmapData? rawData = BitmapUtils.LockBitmap(rawBitmap, rect, ImageLockMode.ReadOnly);
 
-            Bitmap? transBitmap = BitmapUtils.CreateTransparentBitmap(_bmp, transMode.Checked, inverseMode.Checked);
+            Bitmap? transBitmap = BitmapUtils.CreateTransparentBitmap(_bmp, transparentMode.Checked, inverseMode.Checked);
             BitmapData? transData = BitmapUtils.LockBitmap(transBitmap, rect, ImageLockMode.ReadWrite);
 
             bool skipped = false;
@@ -162,7 +163,7 @@ public partial class MainForm : Form
 
             rawBitmap?.Dispose();
 
-            if (!skipped && transMode.Checked && !inverseMode.Checked)
+            if (!skipped && transparentMode.Checked && !inverseMode.Checked)
             {
                 if (transBitmap != null)
                 {
@@ -181,6 +182,8 @@ public partial class MainForm : Form
 
             bitMap.Dispose();
             FormUtils.ShowInfo("テクスチャ画像の作成が完了しました。");
+
+            FileSystemUtils.OpenFilePath(filePath);
         }
         catch (Exception ex)
         {
@@ -214,7 +217,7 @@ public partial class MainForm : Form
 
         if (selectedPoints.Length == 0)
         {
-            if (transMode.Checked)
+            if (transparentMode.Checked)
             {
                 FormUtils.ShowInfo("選択エリアがなかったため、透過モードはスキップされます。");
                 skipped = true;
@@ -222,7 +225,7 @@ public partial class MainForm : Form
 
             processor.ProcessAllPixels(sourcePixels, sourcePixels);
         }
-        else if (transMode.Checked)
+        else if (transparentMode.Checked)
         {
             if (inverseMode.Checked)
             {
@@ -348,6 +351,13 @@ public partial class MainForm : Form
             _selectedPointsForPreview = BitArrayUtils.GetEmpty();
             _selectedAreaListForm.Clear();
 
+            _advancedColorSettingsForm.Reset();
+
+            _balanceModeSettingsForm.LoadSettings(BalanceModeUtils.GetEmpty());
+            balanceMode.Checked = false;
+
+            transparentMode.Checked = false;
+
             Text = FORM_TITLE;
             selectMode.Checked = false;
 
@@ -357,6 +367,86 @@ public partial class MainForm : Form
             ColorPickerForm.Hide();
             _balanceModeSettingsForm.ResetGradientPreviewImage();
         }
+    }
+
+    /// <summary>
+    /// 色情報設定ファイルを読み込む
+    /// </summary>
+    /// <param name="path"></param>
+    private void LoadColorSettingsFile(string path)
+    {
+        if (!File.Exists(path))
+        {
+            FormUtils.ShowError("ファイルが存在しません。");
+            return;
+        }
+
+        try
+        {
+            string json = File.ReadAllText(path);
+            ColorSettings? colorSettings = JsonSerializer.Deserialize<ColorSettings>(json) ?? throw new Exception("色情報設定ファイルが読み込めませんでした。");
+            SetColorSettingsValues(colorSettings);
+
+            FormUtils.ShowInfo("色情報設定ファイルの読み込みに成功しました！");
+        }
+        catch
+        {
+            FormUtils.ShowError("色情報設定ファイルの読み込みに失敗しました。");
+        }
+    }
+
+    /// <summary>
+    /// 色情報設定ファイルを出力する
+    /// </summary>
+    /// <param name="path"></param>
+    private void ExportColorSettingsFile(string path)
+    {
+        try
+        {
+            ColorSettings colorSettings = new ColorSettings()
+            {
+                PreviousColor = new SerializableColor(_previousColor),
+                NewColor = new SerializableColor(_newColor),
+                BalanceModeEnabled = balanceMode.Checked,
+                TransparentModeEnabled = transparentMode.Checked,
+                BalanceModeConfiguration = _balanceModeSettingsForm.Configuration,
+                AdvancedColorConfiguration = _advancedColorSettingsForm.Configuration
+            };
+
+            string json = JsonSerializer.Serialize(colorSettings);
+            File.WriteAllText(path, json);
+
+            FormUtils.ShowInfo("色情報設定ファイルの出力に成功しました！");
+            FileSystemUtils.OpenFilePath(path);
+        }
+        catch
+        {
+            FormUtils.ShowError("色情報設定ファイルの出力に失敗しました。");
+        }
+    }
+
+    /// <summary>
+    /// 与えられたColorSettingsの値を元にFormの値を設定します
+    /// </summary>
+    /// <param name="colorSettings"></param>
+    private void SetColorSettingsValues(ColorSettings colorSettings)
+    {
+        _previousColor = colorSettings.PreviousColor.ToColor();
+        previousColorBox.BackColor = colorSettings.PreviousColor.ToColor();
+
+        _newColor = colorSettings.NewColor.ToColor();
+        newColorBox.BackColor = colorSettings.NewColor.ToColor();
+
+        _balanceModeSettingsForm.LoadSettings(colorSettings.BalanceModeConfiguration);
+        _advancedColorSettingsForm.LoadSettings(colorSettings.AdvancedColorConfiguration);
+
+        balanceMode.Checked = colorSettings.BalanceModeEnabled;
+        transparentMode.Checked = colorSettings.TransparentModeEnabled;
+
+        UpdateColorData();
+
+        if (_previewBitmap == null) return;
+        BitmapUtils.SetImage(coloredPreviewBox, GenerateColoredPreview(_previewBitmap));
     }
 
     /// <summary>
@@ -634,6 +724,28 @@ public partial class MainForm : Form
 
     private void BalanceMode_CheckedChanged(object sender, EventArgs e)
     {
+        if (balanceMode.Checked)
+        {
+            int currentBalanceMode = _balanceModeSettingsForm.Configuration.ModeVersion;
+            var result = FormUtils.ShowConfirm(
+                "バランスモードが有効化されました！\n\n" +
+                "色を綺麗に改変するためには、以下の設定項目の調整が推奨されます。\n\n" +
+                "推奨設定項目：\n" +
+                "- V1: 重りの調整\n" +
+                "- V2: 半径の長さの調整\n" +
+                "- V3: 変更後の色、およびグラデーション位置の調整\n\n" +
+                $"おすすめバージョン: V3 (現在のバージョン: V{currentBalanceMode})\n\n" +
+                "設定画面を開きますか？",
+                "バランスモード"
+            );
+
+            if (result)
+            {
+                _balanceModeSettingsForm.Show();
+                _balanceModeSettingsForm.BringToFront();
+            }
+        }
+
         if (_previewBitmap == null || _previousColor == Color.Empty || _newColor == Color.Empty) return;
 
         BitmapUtils.SetImage(coloredPreviewBox, GenerateColoredPreview(_previewBitmap));
@@ -761,6 +873,32 @@ public partial class MainForm : Form
         }
     }
 
+    private void ImportColorSettings_Click(object sender, EventArgs e)
+    {
+        OpenFileDialog dialog = new OpenFileDialog()
+        {
+            Filter = "色情報設定ファイル|*.ccs",
+            Title = "色情報設定ファイルを選択してください"
+        };
+
+        if (dialog.ShowDialog() != DialogResult.OK) return;
+        LoadColorSettingsFile(dialog.FileName);
+    }
+
+    private void ExportColorSettings_Click(object sender, EventArgs e)
+    {
+        SaveFileDialog dialog = new SaveFileDialog()
+        {
+            Filter = "色情報設定ファイル|*.ccs",
+            Title = "色情報設定ファイルの保存先を選択してください",
+            FileName = $"MyColorTheme_{DateTime.Now:MM-dd_HH-mm-ss}.ccs",
+            InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop)
+        };
+
+        if (dialog.ShowDialog() != DialogResult.OK) return;
+        ExportColorSettingsFile(dialog.FileName);
+    }
+
     private void MainForm_DragDrop(object sender, DragEventArgs e)
     {
         if (e.Data == null) return;
@@ -768,10 +906,31 @@ public partial class MainForm : Form
         string[]? files = (string[]?)e.Data.GetData(DataFormats.FileDrop, false);
         if (files == null || files.Length == 0) return;
 
-        LoadPictureFile(files[0]);
+        var file = files[0];
+
+        if (Path.GetExtension(file) == ".ccs")
+        {
+            LoadColorSettingsFile(file);
+        }
+        else
+        {
+            LoadPictureFile(file);
+        }
     }
 
     private void MainForm_DragEnter(object sender, DragEventArgs e)
         => e.Effect = DragDropEffects.All;
+    private void MainForm_KeyDown(object sender, KeyEventArgs e)
+    {
+        if (e.Control && e.KeyCode == Keys.O)
+        {
+            ImportColorSettings_Click(sender, e);
+        }
+
+        if (e.Control && e.KeyCode == Keys.S)
+        {
+            ExportColorSettings_Click(sender, e);
+        }
+    }
     #endregion
 }

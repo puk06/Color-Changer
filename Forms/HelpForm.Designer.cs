@@ -37,6 +37,7 @@
             label1 = new Label();
             button6 = new Button();
             button7 = new Button();
+            button8 = new Button();
             SuspendLayout();
             // 
             // button1
@@ -135,11 +136,23 @@
             button7.UseVisualStyleBackColor = true;
             button7.Click += Button7_Click;
             // 
+            // button8
+            // 
+            button8.Font = new Font("Yu Gothic UI", 10F);
+            button8.Location = new Point(12, 401);
+            button8.Name = "button8";
+            button8.Size = new Size(149, 50);
+            button8.TabIndex = 9;
+            button8.Text = "設定の読み込み / 保存";
+            button8.UseVisualStyleBackColor = true;
+            button8.Click += Button8_Click;
+            // 
             // HelpForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(803, 584);
+            Controls.Add(button8);
             Controls.Add(button7);
             Controls.Add(button6);
             Controls.Add(label1);
@@ -172,5 +185,6 @@
         private Label label1;
         private Button button6;
         private Button button7;
+        private Button button8;
     }
 }
