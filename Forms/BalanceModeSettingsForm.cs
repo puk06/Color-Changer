@@ -183,7 +183,10 @@ internal partial class BalanceModeSettingsForm : Form
         => NotifyConfigurationChanged();
 
     private void V3GradientColor_Click(object sender, EventArgs e)
-        => _colorPickerForm.Show();
+    {
+        _colorPickerForm.Show();
+        _colorPickerForm.BringToFront();
+    }
 
     private void V3gradient_Change(object sender, EventArgs e)
         => NotifyConfigurationChanged();

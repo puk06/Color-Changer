@@ -34,6 +34,8 @@ public partial class MainForm : Form
     private BitArray _selectedPointsForPreview = BitArrayUtils.GetEmpty();
     private Bitmap? _previewBitmap;
 
+    private bool _savedColorSettings = false;
+
     internal readonly ColorPickerForm ColorPickerForm = new ColorPickerForm();
     private readonly BalanceModeSettingsForm _balanceModeSettingsForm;
     private readonly SelectedAreaListForm _selectedAreaListForm = new SelectedAreaListForm();
@@ -303,6 +305,12 @@ public partial class MainForm : Form
             return;
         }
 
+        if (_bmp != null && _previousColor != Color.Empty && _newColor != Color.Empty && !_savedColorSettings)
+        {
+            var result = FormUtils.ShowConfirm("現在の色設定を保存せずに画像を変更しようとしています。\n画像変更前に保存しますか？", "画像変更");
+            if (result) ExportColorSettings_Click(null, null);
+        }
+
         try
         {
             BitmapUtils.DisposeBitmap(ref _bmp);
@@ -366,6 +374,8 @@ public partial class MainForm : Form
 
             ColorPickerForm.Hide();
             _balanceModeSettingsForm.ResetGradientPreviewImage();
+
+            _savedColorSettings = false;
         }
     }
 
@@ -418,6 +428,7 @@ public partial class MainForm : Form
 
             FormUtils.ShowInfo("色情報設定ファイルの出力に成功しました！");
             FileSystemUtils.OpenFilePath(path);
+            _savedColorSettings = true;
         }
         catch
         {
@@ -885,7 +896,7 @@ public partial class MainForm : Form
         LoadColorSettingsFile(dialog.FileName);
     }
 
-    private void ExportColorSettings_Click(object sender, EventArgs e)
+    private void ExportColorSettings_Click(object? sender, EventArgs? e)
     {
         SaveFileDialog dialog = new SaveFileDialog()
         {
