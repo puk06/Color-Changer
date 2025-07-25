@@ -29,22 +29,25 @@ internal partial class BalanceModeSettingsForm : Form
     private readonly MainForm _mainForm;
 
     private static readonly string V1SettingsDescription = "このモードの説明:\n" +
-        "従来のバランスモードの計算式を使った色変換モードです。\n\n" +
+        "従来のバランスモードの計算式を使った色変換です。\n\n" +
         "計算式について: \n" +
-        "RGB空間上で選択されている色の点からそれぞれのピクセルの色までの距離と、その延長線上の点までの距離を元に色を計算し、色の変化率のグラフを作成します。" +
-        "このモードは、色がRGB空間上の壁に近いと色があまり変化しないというデメリットがあります。";
+        "選んだ色と各ピクセルの色の距離、およびその延長線上の位置から変化率を計算します。\n\n" +
+        "デメリットについて: \n" +
+        "RGB空間の端に近い色は変化が小さくなります。";
 
     private static readonly string V2SettingsDescription = "このモードの説明:\n" +
-        "新しいバランスモードの計算式を使った色変換モードです。\n\n" +
+        "新しい計算式を使ったバランスモードです。\n\n" +
         "計算式について: \n" +
-        "RGB空間上で、選択した色の点から球状に広がるように色の変化率を計算します。球の半径の場所から色の変化率を計算するようになります。" +
-        "このモードはRGB空間上で壁に関係なく均等に色を変えることが出来ますが、v1と比べて値の設定が複雑で難しいというデメリットがあります。";
+        "選んだ色を中心に球状に色の変化率を計算し、半径の位置を基準とします。\n\n" +
+        "デメリットについて: \n" +
+        "RGB空間の制限を受けませんが、設定が少し複雑です。";
 
     private static readonly string V3SettingsDescription = "このモードの説明:\n" +
-        "ピクセルのグレースケール値を用いた色変換モードです。\n\n" +
+        "グレースケール値を使った色変換です。\n\n" +
         "計算式について: \n" +
-        "グラデーション開始色と、終了色を基に作成したグラデーション内でピクセルのグレースケール値から色の変化率を計算します。" +
-        "このモードは前の色関係なく綺麗に色を変えることができますが、一度グレーにして全体で色が統一されるので、変わってほしくない色まで変わってしまう可能性があります。";
+        "開始色と終了色のグラデーションに沿って、ピクセルの明るさから変化率を決めます。\n\n" +
+        "デメリットについて: \n" +
+        "色が均一に変わりますが、意図しない部分も変化する可能性があります。";
 
     internal BalanceModeSettingsForm(MainForm mainForm)
     {
@@ -57,6 +60,7 @@ internal partial class BalanceModeSettingsForm : Form
         _colorPickerForm.SetColor(Color.FromArgb(255, 255, 255));
 
         v2radiusBar.Maximum = (int)Math.Sqrt(3 * 255 * 255) + 1;
+        v2radiusBar.TickFrequency = v2radiusBar.Maximum;
         ApplyConfigurationToInputs(_configuration);
     }
 

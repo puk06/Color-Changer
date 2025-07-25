@@ -194,6 +194,7 @@ namespace ColorChanger.Forms
             // v2radiusBar
             // 
             v2radiusBar.AutoSize = false;
+            v2radiusBar.BackColor = Color.FromArgb(249, 249, 249);
             v2radiusBar.Location = new Point(6, 37);
             v2radiusBar.Name = "v2radiusBar";
             v2radiusBar.Size = new Size(257, 26);
@@ -270,10 +271,11 @@ namespace ColorChanger.Forms
             v3Settings.Size = new Size(269, 334);
             v3Settings.TabIndex = 2;
             v3Settings.Text = "v3";
+            v3Settings.UseVisualStyleBackColor = true;
             // 
             // v3gradientColorStart
             // 
-            v3gradientColorStart.BackColor = Color.White;
+            v3gradientColorStart.BackColor = SystemColors.ActiveBorder;
             v3gradientColorStart.BorderStyle = BorderStyle.Fixed3D;
             v3gradientColorStart.Location = new Point(161, 6);
             v3gradientColorStart.Name = "v3gradientColorStart";
@@ -320,6 +322,7 @@ namespace ColorChanger.Forms
             // v3gradientEnd
             // 
             v3gradientEnd.AutoSize = false;
+            v3gradientEnd.BackColor = Color.FromArgb(249, 249, 249);
             v3gradientEnd.Location = new Point(6, 170);
             v3gradientEnd.Maximum = 100;
             v3gradientEnd.Name = "v3gradientEnd";
@@ -342,6 +345,7 @@ namespace ColorChanger.Forms
             // v3gradientStart
             // 
             v3gradientStart.AutoSize = false;
+            v3gradientStart.BackColor = Color.FromArgb(249, 249, 249);
             v3gradientStart.Location = new Point(6, 103);
             v3gradientStart.Maximum = 100;
             v3gradientStart.Name = "v3gradientStart";
@@ -353,7 +357,7 @@ namespace ColorChanger.Forms
             // 
             // v3gradientColorEnd
             // 
-            v3gradientColorEnd.BackColor = Color.White;
+            v3gradientColorEnd.BackColor = SystemColors.ActiveBorder;
             v3gradientColorEnd.BorderStyle = BorderStyle.Fixed3D;
             v3gradientColorEnd.Location = new Point(161, 40);
             v3gradientColorEnd.Name = "v3gradientColorEnd";
