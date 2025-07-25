@@ -918,7 +918,7 @@ public partial class MainForm : Form
         string[]? files = (string[]?)e.Data.GetData(DataFormats.FileDrop, false);
         if (files == null || files.Length == 0) return;
 
-        var file = files[0];
+        string file = files[0];
 
         if (Path.GetExtension(file) == ".ccs")
         {
@@ -932,6 +932,7 @@ public partial class MainForm : Form
 
     private void MainForm_DragEnter(object sender, DragEventArgs e)
         => e.Effect = DragDropEffects.All;
+
     private void MainForm_KeyDown(object sender, KeyEventArgs e)
     {
         if (e.Control && e.KeyCode == Keys.O)
