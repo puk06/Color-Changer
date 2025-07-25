@@ -108,7 +108,8 @@ internal partial class BalanceModeSettingsForm : Form
         v2minValue.Text = config.V2MinimumValue.ToString("F2");
         v2includeOutside.Checked = config.V2IncludeOutside;
 
-        v3gradientColorStart.BackColor = _mainForm.ColorPickerForm.SelectedColor;
+        var selectedColor = _mainForm.ColorPickerForm.SelectedColor;
+        v3gradientColorStart.BackColor = selectedColor == Color.Empty ? ColorUtils.DefaultBackgroundColor : selectedColor;
 
         _colorPickerForm.SetColor(config.V3GradientColor.ToColor(), true);
         v3gradientColorEnd.BackColor = config.V3GradientColor.ToColor();
