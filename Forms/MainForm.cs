@@ -657,6 +657,7 @@ public partial class MainForm : Form
 
             _newColor = color;
             newColorBox.BackColor = color;
+            ColorPickerForm.SetColor(_newColor == Color.Empty ? _previousColor : _newColor);
 
             UpdateColorData();
 
