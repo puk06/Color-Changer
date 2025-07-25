@@ -43,7 +43,7 @@ internal partial class BalanceModeSettingsForm : Form
     private static readonly string V3SettingsDescription = "このモードの説明:\n" +
         "ピクセルのグレースケール値を用いた色変換モードです。\n\n" +
         "計算式について: \n" +
-        "変更後の色と、終了色を基に作成したグラデーション内でピクセルのグレースケール値から色の変化率を計算します。" +
+        "グラデーション開始色と、終了色を基に作成したグラデーション内でピクセルのグレースケール値から色の変化率を計算します。" +
         "このモードは前の色関係なく綺麗に色を変えることができますが、一度グレーにして全体で色が統一されるので、変わってほしくない色まで変わってしまう可能性があります。";
 
     internal BalanceModeSettingsForm(MainForm mainForm)
@@ -108,8 +108,10 @@ internal partial class BalanceModeSettingsForm : Form
         v2minValue.Text = config.V2MinimumValue.ToString("F2");
         v2includeOutside.Checked = config.V2IncludeOutside;
 
+        v3gradientColorStart.BackColor = _mainForm.ColorPickerForm.SelectedColor;
+
         _colorPickerForm.SetColor(config.V3GradientColor.ToColor(), true);
-        v3gradientColor.BackColor = config.V3GradientColor.ToColor();
+        v3gradientColorEnd.BackColor = config.V3GradientColor.ToColor();
         v3gradientStart.Value = config.V3GradientStart;
         v3gradientEnd.Value = config.V3GradientEnd;
     }
@@ -140,7 +142,7 @@ internal partial class BalanceModeSettingsForm : Form
     {
         _colorPickerForm.ColorChanged += (s, e) =>
         {
-            v3gradientColor.BackColor = _colorPickerForm.SelectedColor;
+            v3gradientColorEnd.BackColor = _colorPickerForm.SelectedColor;
             NotifyConfigurationChanged();
         };
     }
@@ -182,7 +184,13 @@ internal partial class BalanceModeSettingsForm : Form
     private void V2includeOutside_CheckedChanged(object sender, EventArgs e)
         => NotifyConfigurationChanged();
 
-    private void V3GradientColor_Click(object sender, EventArgs e)
+    private void V3gradientColorStart_Click(object sender, EventArgs e)
+    {
+        _mainForm.ColorPickerForm.Show();
+        _mainForm.ColorPickerForm.BringToFront();
+    }
+
+    private void V3GradientColorEnd_Click(object sender, EventArgs e)
     {
         _colorPickerForm.Show();
         _colorPickerForm.BringToFront();

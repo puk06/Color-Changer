@@ -49,23 +49,26 @@ namespace ColorChanger.Forms
             v2radius = new TextBox();
             label2 = new Label();
             v3Settings = new TabPage();
+            v3gradientColorStart = new PictureBox();
+            label10 = new Label();
             label9 = new Label();
             gradientPreview = new PictureBox();
             label8 = new Label();
             v3gradientEnd = new TrackBar();
             label7 = new Label();
             v3gradientStart = new TrackBar();
-            v3gradientColor = new PictureBox();
+            v3gradientColorEnd = new PictureBox();
             label6 = new Label();
             balanceModeSettingsTab.SuspendLayout();
             v1Settings.SuspendLayout();
             v2Settings.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)v2radiusBar).BeginInit();
             v3Settings.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)v3gradientColorStart).BeginInit();
             ((System.ComponentModel.ISupportInitialize)gradientPreview).BeginInit();
             ((System.ComponentModel.ISupportInitialize)v3gradientEnd).BeginInit();
             ((System.ComponentModel.ISupportInitialize)v3gradientStart).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)v3gradientColor).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)v3gradientColorEnd).BeginInit();
             SuspendLayout();
             // 
             // label1
@@ -195,8 +198,8 @@ namespace ColorChanger.Forms
             v2radiusBar.Name = "v2radiusBar";
             v2radiusBar.Size = new Size(257, 26);
             v2radiusBar.TabIndex = 6;
-            v2radiusBar.MouseUp += V2radiusBar_Change;
             v2radiusBar.KeyDown += V2radiusBar_Change;
+            v2radiusBar.MouseUp += V2radiusBar_Change;
             // 
             // v2minValue
             // 
@@ -252,13 +255,15 @@ namespace ColorChanger.Forms
             // v3Settings
             // 
             v3Settings.BackColor = Color.Transparent;
+            v3Settings.Controls.Add(v3gradientColorStart);
+            v3Settings.Controls.Add(label10);
             v3Settings.Controls.Add(label9);
             v3Settings.Controls.Add(gradientPreview);
             v3Settings.Controls.Add(label8);
             v3Settings.Controls.Add(v3gradientEnd);
             v3Settings.Controls.Add(label7);
             v3Settings.Controls.Add(v3gradientStart);
-            v3Settings.Controls.Add(v3gradientColor);
+            v3Settings.Controls.Add(v3gradientColorEnd);
             v3Settings.Controls.Add(label6);
             v3Settings.Location = new Point(4, 29);
             v3Settings.Name = "v3Settings";
@@ -266,10 +271,30 @@ namespace ColorChanger.Forms
             v3Settings.TabIndex = 2;
             v3Settings.Text = "v3";
             // 
+            // v3gradientColorStart
+            // 
+            v3gradientColorStart.BackColor = Color.White;
+            v3gradientColorStart.BorderStyle = BorderStyle.Fixed3D;
+            v3gradientColorStart.Location = new Point(161, 6);
+            v3gradientColorStart.Name = "v3gradientColorStart";
+            v3gradientColorStart.Size = new Size(102, 27);
+            v3gradientColorStart.TabIndex = 14;
+            v3gradientColorStart.TabStop = false;
+            v3gradientColorStart.Click += V3gradientColorStart_Click;
+            // 
+            // label10
+            // 
+            label10.AutoSize = true;
+            label10.Location = new Point(6, 9);
+            label10.Name = "label10";
+            label10.Size = new Size(142, 20);
+            label10.TabIndex = 13;
+            label10.Text = "グラデーションの開始色";
+            // 
             // label9
             // 
             label9.AutoSize = true;
-            label9.Location = new Point(6, 179);
+            label9.Location = new Point(6, 214);
             label9.Name = "label9";
             label9.Size = new Size(136, 20);
             label9.TabIndex = 12;
@@ -277,7 +302,7 @@ namespace ColorChanger.Forms
             // 
             // gradientPreview
             // 
-            gradientPreview.Location = new Point(6, 202);
+            gradientPreview.Location = new Point(6, 237);
             gradientPreview.Name = "gradientPreview";
             gradientPreview.Size = new Size(257, 40);
             gradientPreview.TabIndex = 11;
@@ -286,7 +311,7 @@ namespace ColorChanger.Forms
             // label8
             // 
             label8.AutoSize = true;
-            label8.Location = new Point(6, 112);
+            label8.Location = new Point(6, 147);
             label8.Name = "label8";
             label8.Size = new Size(145, 20);
             label8.TabIndex = 10;
@@ -295,20 +320,20 @@ namespace ColorChanger.Forms
             // v3gradientEnd
             // 
             v3gradientEnd.AutoSize = false;
-            v3gradientEnd.Location = new Point(6, 135);
+            v3gradientEnd.Location = new Point(6, 170);
             v3gradientEnd.Maximum = 100;
             v3gradientEnd.Name = "v3gradientEnd";
             v3gradientEnd.Size = new Size(257, 26);
             v3gradientEnd.TabIndex = 9;
             v3gradientEnd.TickFrequency = 10;
             v3gradientEnd.Value = 100;
-            v3gradientEnd.MouseUp += V3gradient_Change;
             v3gradientEnd.KeyDown += V3gradient_Change;
+            v3gradientEnd.MouseUp += V3gradient_Change;
             // 
             // label7
             // 
             label7.AutoSize = true;
-            label7.Location = new Point(6, 45);
+            label7.Location = new Point(6, 80);
             label7.Name = "label7";
             label7.Size = new Size(145, 20);
             label7.TabIndex = 8;
@@ -317,30 +342,30 @@ namespace ColorChanger.Forms
             // v3gradientStart
             // 
             v3gradientStart.AutoSize = false;
-            v3gradientStart.Location = new Point(6, 68);
+            v3gradientStart.Location = new Point(6, 103);
             v3gradientStart.Maximum = 100;
             v3gradientStart.Name = "v3gradientStart";
             v3gradientStart.Size = new Size(257, 26);
             v3gradientStart.TabIndex = 7;
             v3gradientStart.TickFrequency = 10;
-            v3gradientStart.MouseUp += V3gradient_Change;
             v3gradientStart.KeyDown += V3gradient_Change;
+            v3gradientStart.MouseUp += V3gradient_Change;
             // 
-            // v3gradientColor
+            // v3gradientColorEnd
             // 
-            v3gradientColor.BackColor = Color.White;
-            v3gradientColor.BorderStyle = BorderStyle.Fixed3D;
-            v3gradientColor.Location = new Point(161, 5);
-            v3gradientColor.Name = "v3gradientColor";
-            v3gradientColor.Size = new Size(102, 27);
-            v3gradientColor.TabIndex = 4;
-            v3gradientColor.TabStop = false;
-            v3gradientColor.Click += V3GradientColor_Click;
+            v3gradientColorEnd.BackColor = Color.White;
+            v3gradientColorEnd.BorderStyle = BorderStyle.Fixed3D;
+            v3gradientColorEnd.Location = new Point(161, 40);
+            v3gradientColorEnd.Name = "v3gradientColorEnd";
+            v3gradientColorEnd.Size = new Size(102, 27);
+            v3gradientColorEnd.TabIndex = 4;
+            v3gradientColorEnd.TabStop = false;
+            v3gradientColorEnd.Click += V3GradientColorEnd_Click;
             // 
             // label6
             // 
             label6.AutoSize = true;
-            label6.Location = new Point(6, 8);
+            label6.Location = new Point(6, 43);
             label6.Name = "label6";
             label6.Size = new Size(142, 20);
             label6.TabIndex = 2;
@@ -371,10 +396,11 @@ namespace ColorChanger.Forms
             ((System.ComponentModel.ISupportInitialize)v2radiusBar).EndInit();
             v3Settings.ResumeLayout(false);
             v3Settings.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)v3gradientColorStart).EndInit();
             ((System.ComponentModel.ISupportInitialize)gradientPreview).EndInit();
             ((System.ComponentModel.ISupportInitialize)v3gradientEnd).EndInit();
             ((System.ComponentModel.ISupportInitialize)v3gradientStart).EndInit();
-            ((System.ComponentModel.ISupportInitialize)v3gradientColor).EndInit();
+            ((System.ComponentModel.ISupportInitialize)v3gradientColorEnd).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -400,7 +426,7 @@ namespace ColorChanger.Forms
         private TextBox v2radius;
         private CheckBox v2includeOutside;
         private TabPage v3Settings;
-        private PictureBox v3gradientColor;
+        private PictureBox v3gradientColorEnd;
         private Label label6;
         private Label label7;
         private TrackBar v3gradientStart;
@@ -408,5 +434,7 @@ namespace ColorChanger.Forms
         private PictureBox gradientPreview;
         private Label label8;
         private TrackBar v3gradientEnd;
+        private PictureBox v3gradientColorStart;
+        private Label label10;
     }
 }
