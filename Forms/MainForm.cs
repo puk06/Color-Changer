@@ -10,7 +10,7 @@ namespace ColorChanger.Forms;
 
 public partial class MainForm : Form
 {
-    private const string CURRENT_VERSION = "v1.0.16";
+    private const string CURRENT_VERSION = "v1.0.17";
     private static readonly string FORM_TITLE = $"Color Changer For Texture {CURRENT_VERSION}";
     private static readonly Point VERSION_LABEL_POSITION = new Point(275, 54);
     private const int COLOR_UPDATE_DEBOUNCE_MS = 14;
@@ -52,6 +52,9 @@ public partial class MainForm : Form
             return _colorDifference;
         }
     }
+
+    internal bool NewColorSelected
+        => _newColor != Color.Empty;
 
     public MainForm()
     {
@@ -348,7 +351,9 @@ public partial class MainForm : Form
             _previousColor = Color.Empty;
             _newColor = Color.Empty;
             _backgroundColor = Color.Empty;
+
             ColorPickerForm.SetInitialColor(Color.Empty);
+            ColorPickerForm.SetColor(Color.Empty);
 
             previousColorBox.BackColor = ColorUtils.DefaultBackgroundColor;
             newColorBox.BackColor = ColorUtils.DefaultBackgroundColor;

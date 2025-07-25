@@ -113,7 +113,7 @@ internal partial class BalanceModeSettingsForm : Form
         v2includeOutside.Checked = config.V2IncludeOutside;
 
         var selectedColor = _mainForm.ColorPickerForm.SelectedColor;
-        v3gradientColorStart.BackColor = selectedColor == Color.Empty ? ColorUtils.DefaultBackgroundColor : selectedColor;
+        v3gradientColorStart.BackColor = _mainForm.NewColorSelected ? selectedColor : ColorUtils.DefaultBackgroundColor;
 
         _colorPickerForm.SetColor(config.V3GradientColor.ToColor(), true);
         v3gradientColorEnd.BackColor = config.V3GradientColor.ToColor();
