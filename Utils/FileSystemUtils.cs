@@ -5,7 +5,7 @@ namespace ColorChanger.Utils;
 internal static class FileSystemUtils
 {
     /// <summary>
-    /// アイテムのファイルパスを開きます。
+    /// ファイルのパスを開きます。
     /// </summary>
     internal static void OpenFilePath(string path)
     {
