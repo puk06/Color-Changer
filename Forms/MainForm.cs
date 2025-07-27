@@ -43,6 +43,7 @@ internal partial class MainForm : Form
     private readonly AdvancedColorSettingsForm _advancedColorSettingsForm = new AdvancedColorSettingsForm();
     private readonly SelectColorFromTextureForm _selectColorFromTextureForm = new SelectColorFromTextureForm();
     private readonly SelectionPenSettingsForm _selectionPenSettingsForm = new SelectionPenSettingsForm();
+    private readonly PreviewZoomForm _previewZoomForm = new PreviewZoomForm();
 
     private readonly ColorDifference _colorDifference = new ColorDifference(Color.Empty, Color.Empty);
     private ColorDifference ColorDifference
@@ -330,6 +331,9 @@ internal partial class MainForm : Form
             _previewBitmap = GenerateColoredPreview(_bmp, rawMode: true);
 
             BitmapUtils.SetImage(previewBox, _previewBitmap, disposeImage: false);
+
+            _previewZoomForm.Reset();
+            _previewZoomForm.SetImage(_previewBitmap, false);
 
             _imageFilePath = path;
         }
@@ -715,6 +719,32 @@ internal partial class MainForm : Form
 
         _advancedColorSettingsForm.ConfigurationChanged += (s, e)
             => UpdateColorConfigulation();
+
+        _previewZoomForm.PreviewMouseMoved += (s, e) =>
+        {
+            if (s is Point pointLocation)
+            {
+                var mouseEvent = new MouseEventArgs(e.Button, e.Clicks, pointLocation.X, pointLocation.Y, e.Delta);
+                SelectPreviousColor(s, mouseEvent);
+            }
+        };
+
+        _previewZoomForm.PreviewMouseUp += PreviewBox_MouseUp;
+
+        _previewZoomForm.RequestImageUpdate += (s, e) =>
+        {
+            if (_previewBitmap == null || s is not int selectedIndex) return;
+
+            switch (selectedIndex)
+            {
+                case 0:
+                    _previewZoomForm.SetImage(_previewBitmap, false);
+                    break;
+                case 1:
+                    _previewZoomForm.SetImage(GenerateColoredPreview(_previewBitmap), true);
+                    break;
+            }
+        };
     }
 
     private void OnPaint(object sender, PaintEventArgs e)
@@ -733,7 +763,7 @@ internal partial class MainForm : Form
         if (selectMode.Checked && _selectionPenSettingsForm.PenEnaled) GeneratePenSelectionPreview(e);
     }
 
-    private void PreviewBox_MouseUp(object sender, MouseEventArgs e)
+    private void PreviewBox_MouseUp(object? sender, MouseEventArgs e)
     {
         if (selectMode.Checked && _selectionPenSettingsForm.PenEnaled) OnSelectionEnd();
 
@@ -891,6 +921,7 @@ internal partial class MainForm : Form
         _helpForm.Show();
         _helpForm.BringToFront();
     }
+
     private void SelectColorFromTexture_Click(object sender, EventArgs e)
     {
         _selectColorFromTextureForm.Show();
@@ -901,6 +932,12 @@ internal partial class MainForm : Form
     {
         _selectionPenSettingsForm.Show();
         _selectionPenSettingsForm.BringToFront();
+    }
+
+    private void PreviewZoomTool_Click(object sender, EventArgs e)
+    {
+        _previewZoomForm.Show();
+        _previewZoomForm.BringToFront();
     }
 
     private void UndoButton_Click(object sender, EventArgs e)

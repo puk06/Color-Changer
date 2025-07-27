@@ -49,6 +49,7 @@
             menuToolBar = new MenuStrip();
             fileMenu = new ToolStripMenuItem();
             OpenFile = new ToolStripMenuItem();
+            separator = new ToolStripSeparator();
             ImportColorSettings = new ToolStripMenuItem();
             ExportColorSettings = new ToolStripMenuItem();
             balanceModeSettingsButton = new ToolStripMenuItem();
@@ -81,7 +82,7 @@
             label1 = new Label();
             selectModePanel = new Panel();
             label12 = new Label();
-            toolStripSeparator1 = new ToolStripSeparator();
+            previewZoomTool = new ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)previewBox).BeginInit();
             ((System.ComponentModel.ISupportInitialize)previousColorBox).BeginInit();
             ((System.ComponentModel.ISupportInitialize)newColorBox).BeginInit();
@@ -309,7 +310,7 @@
             // 
             // fileMenu
             // 
-            fileMenu.DropDownItems.AddRange(new ToolStripItem[] { OpenFile, toolStripSeparator1, ImportColorSettings, ExportColorSettings });
+            fileMenu.DropDownItems.AddRange(new ToolStripItem[] { OpenFile, separator, ImportColorSettings, ExportColorSettings });
             fileMenu.Font = new Font("Yu Gothic UI", 9F);
             fileMenu.Name = "fileMenu";
             fileMenu.Size = new Size(53, 20);
@@ -321,6 +322,11 @@
             OpenFile.Size = new Size(186, 22);
             OpenFile.Text = "画像ファイルを開く";
             OpenFile.Click += OpenFile_Click;
+            // 
+            // separator
+            // 
+            separator.Name = "separator";
+            separator.Size = new Size(183, 6);
             // 
             // ImportColorSettings
             // 
@@ -362,7 +368,7 @@
             // 
             // toolMenu
             // 
-            toolMenu.DropDownItems.AddRange(new ToolStripItem[] { selectColorFromTexture, selectionPenTool });
+            toolMenu.DropDownItems.AddRange(new ToolStripItem[] { selectColorFromTexture, selectionPenTool, previewZoomTool });
             toolMenu.Font = new Font("Yu Gothic UI", 9F);
             toolMenu.Name = "toolMenu";
             toolMenu.Size = new Size(46, 20);
@@ -658,10 +664,12 @@
             label12.TabIndex = 28;
             label12.Text = "選択モード";
             // 
-            // toolStripSeparator1
+            // previewZoomTool
             // 
-            toolStripSeparator1.Name = "toolStripSeparator1";
-            toolStripSeparator1.Size = new Size(183, 6);
+            previewZoomTool.Name = "previewZoomTool";
+            previewZoomTool.Size = new Size(182, 22);
+            previewZoomTool.Text = "拡大プレビュー";
+            previewZoomTool.Click += PreviewZoomTool_Click;
             // 
             // MainForm
             // 
@@ -762,6 +770,7 @@
         private ToolStripMenuItem ImportColorSettings;
         private ToolStripMenuItem ExportColorSettings;
         private ToolStripMenuItem selectionPenTool;
-        private ToolStripSeparator toolStripSeparator1;
+        private ToolStripSeparator separator;
+        private ToolStripMenuItem previewZoomTool;
     }
 }
