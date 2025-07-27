@@ -229,6 +229,9 @@ internal partial class PreviewZoomForm : Form
         Invalidate();
     }
 
+    private void HowToUse_Click(object sender, EventArgs e)
+        => FormUtils.ShowInfo("操作方法: \nCtrl + クリック: 移動\nホイール: 拡大 / 縮小\nクリック: メイン画面のクリック");
+
     private void NotifyMouseMoved(Point point, MouseEventArgs e)
         => PreviewMouseMoved?.Invoke(point, e);
 

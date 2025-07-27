@@ -722,18 +722,18 @@ internal partial class MainForm : Form
 
         _previewZoomForm.PreviewMouseMoved += (s, e) =>
         {
-            if (s is Point pointLocation)
-            {
-                var mouseEvent = new MouseEventArgs(e.Button, e.Clicks, pointLocation.X, pointLocation.Y, e.Delta);
-                SelectPreviousColor(s, mouseEvent);
-            }
+            if (s is not Point pointLocation) return;
+
+            var mouseEvent = new MouseEventArgs(e.Button, e.Clicks, pointLocation.X, pointLocation.Y, e.Delta);
+            SelectPreviousColor(s, mouseEvent);
         };
 
         _previewZoomForm.PreviewMouseUp += PreviewBox_MouseUp;
 
         _previewZoomForm.RequestImageUpdate += (s, e) =>
         {
-            if (_previewBitmap == null || s is not int selectedIndex) return;
+            if (_previewBitmap == null) return;
+            if (s is not int selectedIndex) return;
 
             switch (selectedIndex)
             {
