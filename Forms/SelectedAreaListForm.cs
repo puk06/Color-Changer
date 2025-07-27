@@ -4,7 +4,7 @@ using System.Collections;
 
 namespace ColorChanger.Forms;
 
-public partial class SelectedAreaListForm : Form
+internal partial class SelectedAreaListForm : Form
 {
     /// <summary>
     /// 選択エリアの有効／無効が変更されたときに発生するイベント
@@ -43,18 +43,24 @@ public partial class SelectedAreaListForm : Form
         }
     }
 
-    public SelectedAreaListForm()
+    internal SelectedAreaListForm()
     {
         InitializeComponent();
         Icon = FormUtils.GetSoftwareIcon();
     }
 
+    /// <summary>
+    /// 選択エリアをクリアします。
+    /// </summary>
     internal void Clear()
     {
         _selectedAreas.Clear();
         selectedValuesList.Items.Clear();
     }
 
+    /// <summary>
+    /// 最後に追加されたものを削除します。
+    /// </summary>
     internal void RemoveLast()
     {
         if (_selectedAreas.Count == 0) return;
@@ -67,6 +73,11 @@ public partial class SelectedAreaListForm : Form
         TriggerCheckedChanged();
     }
 
+    /// <summary>
+    /// 渡されたBitArrayを選択エリアとして追加します。
+    /// </summary>
+    /// <param name="values"></param>
+    /// <param name="isEraser"></param>
     internal void Add(BitArray values, bool isEraser = false)
     {
         for (int i = 0; i < _selectedAreas.Count; i++)

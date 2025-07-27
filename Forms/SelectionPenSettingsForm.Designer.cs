@@ -67,7 +67,7 @@
             penWidth.TabIndex = 2;
             penWidth.TickFrequency = 50;
             penWidth.Value = 100;
-            penWidth.ValueChanged += penWidth_ValueChanged;
+            penWidth.ValueChanged += PenWidth_ValueChanged;
             // 
             // label2
             // 

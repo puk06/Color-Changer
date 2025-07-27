@@ -3,27 +3,32 @@ using System.Collections;
 
 namespace ColorChanger.Forms;
 
-public partial class SelectionPenSettingsForm : Form
+internal partial class SelectionPenSettingsForm : Form
 {
     internal bool PenEnaled => enablePen.Checked;
     internal bool IsEraser => eraserMode.Checked;
+
+
+    private BitArray _currentSelectedArea = BitArrayUtils.GetEmpty();
     internal bool Initialized => _currentSelectedArea.Count != 0;
     internal BitArray GetCurrentSelectedArea => _currentSelectedArea;
 
     private int PenWidth => penWidth.Value;
 
-    private BitArray _currentSelectedArea = BitArrayUtils.GetEmpty();
-
     private int _width;
     private int _height;
 
-    public SelectionPenSettingsForm()
+    internal SelectionPenSettingsForm()
     {
         InitializeComponent();
         Icon = FormUtils.GetSoftwareIcon();
         RefleshPenWidthLabel();
     }
 
+    /// <summary>
+    /// 選択エリアを初期化します。
+    /// </summary>
+    /// <param name="bitmapSize"></param>
     internal void Initialize(Size bitmapSize)
     {
         _width = bitmapSize.Width;
@@ -31,6 +36,10 @@ public partial class SelectionPenSettingsForm : Form
         _currentSelectedArea = new BitArray(_width * _height);
     }
 
+    /// <summary>
+    /// 渡されたPointから、選択エリアを作成します。
+    /// </summary>
+    /// <param name="center"></param>
     internal void SetSelectionArea(Point center)
     {
         if (!Initialized || PenWidth <= 0) return;
@@ -57,6 +66,11 @@ public partial class SelectionPenSettingsForm : Form
         }
     }
 
+    /// <summary>
+    /// 渡されたSizeに縮小した現在の選択エリアを計算、取得します。
+    /// </summary>
+    /// <param name="previewSize"></param>
+    /// <returns></returns>
     internal bool[,] GeneratePreviewSelectionMap(Size previewSize)
     {
         int targetWidth = previewSize.Width;
@@ -99,6 +113,9 @@ public partial class SelectionPenSettingsForm : Form
         return previewMap;
     }
 
+    /// <summary>
+    /// 選択エリアをリセットします。リセット後はInitializeの実行が必要になります。
+    /// </summary>
     internal void Reset()
     {
         _width = 0;
@@ -106,7 +123,7 @@ public partial class SelectionPenSettingsForm : Form
         _currentSelectedArea = BitArrayUtils.GetEmpty();
     }
 
-    private void penWidth_ValueChanged(object sender, EventArgs e)
+    private void PenWidth_ValueChanged(object sender, EventArgs e)
         => RefleshPenWidthLabel();
 
     private void RefleshPenWidthLabel()

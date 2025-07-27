@@ -75,6 +75,10 @@ internal partial class BalanceModeSettingsForm : Form
         gradientPreview.Image = null;
     }
 
+    /// <summary>
+    /// 渡されたConfigからデータを読み込みます。
+    /// </summary>
+    /// <param name="balanceModeConfiguration"></param>
     internal void LoadSettings(BalanceModeConfiguration balanceModeConfiguration)
     {
         ApplyConfigurationToInputs(balanceModeConfiguration);

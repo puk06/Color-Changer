@@ -33,12 +33,19 @@ internal partial class AdvancedColorSettingsForm : Form
         ApplyConfigurationToInputs(_configuration);
     }
 
+    /// <summary>
+    /// 渡されたConfigからデータを読み込みます。
+    /// </summary>
+    /// <param name="advancedColorConfiguration"></param>
     internal void LoadSettings(AdvancedColorConfiguration advancedColorConfiguration)
     {
         ApplyConfigurationToInputs(advancedColorConfiguration);
         NotifyConfigurationChanged();
     }
 
+    /// <summary>
+    /// フォームの中身をリセットします。
+    /// </summary>
     internal void Reset()
     {
         brightness.Text = "1.00";

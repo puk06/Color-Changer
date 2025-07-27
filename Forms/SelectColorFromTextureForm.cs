@@ -5,7 +5,7 @@ using System.Diagnostics;
 
 namespace ColorChanger.Forms;
 
-public partial class SelectColorFromTextureForm : Form
+internal partial class SelectColorFromTextureForm : Form
 {
     private const int COLOR_UPDATE_DEBOUNCE_MS = 14;
 
@@ -23,7 +23,7 @@ public partial class SelectColorFromTextureForm : Form
     private Point _clickedPoint = Point.Empty;
     private readonly Stopwatch _updateDebounceStopwatch = Stopwatch.StartNew();
 
-    public SelectColorFromTextureForm()
+    internal SelectColorFromTextureForm()
     {
         InitializeComponent();
         Icon = FormUtils.GetSoftwareIcon();

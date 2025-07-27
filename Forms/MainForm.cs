@@ -8,7 +8,7 @@ using System.Text.Json;
 
 namespace ColorChanger.Forms;
 
-public partial class MainForm : Form
+internal partial class MainForm : Form
 {
     private const string CURRENT_VERSION = "v1.0.18";
     private static readonly string FORM_TITLE = $"Color Changer For Texture {CURRENT_VERSION}";
@@ -54,10 +54,13 @@ public partial class MainForm : Form
         }
     }
 
+    /// <summary>
+    /// 変更後の色が選択されているかどうかを取得します。
+    /// </summary>
     internal bool NewColorSelected
         => _newColor != Color.Empty;
 
-    public MainForm()
+    internal MainForm()
     {
         _balanceModeSettingsForm = new BalanceModeSettingsForm(this);
 
