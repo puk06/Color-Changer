@@ -48,7 +48,7 @@ public partial class SelectionPenSettingsForm : Form
                 int dx = x - center.X;
                 int dy = y - center.Y;
 
-                if (dx * dx + dy * dy <= radius * radius)
+                if ((dx * dx) + (dy * dy) <= radius * radius)
                 {
                     int index = PixelUtils.GetPixelIndex(x, y, _width);
                     _currentSelectedArea[index] = true;
@@ -83,7 +83,7 @@ public partial class SelectionPenSettingsForm : Form
                 {
                     for (int x = startX; x < endX; x++)
                     {
-                        int index = y * _width + x;
+                        int index = PixelUtils.GetPixelIndex(x, y, _width);
                         if (_currentSelectedArea[index])
                         {
                             selected = true;

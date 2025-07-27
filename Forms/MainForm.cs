@@ -98,22 +98,7 @@ public partial class MainForm : Form
 
         if (selectMode.Checked)
         {
-            if (_previousColor == Color.Empty || _newColor == Color.Empty)
-            {
-                FormUtils.ShowError("色が選択されていません。（プレビューが作成できません）");
-                return;
-            }
-
             Point originalCoordinates = BitmapUtils.ConvertToOriginalCoordinates(e, previewBox, _bmp);
-
-            if (_selectionPenSettingsForm.PenEnaled)
-            {
-                if (!_selectionPenSettingsForm.Initialized) _selectionPenSettingsForm.Initialize(_bmp.Size);
-                _selectionPenSettingsForm.SetSelectionArea(originalCoordinates);
-                previewBox.Invalidate();
-                return;
-            }
-
             HandleSelectionMode(e, selectedColor, originalCoordinates);
             return;
         }
@@ -610,6 +595,20 @@ public partial class MainForm : Form
         {
             _backgroundColor = color;
             backgroundColorBox.BackColor = color;
+            return;
+        }
+
+        if (_previousColor == Color.Empty || _newColor == Color.Empty)
+        {
+            FormUtils.ShowError("色が選択されていません。（プレビューが作成できません）");
+            return;
+        }
+
+        if (_selectionPenSettingsForm.PenEnaled)
+        {
+            if (!_selectionPenSettingsForm.Initialized) _selectionPenSettingsForm.Initialize(_bmp.Size);
+            _selectionPenSettingsForm.SetSelectionArea(originalCoordinates);
+            previewBox.Invalidate();
             return;
         }
 
