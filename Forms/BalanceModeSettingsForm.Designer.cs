@@ -385,7 +385,6 @@ namespace ColorChanger.Forms
             Controls.Add(balanceModeComboBox);
             Controls.Add(label1);
             FormBorderStyle = FormBorderStyle.FixedSingle;
-            Icon = new Icon(new MemoryStream(Properties.Resources.AppIcon));
             MaximizeBox = false;
             MinimizeBox = false;
             Name = "BalanceModeSettingsForm";

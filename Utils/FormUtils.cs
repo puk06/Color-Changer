@@ -2,6 +2,8 @@
 
 internal static class FormUtils
 {
+    private static readonly Icon _softwareIcon = new Icon(new MemoryStream(Properties.Resources.AppIcon));
+
     /// <summary>
     /// キー入力がナビゲーションキーかどうかを判定する
     /// </summary>
@@ -65,4 +67,10 @@ internal static class FormUtils
 
         label.Location = new Point(x - textWidthSize, y);
     }
+
+    /// <summary>
+    /// フォームのアイコンで使用する、ソフトウェアアイコンを取得する。
+    /// </summary>
+    /// <returns></returns>
+    internal static Icon GetSoftwareIcon() => _softwareIcon;
 }

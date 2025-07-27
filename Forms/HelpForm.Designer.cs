@@ -38,6 +38,7 @@
             button6 = new Button();
             button7 = new Button();
             button8 = new Button();
+            button9 = new Button();
             SuspendLayout();
             // 
             // button1
@@ -147,11 +148,23 @@
             button8.UseVisualStyleBackColor = true;
             button8.Click += Button8_Click;
             // 
+            // button9
+            // 
+            button9.Font = new Font("Yu Gothic UI", 10F);
+            button9.Location = new Point(12, 457);
+            button9.Name = "button9";
+            button9.Size = new Size(149, 50);
+            button9.TabIndex = 10;
+            button9.Text = "選択用ペンツール";
+            button9.UseVisualStyleBackColor = true;
+            button9.Click += Button9_Click;
+            // 
             // HelpForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(803, 584);
+            Controls.Add(button9);
             Controls.Add(button8);
             Controls.Add(button7);
             Controls.Add(button6);
@@ -163,7 +176,6 @@
             Controls.Add(button2);
             Controls.Add(button1);
             FormBorderStyle = FormBorderStyle.FixedSingle;
-            Icon = new Icon(new MemoryStream(Properties.Resources.AppIcon));
             MaximizeBox = false;
             MinimizeBox = false;
             Name = "HelpForm";
@@ -186,5 +198,6 @@
         private Button button6;
         private Button button7;
         private Button button8;
+        private Button button9;
     }
 }

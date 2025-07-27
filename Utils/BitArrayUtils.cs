@@ -31,19 +31,21 @@ internal static class BitArrayUtils
         => new BitArray(0);
 
     /// <summary>
-    /// BitArrayをマージする
+    /// BitArrayをマージする。Eraserレイヤーの場合はマージ時に削除する。
     /// </summary>
     /// <param name="bitArray1"></param>
     /// <param name="bitArray2"></param>
-    internal static void Merge(ref BitArray bitArray1, BitArray bitArray2)
+    /// <param name="isEraser"></param>
+    internal static void Merge(ref BitArray bitArray1, BitArray bitArray2, bool isEraser)
     {
         if (bitArray1.Length == 0) bitArray1 = new BitArray(bitArray2.Length);
+        bool value = !isEraser;
 
         for (int i = 0; i < bitArray2.Count; i++)
         {
             if (bitArray2[i])
             {
-                bitArray1[i] = true;
+                bitArray1[i] = value;
             }
         }
     }

@@ -47,15 +47,16 @@
             balanceMode = new CheckBox();
             inverseMode = new CheckBox();
             menuToolBar = new MenuStrip();
-            FileMenu = new ToolStripMenuItem();
+            fileMenu = new ToolStripMenuItem();
             OpenFile = new ToolStripMenuItem();
             ImportColorSettings = new ToolStripMenuItem();
             ExportColorSettings = new ToolStripMenuItem();
             balanceModeSettingsButton = new ToolStripMenuItem();
             selectedAreaListButton = new ToolStripMenuItem();
-            AdvancedColorSettingsButton = new ToolStripMenuItem();
-            ToolMenu = new ToolStripMenuItem();
-            SelectColorFromTexture = new ToolStripMenuItem();
+            advancedColorSettingsButton = new ToolStripMenuItem();
+            toolMenu = new ToolStripMenuItem();
+            selectColorFromTexture = new ToolStripMenuItem();
+            selectionPenTool = new ToolStripMenuItem();
             helpUseButton = new ToolStripMenuItem();
             aboutThisSoftware = new ToolStripMenuItem();
             donationButton = new ToolStripMenuItem();
@@ -298,20 +299,20 @@
             // menuToolBar
             // 
             menuToolBar.Font = new Font("Yu Gothic UI", 19F);
-            menuToolBar.Items.AddRange(new ToolStripItem[] { FileMenu, balanceModeSettingsButton, selectedAreaListButton, AdvancedColorSettingsButton, ToolMenu, helpUseButton, aboutThisSoftware, donationButton });
+            menuToolBar.Items.AddRange(new ToolStripItem[] { fileMenu, balanceModeSettingsButton, selectedAreaListButton, advancedColorSettingsButton, toolMenu, helpUseButton, aboutThisSoftware, donationButton });
             menuToolBar.Location = new Point(0, 0);
             menuToolBar.Name = "menuToolBar";
             menuToolBar.Size = new Size(1256, 24);
             menuToolBar.TabIndex = 38;
             menuToolBar.Text = "menuStrip1";
             // 
-            // FileMenu
+            // fileMenu
             // 
-            FileMenu.DropDownItems.AddRange(new ToolStripItem[] { OpenFile, ImportColorSettings, ExportColorSettings });
-            FileMenu.Font = new Font("Yu Gothic UI", 9F);
-            FileMenu.Name = "FileMenu";
-            FileMenu.Size = new Size(53, 20);
-            FileMenu.Text = "ファイル";
+            fileMenu.DropDownItems.AddRange(new ToolStripItem[] { OpenFile, ImportColorSettings, ExportColorSettings });
+            fileMenu.Font = new Font("Yu Gothic UI", 9F);
+            fileMenu.Name = "fileMenu";
+            fileMenu.Size = new Size(53, 20);
+            fileMenu.Text = "ファイル";
             // 
             // OpenFile
             // 
@@ -350,28 +351,35 @@
             selectedAreaListButton.Text = "選択エリアリスト";
             selectedAreaListButton.Click += SelectedAreaListButton_Click;
             // 
-            // AdvancedColorSettingsButton
+            // advancedColorSettingsButton
             // 
-            AdvancedColorSettingsButton.Font = new Font("Yu Gothic UI", 9F);
-            AdvancedColorSettingsButton.Name = "AdvancedColorSettingsButton";
-            AdvancedColorSettingsButton.Size = new Size(89, 20);
-            AdvancedColorSettingsButton.Text = "色の追加設定";
-            AdvancedColorSettingsButton.Click += AdvancedColorSettingsButton_Click;
+            advancedColorSettingsButton.Font = new Font("Yu Gothic UI", 9F);
+            advancedColorSettingsButton.Name = "advancedColorSettingsButton";
+            advancedColorSettingsButton.Size = new Size(89, 20);
+            advancedColorSettingsButton.Text = "色の追加設定";
+            advancedColorSettingsButton.Click += AdvancedColorSettingsButton_Click;
             // 
-            // ToolMenu
+            // toolMenu
             // 
-            ToolMenu.DropDownItems.AddRange(new ToolStripItem[] { SelectColorFromTexture });
-            ToolMenu.Font = new Font("Yu Gothic UI", 9F);
-            ToolMenu.Name = "ToolMenu";
-            ToolMenu.Size = new Size(46, 20);
-            ToolMenu.Text = "ツール";
+            toolMenu.DropDownItems.AddRange(new ToolStripItem[] { selectColorFromTexture, selectionPenTool });
+            toolMenu.Font = new Font("Yu Gothic UI", 9F);
+            toolMenu.Name = "toolMenu";
+            toolMenu.Size = new Size(46, 20);
+            toolMenu.Text = "ツール";
             // 
-            // SelectColorFromTexture
+            // selectColorFromTexture
             // 
-            SelectColorFromTexture.Name = "SelectColorFromTexture";
-            SelectColorFromTexture.Size = new Size(182, 22);
-            SelectColorFromTexture.Text = "テクスチャから色を選択";
-            SelectColorFromTexture.Click += SelectColorFromTexture_Click;
+            selectColorFromTexture.Name = "selectColorFromTexture";
+            selectColorFromTexture.Size = new Size(182, 22);
+            selectColorFromTexture.Text = "テクスチャから色を選択";
+            selectColorFromTexture.Click += SelectColorFromTexture_Click;
+            // 
+            // selectionPenTool
+            // 
+            selectionPenTool.Name = "selectionPenTool";
+            selectionPenTool.Size = new Size(182, 22);
+            selectionPenTool.Text = "選択ペンツール";
+            selectionPenTool.Click += SelectionPenTool_Click;
             // 
             // helpUseButton
             // 
@@ -671,7 +679,6 @@
             Controls.Add(menuToolBar);
             FormBorderStyle = FormBorderStyle.FixedSingle;
             KeyPreview = true;
-            Icon = new Icon(new MemoryStream(Properties.Resources.AppIcon));
             MainMenuStrip = menuToolBar;
             MaximizeBox = false;
             Name = "MainForm";
@@ -715,7 +722,7 @@
         private CheckBox balanceMode;
         private CheckBox inverseMode;
         private MenuStrip menuToolBar;
-        private ToolStripMenuItem FileMenu;
+        private ToolStripMenuItem fileMenu;
         private ToolStripMenuItem helpUseButton;
         private ToolStripMenuItem aboutThisSoftware;
         private Label label5;
@@ -732,7 +739,7 @@
         private ToolStripMenuItem donationButton;
         private Panel selectModePanel;
         private Label label12;
-        private ToolStripMenuItem AdvancedColorSettingsButton;
+        private ToolStripMenuItem advancedColorSettingsButton;
         private Label label14;
         private Label advancedColorConfigStatus;
         private Label label10;
@@ -743,10 +750,11 @@
         private Label memoryUsage;
         private Label label17;
         private Label textureType;
-        private ToolStripMenuItem ToolMenu;
-        private ToolStripMenuItem SelectColorFromTexture;
+        private ToolStripMenuItem toolMenu;
+        private ToolStripMenuItem selectColorFromTexture;
         private ToolStripMenuItem OpenFile;
         private ToolStripMenuItem ImportColorSettings;
         private ToolStripMenuItem ExportColorSettings;
+        private ToolStripMenuItem selectionPenTool;
     }
 }

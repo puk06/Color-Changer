@@ -34,7 +34,7 @@ public partial class SelectedAreaListForm : Form
             {
                 if (item.Enabled)
                 {
-                    BitArrayUtils.Merge(ref selectedArea, item.SelectedPoints);
+                    BitArrayUtils.Merge(ref selectedArea, item.SelectedPoints, item.IsEraser);
                     _selectedAreaCount++;
                 }
             }
@@ -46,6 +46,7 @@ public partial class SelectedAreaListForm : Form
     public SelectedAreaListForm()
     {
         InitializeComponent();
+        Icon = FormUtils.GetSoftwareIcon();
     }
 
     internal void Clear()
@@ -66,11 +67,11 @@ public partial class SelectedAreaListForm : Form
         TriggerCheckedChanged();
     }
 
-    internal void Add(BitArray values)
+    internal void Add(BitArray values, bool isEraser = false)
     {
         for (int i = 0; i < _selectedAreas.Count; i++)
         {
-            if (BitArrayUtils.Equals(_selectedAreas[i].SelectedPoints, values))
+            if (_selectedAreas[i].IsEraser == isEraser && BitArrayUtils.Equals(_selectedAreas[i].SelectedPoints, values))
             {
                 selectedValuesList.SetItemChecked(i, true);
                 return;
@@ -78,7 +79,7 @@ public partial class SelectedAreaListForm : Form
         }
 
         int itemIndex = selectedValuesList.Items.Count + 1;
-        SelectedArea selectedArea = new SelectedArea(itemIndex, true, values);
+        SelectedArea selectedArea = new SelectedArea(itemIndex, true, values, isEraser);
 
         _selectedAreas.Add(selectedArea);
         string title = selectedArea.ToString();

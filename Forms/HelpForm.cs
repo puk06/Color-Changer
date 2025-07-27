@@ -1,4 +1,6 @@
-﻿namespace ColorChanger.Forms;
+﻿using ColorChanger.Utils;
+
+namespace ColorChanger.Forms;
 
 internal partial class HelpForm : Form
 {
@@ -63,9 +65,18 @@ internal partial class HelpForm : Form
         "- 設定ファイルをソフトウィンドウにドラッグ＆ドロップ\n" +
         "- Ctrl + O もしくは、画面上部の「ファイル」メニューから「設定ファイルを読み込む」を選んで開いてください。";
 
+    private static readonly string SelectionPenToolMessage = "マウスペンで選択エリアを追加 / 削除:\n" +
+        "- テクスチャ内の選択エリアをマウスのペンで追加したり、削除したりする事ができる機能です。\n\n" +
+        "1. 選択モードを有効化します。\n" +
+        "2. 画面上部の「ツール」メニューから「選択用ペンツール」をクリックします。\n" +
+        "3. 表示されたウィンドウでペンを有効化し、ペンの太さをスライダーで調節します。\n" +
+        "4. 画像内をマウスでクリックしながら動かすことでペンで選択することが出来ます。\n\n" +
+        "消去用レイヤーは、消しゴムモードをオンにすることで作成することが出来ます。既にある選択エリアを編集することが出来ます。";
+
     internal HelpForm()
     {
         InitializeComponent();
+        Icon = FormUtils.GetSoftwareIcon();
     }
 
     #region イベントハンドラー
@@ -107,6 +118,11 @@ internal partial class HelpForm : Form
     private void Button8_Click(object sender, EventArgs e)
     {
         descriptionText.Text = ImportOrExportColorSettingsMessage;
+    }
+
+    private void Button9_Click(object sender, EventArgs e)
+    {
+        descriptionText.Text = SelectionPenToolMessage;
     }
     #endregion
 

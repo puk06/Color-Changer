@@ -258,7 +258,6 @@
             Controls.Add(colorPaletteBox);
             Controls.Add(redBar);
             FormBorderStyle = FormBorderStyle.FixedSingle;
-            Icon = new Icon(new MemoryStream(Properties.Resources.AppIcon));
             MaximizeBox = false;
             MinimizeBox = false;
             Name = "ColorPickerForm";

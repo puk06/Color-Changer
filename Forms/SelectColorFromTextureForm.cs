@@ -26,6 +26,7 @@ public partial class SelectColorFromTextureForm : Form
     public SelectColorFromTextureForm()
     {
         InitializeComponent();
+        Icon = FormUtils.GetSoftwareIcon();
 
         previewBox.BackColor = ColorUtils.DefaultBackgroundColor;
         selectedColorBox.BackColor = ColorUtils.DefaultBackgroundColor;

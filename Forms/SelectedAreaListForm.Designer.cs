@@ -60,7 +60,6 @@
             Controls.Add(label1);
             Controls.Add(selectedValuesList);
             FormBorderStyle = FormBorderStyle.FixedSingle;
-            Icon = new Icon(new MemoryStream(Properties.Resources.AppIcon));
             MaximizeBox = false;
             Name = "SelectedAreaListForm";
             StartPosition = FormStartPosition.CenterScreen;

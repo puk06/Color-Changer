@@ -24,6 +24,8 @@ internal partial class ColorPickerForm : Form
     internal ColorPickerForm()
     {
         InitializeComponent();
+        Icon = FormUtils.GetSoftwareIcon();
+
         UpdateSelectedColor(SelectedColor);
     }
 

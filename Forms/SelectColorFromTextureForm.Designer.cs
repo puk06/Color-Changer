@@ -169,7 +169,6 @@
             Controls.Add(label15);
             Controls.Add(previewBox);
             FormBorderStyle = FormBorderStyle.FixedSingle;
-            Icon = new Icon(new MemoryStream(Properties.Resources.AppIcon));
             MaximizeBox = false;
             Name = "SelectColorFromTextureForm";
             StartPosition = FormStartPosition.CenterScreen;

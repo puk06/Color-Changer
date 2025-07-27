@@ -10,7 +10,7 @@ namespace ColorChanger.Forms;
 
 public partial class MainForm : Form
 {
-    private const string CURRENT_VERSION = "v1.0.17";
+    private const string CURRENT_VERSION = "v1.0.18";
     private static readonly string FORM_TITLE = $"Color Changer For Texture {CURRENT_VERSION}";
     private static readonly Point VERSION_LABEL_POSITION = new Point(275, 54);
     private const int COLOR_UPDATE_DEBOUNCE_MS = 14;
@@ -42,6 +42,7 @@ public partial class MainForm : Form
     private readonly HelpForm _helpForm = new HelpForm();
     private readonly AdvancedColorSettingsForm _advancedColorSettingsForm = new AdvancedColorSettingsForm();
     private readonly SelectColorFromTextureForm _selectColorFromTextureForm = new SelectColorFromTextureForm();
+    private readonly SelectionPenSettingsForm _selectionPenSettingsForm = new SelectionPenSettingsForm();
 
     private readonly ColorDifference _colorDifference = new ColorDifference(Color.Empty, Color.Empty);
     private ColorDifference ColorDifference
@@ -59,8 +60,9 @@ public partial class MainForm : Form
     public MainForm()
     {
         _balanceModeSettingsForm = new BalanceModeSettingsForm(this);
-        InitializeComponent();
 
+        InitializeComponent();
+        Icon = FormUtils.GetSoftwareIcon();
         Text = FORM_TITLE;
 
         versionLabel.Text = CURRENT_VERSION;
@@ -97,6 +99,15 @@ public partial class MainForm : Form
         if (selectMode.Checked)
         {
             Point originalCoordinates = BitmapUtils.ConvertToOriginalCoordinates(e, previewBox, _bmp);
+
+            if (_selectionPenSettingsForm.PenEnaled)
+            {
+                if (!_selectionPenSettingsForm.Initialized) _selectionPenSettingsForm.Initialize(_bmp.Size);
+                _selectionPenSettingsForm.SetSelectionArea(originalCoordinates);
+                previewBox.Invalidate();
+                return;
+            }
+
             HandleSelectionMode(e, selectedColor, originalCoordinates);
             return;
         }
@@ -626,6 +637,33 @@ public partial class MainForm : Form
 
         _selectedAreaListForm.Add(values);
     }
+
+    private void GeneratePenSelectionPreview(PaintEventArgs e)
+    {
+        bool[,] previewMap = _selectionPenSettingsForm.GeneratePreviewSelectionMap(previewBox.Size);
+
+        int width = previewMap.GetLength(0);
+        int height = previewMap.GetLength(1);
+
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                if (previewMap[x, y])
+                {
+                    e.Graphics.FillRectangle(Brushes.Red, x, y, 1, 1);
+                }
+            }
+        }
+    }
+
+    private void OnSelectionEnd()
+    {
+        if (!_selectionPenSettingsForm.Initialized) return;
+        _selectedAreaListForm.Add(_selectionPenSettingsForm.GetCurrentSelectedArea, _selectionPenSettingsForm.IsEraser);
+        _selectionPenSettingsForm.Reset();
+        previewBox.Invalidate();
+    }
     #endregion
 
     #region イベントハンドラー
@@ -687,10 +725,15 @@ public partial class MainForm : Form
         using Pen pen = new Pen(inverseColor, 2);
         e.Graphics.DrawLine(pen, _clickedPoint.X - 5, _clickedPoint.Y, _clickedPoint.X + 5, _clickedPoint.Y);
         e.Graphics.DrawLine(pen, _clickedPoint.X, _clickedPoint.Y - 5, _clickedPoint.X, _clickedPoint.Y + 5);
+
+        if (pictureBox.Name != "previewBox") return;
+        if (selectMode.Checked && _selectionPenSettingsForm.PenEnaled) GeneratePenSelectionPreview(e);
     }
 
     private void PreviewBox_MouseUp(object sender, MouseEventArgs e)
     {
+        if (selectMode.Checked && _selectionPenSettingsForm.PenEnaled) OnSelectionEnd();
+
         if (e.Button != MouseButtons.Left) return;
         if (_previewBitmap == null || _newColor == Color.Empty || _previousColor == Color.Empty) return;
 
@@ -734,7 +777,7 @@ public partial class MainForm : Form
 
         if (selectMode.Checked && _backgroundColor == Color.Empty)
         {
-            FormUtils.ShowInfo("選択モードが有効になりました。はじめに背景色を右クリックで設定してください。", "選択モード");
+            FormUtils.ShowInfo("選択モードが有効になりました。\nペンツール以外でオブジェクト選択する場合は、はじめに背景色を右クリックで設定してください。", "選択モード");
         }
 
         selectModePanel.Enabled = selectMode.Checked;
@@ -849,6 +892,12 @@ public partial class MainForm : Form
     {
         _selectColorFromTextureForm.Show();
         _selectColorFromTextureForm.BringToFront();
+    }
+
+    private void SelectionPenTool_Click(object sender, EventArgs e)
+    {
+        _selectionPenSettingsForm.Show();
+        _selectionPenSettingsForm.BringToFront();
     }
 
     private void UndoButton_Click(object sender, EventArgs e)

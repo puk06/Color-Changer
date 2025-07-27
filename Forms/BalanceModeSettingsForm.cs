@@ -54,6 +54,8 @@ internal partial class BalanceModeSettingsForm : Form
         _mainForm = mainForm;
 
         InitializeComponent();
+        Icon = FormUtils.GetSoftwareIcon();
+
         SetupEventHandlers();
 
         _colorPickerForm.SetInitialColor(Color.FromArgb(255, 255, 255));

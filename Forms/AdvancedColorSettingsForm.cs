@@ -28,6 +28,8 @@ internal partial class AdvancedColorSettingsForm : Form
     internal AdvancedColorSettingsForm()
     {
         InitializeComponent();
+        Icon = FormUtils.GetSoftwareIcon();
+
         ApplyConfigurationToInputs(_configuration);
     }
 
