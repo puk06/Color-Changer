@@ -141,8 +141,8 @@ internal partial class PreviewZoomForm : Form
         var mousePos = e.Location;
         var deltaZoom = _zoom / oldZoom;
 
-        _panOffset.X = (int)(mousePos.X - deltaZoom * (mousePos.X - _panOffset.X));
-        _panOffset.Y = (int)(mousePos.Y - deltaZoom * (mousePos.Y - _panOffset.Y));
+        _panOffset.X = (int)(mousePos.X - (deltaZoom * (mousePos.X - _panOffset.X)));
+        _panOffset.Y = (int)(mousePos.Y - (deltaZoom * (mousePos.Y - _panOffset.Y)));
 
         Invalidate();
     }
