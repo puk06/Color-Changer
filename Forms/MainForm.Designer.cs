@@ -81,6 +81,7 @@
             label1 = new Label();
             selectModePanel = new Panel();
             label12 = new Label();
+            toolStripSeparator1 = new ToolStripSeparator();
             ((System.ComponentModel.ISupportInitialize)previewBox).BeginInit();
             ((System.ComponentModel.ISupportInitialize)previousColorBox).BeginInit();
             ((System.ComponentModel.ISupportInitialize)newColorBox).BeginInit();
@@ -308,7 +309,7 @@
             // 
             // fileMenu
             // 
-            fileMenu.DropDownItems.AddRange(new ToolStripItem[] { OpenFile, ImportColorSettings, ExportColorSettings });
+            fileMenu.DropDownItems.AddRange(new ToolStripItem[] { OpenFile, toolStripSeparator1, ImportColorSettings, ExportColorSettings });
             fileMenu.Font = new Font("Yu Gothic UI", 9F);
             fileMenu.Name = "fileMenu";
             fileMenu.Size = new Size(53, 20);
@@ -657,6 +658,11 @@
             label12.TabIndex = 28;
             label12.Text = "選択モード";
             // 
+            // toolStripSeparator1
+            // 
+            toolStripSeparator1.Name = "toolStripSeparator1";
+            toolStripSeparator1.Size = new Size(183, 6);
+            // 
             // MainForm
             // 
             AllowDrop = true;
@@ -756,5 +762,6 @@
         private ToolStripMenuItem ImportColorSettings;
         private ToolStripMenuItem ExportColorSettings;
         private ToolStripMenuItem selectionPenTool;
+        private ToolStripSeparator toolStripSeparator1;
     }
 }
