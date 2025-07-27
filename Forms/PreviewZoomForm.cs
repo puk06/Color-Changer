@@ -1,4 +1,5 @@
 ﻿using ColorChanger.Utils;
+using System.Drawing.Drawing2D;
 
 namespace ColorChanger.Forms;
 
@@ -30,20 +31,6 @@ internal partial class PreviewZoomForm : Form
     }
 
     /// <summary>
-    /// 画像をリセットします。
-    /// </summary>
-    internal void Reset()
-    {
-        if (_canDispose)
-        {
-            _image?.Dispose();
-            _image = null;
-        }
-
-        previewImageMode.SelectedIndex = 0;
-    }
-
-    /// <summary>
     /// 画像をセットします。
     /// </summary>
     /// <param name="image"></param>
@@ -59,6 +46,7 @@ internal partial class PreviewZoomForm : Form
         _canDispose = canDispose;
         _image = image;
 
+        if (_panOffset == Point.Empty) CenterImage();
         Invalidate();
     }
 
@@ -108,9 +96,9 @@ internal partial class PreviewZoomForm : Form
         g.DrawImage(_image, imgX, imgY, imgDrawWidth, imgDrawHeight);
 
         float visibleX = -_panOffset.X / _zoom;
-        float visibleY = -_panOffset.Y / _zoom;
+        float visibleY = (-_panOffset.Y + panel.Height) / _zoom;
         float visibleW = ClientSize.Width / _zoom;
-        float visibleH = ClientSize.Height / _zoom;
+        float visibleH = (ClientSize.Height - panel.Height) / _zoom;
 
         float clippedX = Math.Max(0, visibleX);
         float clippedY = Math.Max(0, visibleY);
@@ -126,6 +114,18 @@ internal partial class PreviewZoomForm : Form
 
         g.DrawRectangle(_redPen, redRect.X, redRect.Y, redRect.Width, redRect.Height);
         g.DrawRectangle(_borderPen, previewBox);
+    }
+
+    private void CenterImage()
+    {
+        if (_image == null) return;
+
+        _zoom = 1.0f;
+
+        int x = (Size.Width - (int)(_image.Width * _zoom)) / 2;
+        int y = ((Size.Height - panel.Height - (int)(_image.Height * _zoom)) / 2) + panel.Height;
+
+        _panOffset = new Point(x, y);
     }
     #endregion
 
@@ -152,7 +152,7 @@ internal partial class PreviewZoomForm : Form
         if (_image == null) return;
 
         e.Graphics.Clear(BackColor);
-        e.Graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+        e.Graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
 
         e.Graphics.TranslateTransform(_panOffset.X, _panOffset.Y);
         e.Graphics.ScaleTransform(_zoom, _zoom);
@@ -223,14 +223,20 @@ internal partial class PreviewZoomForm : Form
 
     private void ViewReset_Click(object sender, EventArgs e)
     {
-        _zoom = 1.0f;
-        _panOffset = Point.Empty;
-
+        CenterImage();
         Invalidate();
     }
 
     private void HowToUse_Click(object sender, EventArgs e)
-        => FormUtils.ShowInfo("操作方法: \nCtrl + クリック: 移動\nホイール: 拡大 / 縮小\nクリック: メイン画面のクリック");
+        => FormUtils.ShowInfo(
+            "操作方法\n\n" +
+            "クリック：\n" +
+            "　→ メイン画面の操作が可能です。\n色選択、オブジェクト選択、ペンなどに使うことができます。\n\n" +
+            "Ctrl + クリック：\n" +
+            "　→ 表示中の画像をドラッグで移動\n\n" +
+            "マウスホイール：\n" +
+            "　→ 画像の拡大 / 縮小"
+        );
 
     private void NotifyMouseMoved(Point point, MouseEventArgs e)
         => PreviewMouseMoved?.Invoke(point, e);

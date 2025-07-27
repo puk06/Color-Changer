@@ -331,8 +331,6 @@ internal partial class MainForm : Form
             _previewBitmap = GenerateColoredPreview(_bmp, rawMode: true);
 
             BitmapUtils.SetImage(previewBox, _previewBitmap, disposeImage: false);
-
-            _previewZoomForm.Reset();
             _previewZoomForm.SetImage(_previewBitmap, false);
 
             _imageFilePath = path;

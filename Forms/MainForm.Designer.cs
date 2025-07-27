@@ -423,7 +423,7 @@
             label5.TabIndex = 39;
             label5.Text = "画像生成オプション";
             // 
-            // panel1
+            // panel
             // 
             panel1.BackColor = SystemColors.WindowFrame;
             panel1.Controls.Add(label17);

@@ -30,10 +30,10 @@
         {
             previewImageMode = new ComboBox();
             refleshButton = new Button();
-            panel1 = new Panel();
-            viewReset = new Button();
+            panel = new Panel();
             howToUse = new Button();
-            panel1.SuspendLayout();
+            viewReset = new Button();
+            panel.SuspendLayout();
             SuspendLayout();
             // 
             // previewImageMode
@@ -59,29 +59,18 @@
             refleshButton.UseVisualStyleBackColor = true;
             refleshButton.Click += RefleshButton_Click;
             // 
-            // panel1
+            // panel
             // 
-            panel1.BackColor = SystemColors.Control;
-            panel1.Controls.Add(howToUse);
-            panel1.Controls.Add(viewReset);
-            panel1.Controls.Add(refleshButton);
-            panel1.Controls.Add(previewImageMode);
-            panel1.Dock = DockStyle.Top;
-            panel1.Location = new Point(0, 0);
-            panel1.Name = "panel1";
-            panel1.Size = new Size(434, 43);
-            panel1.TabIndex = 3;
-            // 
-            // viewReset
-            // 
-            viewReset.Font = new Font("Yu Gothic UI", 10F);
-            viewReset.Location = new Point(214, 6);
-            viewReset.Name = "viewReset";
-            viewReset.Size = new Size(102, 27);
-            viewReset.TabIndex = 3;
-            viewReset.Text = "ビューリセット";
-            viewReset.UseVisualStyleBackColor = true;
-            viewReset.Click += ViewReset_Click;
+            panel.BackColor = SystemColors.Control;
+            panel.Controls.Add(howToUse);
+            panel.Controls.Add(viewReset);
+            panel.Controls.Add(refleshButton);
+            panel.Controls.Add(previewImageMode);
+            panel.Dock = DockStyle.Top;
+            panel.Location = new Point(0, 0);
+            panel.Name = "panel1";
+            panel.Size = new Size(434, 43);
+            panel.TabIndex = 3;
             // 
             // howToUse
             // 
@@ -94,17 +83,28 @@
             howToUse.UseVisualStyleBackColor = true;
             howToUse.Click += HowToUse_Click;
             // 
+            // viewReset
+            // 
+            viewReset.Font = new Font("Yu Gothic UI", 10F);
+            viewReset.Location = new Point(214, 6);
+            viewReset.Name = "viewReset";
+            viewReset.Size = new Size(102, 27);
+            viewReset.TabIndex = 3;
+            viewReset.Text = "ビューリセット";
+            viewReset.UseVisualStyleBackColor = true;
+            viewReset.Click += ViewReset_Click;
+            // 
             // PreviewZoomForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.White;
-            ClientSize = new Size(434, 411);
-            Controls.Add(panel1);
+            Size = new Size(800, 800);
+            Controls.Add(panel);
             DoubleBuffered = true;
             Name = "PreviewZoomForm";
             StartPosition = FormStartPosition.CenterScreen;
-            Text = "Preview Zoom By Color Changer";
+            Text = "Zoom Preview By Color Changer";
             FormClosing += PreviewZoomForm_FormClosing;
             Paint += PreviewZoomForm_Paint;
             MouseDown += PreviewZoomForm_MouseDown;
@@ -112,14 +112,14 @@
             MouseUp += PreviewZoomForm_MouseUp;
             MouseWheel += ImageZoomForm_MouseWheel;
             Resize += PreviewZoomForm_Resize;
-            panel1.ResumeLayout(false);
+            panel.ResumeLayout(false);
             ResumeLayout(false);
         }
 
         #endregion
         private ComboBox previewImageMode;
         private Button refleshButton;
-        private Panel panel1;
+        private Panel panel;
         private Button viewReset;
         private Button howToUse;
     }
