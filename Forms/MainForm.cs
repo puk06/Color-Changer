@@ -115,6 +115,7 @@ public partial class MainForm : Form
         previousColorBox.BackColor = selectedColor;
         _previousColor = selectedColor;
         ColorPickerForm.SetInitialColor(selectedColor);
+        if (_newColor == Color.Empty) ColorPickerForm.SetColor(selectedColor);
 
         UpdateColorData();
 
