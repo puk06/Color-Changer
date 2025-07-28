@@ -94,7 +94,6 @@ internal partial class MainForm : Form
     {
         if (e.Button != MouseButtons.Left && !(e.Button == MouseButtons.Right && selectMode.Checked)) return;
         if (_bmp == null || _previewBitmap == null) return;
-        if (selectMode.Checked && isMouseMoving) return;
 
         if (!BitmapUtils.IsValidCoordinate(e.Location, _previewBitmap.Size)) return;
 
@@ -106,7 +105,7 @@ internal partial class MainForm : Form
         if (selectMode.Checked)
         {
             Point originalCoordinates = BitmapUtils.ConvertToOriginalCoordinates(e, previewBox, _bmp);
-            HandleSelectionMode(e, selectedColor, originalCoordinates);
+            HandleSelectionMode(e, selectedColor, originalCoordinates, isMouseMoving);
             return;
         }
 
@@ -602,7 +601,7 @@ internal partial class MainForm : Form
     /// <summary>
     /// 選択モードの処理
     /// </summary>
-    private void HandleSelectionMode(MouseEventArgs e, Color color, Point originalCoordinates)
+    private void HandleSelectionMode(MouseEventArgs e, Color color, Point originalCoordinates, bool isMouseMoving)
     {
         if (_bmp == null) return;
         if (e.Button == MouseButtons.Right)
@@ -611,7 +610,6 @@ internal partial class MainForm : Form
             backgroundColorBox.BackColor = color;
             return;
         }
-
         if (_previousColor == Color.Empty || _newColor == Color.Empty)
         {
             FormUtils.ShowError("色が選択されていません。（プレビューが作成できません）");
@@ -625,6 +623,8 @@ internal partial class MainForm : Form
             previewBox.Invalidate();
             return;
         }
+
+        if (isMouseMoving) return;
 
         if (_backgroundColor == Color.Empty)
         {

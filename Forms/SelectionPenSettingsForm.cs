@@ -61,7 +61,10 @@ internal partial class SelectionPenSettingsForm : Form
     }
 
     internal void EndSelection()
-        => _endSelection = true;
+    {
+        _endSelection = true;
+        undo.Enabled = true;
+    }
 
     /// <summary>
     /// 渡されたPointから、選択エリアを作成します。
@@ -71,7 +74,7 @@ internal partial class SelectionPenSettingsForm : Form
     {
         if (!Initialized || PenWidth <= 0) return;
 
-        if (_endSelection)
+        if (_endSelection && !eraserMode.Checked)
         {
             BitArrayUtils.Merge(ref _totalSelectedArea, _currentSelectedArea);
             _currentSelectedArea = new BitArray(_width * _height);
@@ -159,6 +162,8 @@ internal partial class SelectionPenSettingsForm : Form
         _currentSelectedArea = BitArrayUtils.GetEmpty();
         _totalSelectedArea = BitArrayUtils.GetEmpty();
 
+        undo.Enabled = false;
+
         _initialized = false;
     }
 
@@ -166,6 +171,7 @@ internal partial class SelectionPenSettingsForm : Form
     {
         _currentSelectedArea = new BitArray(_width * _height);
         SelectionReverted?.Invoke(null, EventArgs.Empty);
+        undo.Enabled = false;
     }
 
     #region イベントハンドラー
