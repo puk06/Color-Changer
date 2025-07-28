@@ -123,8 +123,8 @@
             previewBox.TabIndex = 4;
             previewBox.TabStop = false;
             previewBox.Paint += OnPaint;
-            previewBox.MouseDown += SelectPreviousColor;
-            previewBox.MouseMove += SelectPreviousColor;
+            previewBox.MouseDown += (s, e) => SelectPreviousColor(false, e);
+            previewBox.MouseMove += (s, e) => SelectPreviousColor(true, e);
             previewBox.MouseUp += PreviewBox_MouseUp;
             // 
             // label4
@@ -182,8 +182,8 @@
             coloredPreviewBox.TabIndex = 12;
             coloredPreviewBox.TabStop = false;
             coloredPreviewBox.Paint += OnPaint;
-            coloredPreviewBox.MouseDown += SelectPreviousColor;
-            coloredPreviewBox.MouseMove += SelectPreviousColor;
+            coloredPreviewBox.MouseDown += (s, e) => SelectPreviousColor(false, e);
+            coloredPreviewBox.MouseMove += (s, e) => SelectPreviousColor(true, e);
             coloredPreviewBox.MouseUp += PreviewBox_MouseUp;
             // 
             // previousRGBLabel

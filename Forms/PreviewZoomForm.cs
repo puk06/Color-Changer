@@ -5,6 +5,7 @@ namespace ColorChanger.Forms;
 
 internal partial class PreviewZoomForm : Form
 {
+    internal event MouseEventHandler? PreviewMouseDown;
     internal event MouseEventHandler? PreviewMouseMoved;
     internal event MouseEventHandler? PreviewMouseUp;
     internal event EventHandler? RequestImageUpdate;
@@ -205,7 +206,7 @@ internal partial class PreviewZoomForm : Form
         }
         else
         {
-            NotifyMouseMoved(GetClickedPosition(e.Location), e);
+            NotifyMouseDown(GetClickedPosition(e.Location), e);
         }
     }
 
@@ -246,6 +247,9 @@ internal partial class PreviewZoomForm : Form
             "マウスホイール：\n" +
             "　→ 画像の拡大 / 縮小"
         );
+
+    private void NotifyMouseDown(Point point, MouseEventArgs e)
+        => PreviewMouseDown?.Invoke(point, e);
 
     private void NotifyMouseMoved(Point point, MouseEventArgs e)
         => PreviewMouseMoved?.Invoke(point, e);

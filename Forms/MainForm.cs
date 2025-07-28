@@ -88,10 +88,13 @@ internal partial class MainForm : Form
     /// <summary>
     /// 変更前の色を選択する。
     /// </summary>
-    private void SelectPreviousColor(object sender, MouseEventArgs e)
+    /// <param name="isMouseMoving"></param>
+    /// <param name="e"></param>
+    private void SelectPreviousColor(bool isMouseMoving, MouseEventArgs e)
     {
         if (e.Button != MouseButtons.Left && !(e.Button == MouseButtons.Right && selectMode.Checked)) return;
         if (_bmp == null || _previewBitmap == null) return;
+        if (selectMode.Checked && isMouseMoving) return;
 
         if (!BitmapUtils.IsValidCoordinate(e.Location, _previewBitmap.Size)) return;
 
@@ -719,13 +722,11 @@ internal partial class MainForm : Form
 
     private void SetupPreviewZoomHandlers()
     {
-        _previewZoomForm.PreviewMouseMoved += (s, e) =>
-        {
-            if (s is not Point pointLocation) return;
+        _previewZoomForm.PreviewMouseDown += (s, e)
+            => HandlePreviewMouse(s as Point?, e, triggeredByMouseMove: false);
 
-            var mouseEvent = new MouseEventArgs(e.Button, e.Clicks, pointLocation.X, pointLocation.Y, e.Delta);
-            SelectPreviousColor(s, mouseEvent);
-        };
+        _previewZoomForm.PreviewMouseMoved += (s, e)
+            => HandlePreviewMouse(s as Point?, e, triggeredByMouseMove: true);
 
         _previewZoomForm.PreviewMouseUp += PreviewBox_MouseUp;
 
@@ -743,6 +744,14 @@ internal partial class MainForm : Form
                     break;
             }
         };
+    }
+
+    private void HandlePreviewMouse(Point? pointLocation, MouseEventArgs e, bool triggeredByMouseMove)
+    {
+        if (pointLocation is not Point point) return;
+
+        var mouseEvent = new MouseEventArgs(e.Button, e.Clicks, point.X, point.Y, e.Delta);
+        SelectPreviousColor(triggeredByMouseMove, mouseEvent);
     }
 
     private void OnPaint(object sender, PaintEventArgs e)
