@@ -486,7 +486,9 @@ internal partial class MainForm : Form
         if (_bmp == null || _previewBitmap == null || _previousColor == Color.Empty || _newColor == Color.Empty) return;
 
         BitArray allSelectedAreas = _selectedAreaListForm.SelectedArea;
+        
         int enabledCount = _selectedAreaListForm.EnabledCount;
+        int enabledEraserCount = _selectedAreaListForm.EnabledEraserAreaCount;
 
         if (allSelectedAreas.Length == 0)
         {
@@ -500,7 +502,7 @@ internal partial class MainForm : Form
             _selectedPointsForPreview = BitmapUtils.ConvertSelectedAreaToPreviewBox(allSelectedAreas, _bmp, previewBox, inverseMode.Checked);
 
             int totalSelectedPoints = BitArrayUtils.GetCount(allSelectedAreas);
-            Text = FORM_TITLE + $" - {enabledCount} 個の選択エリア (総選択ピクセル数: {totalSelectedPoints:N0})";
+            Text = FORM_TITLE + $" - {enabledCount} 個の選択エリア / {enabledEraserCount} 個の消去エリア (総選択ピクセル数: {totalSelectedPoints:N0})";
         }
 
         BitmapUtils.SetImage(coloredPreviewBox, GenerateColoredPreview(_previewBitmap));

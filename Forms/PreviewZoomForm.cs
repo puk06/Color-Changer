@@ -53,7 +53,6 @@ internal partial class PreviewZoomForm : Form
 
     internal void SetGraphics(bool[,]? selectionPenMap)
     {
-        if (_selectionPenMap == null && selectionPenMap == null) return;
         _selectionPenMap = selectionPenMap;
         Invalidate();
     }

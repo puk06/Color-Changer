@@ -18,6 +18,13 @@ internal partial class SelectedAreaListForm : Form
     /// </summary>
     internal int EnabledCount => _selectedAreaCount;
 
+    private int _selectedEraserAreaCount = 0;
+
+    /// <summary>
+    /// 現在有効な消去エリアの数
+    /// </summary>
+    internal int EnabledEraserAreaCount => _selectedEraserAreaCount;
+
     private readonly List<SelectedArea> _selectedAreas = new List<SelectedArea>();
 
     /// <summary>
@@ -28,14 +35,25 @@ internal partial class SelectedAreaListForm : Form
         get
         {
             _selectedAreaCount = 0;
+            _selectedEraserAreaCount = 0;
             BitArray selectedArea = BitArrayUtils.GetEmpty();
 
-            foreach (var item in _selectedAreas)
+            for (int i = _selectedAreas.Count - 1; i >= 0; i--)
             {
+                var item = _selectedAreas[i];
+
                 if (item.Enabled)
                 {
                     BitArrayUtils.Merge(ref selectedArea, item.SelectedPoints, item.IsEraser);
-                    _selectedAreaCount++;
+
+                    if (item.IsEraser)
+                    {
+                        _selectedEraserAreaCount++;
+                    }
+                    else
+                    {
+                        _selectedAreaCount++;
+                    }
                 }
             }
 
@@ -43,10 +61,28 @@ internal partial class SelectedAreaListForm : Form
         }
     }
 
+    private static readonly ContextMenuStrip _contextMenu = new ContextMenuStrip();
+    private int _rightClickedIndex = -1;
+    private readonly InputDialogForm _inputDialogForm = new InputDialogForm("新しいレイヤー名を入力してください", "レイヤー名の変更");
+
     internal SelectedAreaListForm()
     {
         InitializeComponent();
         Icon = FormUtils.GetSoftwareIcon();
+
+        _contextMenu.Items.Add("上へ移動").Click += MoveLayerUp;
+        _contextMenu.Items.Add("下へ移動").Click += MoveLayerDown;
+        _contextMenu.Items.Add("一番上へ移動").Click += MoveCheckedListBoxItemToTop;
+        _contextMenu.Items.Add("一番下へ移動").Click += MoveCheckedListBoxItemToBottom;
+        _contextMenu.Items.Add(new ToolStripSeparator());
+        _contextMenu.Items.Add("選択用レイヤーに変換").Click += MakeSelectionLayer;
+        _contextMenu.Items.Add("消去用レイヤーに変換").Click += MakeEraserLayer;
+        _contextMenu.Items.Add(new ToolStripSeparator());
+        _contextMenu.Items.Add("名前を変更").Click += RenameLayer;
+        _contextMenu.Items.Add(new ToolStripSeparator());
+        _contextMenu.Items.Add("レイヤーを削除").Click += RemoveLayer;
+
+        selectedValuesList.ContextMenuStrip = _contextMenu;
     }
 
     /// <summary>
@@ -70,6 +106,7 @@ internal partial class SelectedAreaListForm : Form
         _selectedAreas.RemoveAt(lastIndex);
         selectedValuesList.Items.RemoveAt(lastIndex);
 
+        RefleshPriorityText();
         TriggerCheckedChanged();
     }
 
@@ -89,13 +126,135 @@ internal partial class SelectedAreaListForm : Form
             }
         }
 
-        int itemIndex = selectedValuesList.Items.Count + 1;
-        SelectedArea selectedArea = new SelectedArea(itemIndex, true, values, isEraser);
+        int index = 1;
+        while (_selectedAreas.Any(selectedArea => selectedArea.Index == index))
+        {
+            index++;
+        }
+
+        SelectedArea selectedArea = new SelectedArea(index, true, values, isEraser);
 
         _selectedAreas.Add(selectedArea);
-        string title = selectedArea.ToString();
-        selectedValuesList.Items.Add(title, true);
+        selectedValuesList.Items.Add(selectedArea.ToString(), true);
+
+        RefleshPriorityText();
     }
+
+    private void RefleshPriorityText()
+    {
+        for (int i = 0; i < selectedValuesList.Items.Count; i++)
+        {
+            selectedValuesList.Items[i] = $"{i + 1}  |  {_selectedAreas[i]}";
+        }
+    }
+
+    #region 右クリックメニュー処理
+    private void MoveLayerUp(object? sender, EventArgs e)
+    {
+        if (_rightClickedIndex <= 0) return;
+
+        SwapLayers(_rightClickedIndex, _rightClickedIndex - 1);
+        _rightClickedIndex--;
+
+        RefleshPriorityText();
+        TriggerCheckedChanged();
+    }
+
+    private void MoveLayerDown(object? sender, EventArgs e)
+    {
+        if (_rightClickedIndex == -1 || _rightClickedIndex >= _selectedAreas.Count - 1) return;
+
+        SwapLayers(_rightClickedIndex, _rightClickedIndex + 1);
+        _rightClickedIndex++;
+
+        RefleshPriorityText();
+        TriggerCheckedChanged();
+    }
+
+    private void MoveCheckedListBoxItemToTop(object? sender, EventArgs e)
+    {
+        if (_rightClickedIndex <= 0) return;
+
+        for (int i = _rightClickedIndex; i > 0; i--)
+        {
+            SwapLayers(i, i - 1);
+        }
+
+        RefleshPriorityText();
+        TriggerCheckedChanged();
+    }
+
+    private void MoveCheckedListBoxItemToBottom(object? sender, EventArgs e)
+    {
+        int last = _selectedAreas.Count - 1;
+        if (_rightClickedIndex == -1 || _rightClickedIndex >= last) return;
+
+        for (int i = _rightClickedIndex; i < last; i++)
+        {
+            SwapLayers(i, i + 1);
+        }
+
+        RefleshPriorityText();
+        TriggerCheckedChanged();
+    }
+
+    private void SwapLayers(int index1, int index2)
+    {
+        (_selectedAreas[index1], _selectedAreas[index2]) = (_selectedAreas[index2], _selectedAreas[index1]);
+        (selectedValuesList.Items[index2], selectedValuesList.Items[index1]) = (selectedValuesList.Items[index1], selectedValuesList.Items[index2]);
+    }
+
+    private void MakeSelectionLayer(object? sender, EventArgs e)
+    {
+        if (_rightClickedIndex == -1) return;
+
+        _selectedAreas[_rightClickedIndex].IsEraser = false;
+
+        RefleshPriorityText();
+        TriggerCheckedChanged();
+    }
+
+    private void MakeEraserLayer(object? sender, EventArgs e)
+    {
+        if (_rightClickedIndex == -1) return;
+
+        _selectedAreas[_rightClickedIndex].IsEraser = true;
+
+        RefleshPriorityText();
+        TriggerCheckedChanged();
+    }
+
+    private void RenameLayer(object? sender, EventArgs e)
+    {
+        if (_rightClickedIndex == -1) return;
+
+        SelectedArea area = _selectedAreas[_rightClickedIndex];
+
+        string? newName = _inputDialogForm.ShowDialog(area.GetLayerName());
+
+        if (!string.IsNullOrEmpty(newName))
+        {
+            area.CustomLayerName = newName;
+        }
+
+        RefleshPriorityText();
+    }
+
+    private void RemoveLayer(object? sender, EventArgs e)
+    {
+        if (_rightClickedIndex == -1) return;
+
+        SelectedArea selectedArea = _selectedAreas[_rightClickedIndex];
+        bool result = FormUtils.ShowConfirm($"このレイヤーを削除しますか？\n\nレイヤー名: {selectedArea.GetLayerName()}\nピクセル数: {selectedArea.Count:N0}");
+        if (!result) return;
+
+        _selectedAreas.RemoveAt(_rightClickedIndex);
+        selectedValuesList.Items.RemoveAt(_rightClickedIndex);
+
+        RefleshPriorityText();
+        TriggerCheckedChanged();
+    }
+    #endregion
 
     #region イベントハンドラー
     private void SelectedValuesList_ItemCheck(object? sender, ItemCheckEventArgs e)
@@ -105,11 +264,28 @@ internal partial class SelectedAreaListForm : Form
 
         if (index < 0 || index >= _selectedAreas.Count) return;
 
-        SelectedArea selectedArea = _selectedAreas[index];
-        selectedArea.Enabled = isChecked;
+        _selectedAreas[index].Enabled = isChecked;
 
         TriggerCheckedChanged();
     }
+
+    private void SelectedValuesList_MouseDown(object sender, MouseEventArgs e)
+    {
+        int clickedIndex = selectedValuesList.IndexFromPoint(e.Location);
+
+        if (e.Button == MouseButtons.Right)
+        {
+            _rightClickedIndex = clickedIndex;
+        }
+        else if (e.Button == MouseButtons.Left && clickedIndex != -1)
+        {
+            selectedValuesList.SetItemChecked(clickedIndex, !selectedValuesList.GetItemChecked(clickedIndex));
+        }
+    }
+
+
+    private void SelectedValuesList_SelectedIndexChanged(object sender, EventArgs e)
+        => selectedValuesList.SelectedIndex = -1;
 
     private void TriggerCheckedChanged()
         => OnCheckedChanged?.Invoke(this, EventArgs.Empty);
