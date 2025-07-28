@@ -7,11 +7,11 @@
   Change colors of textures easily by defining your desired color difference.<br>
   Originally built for hair recoloring, now works with any texture!
   <br><br>
-  <img src="https://img.shields.io/badge/.NET-512BD4?logo=dotnet&logoColor=fff" height="25">&nbsp;&nbsp;&nbsp;&nbsp;
-  <img src="https://custom-icon-badges.demolab.com/badge/C%23-%23239120.svg?logo=cshrp&logoColor=white" height="25">&nbsp;&nbsp;&nbsp;&nbsp;
-  <img src="https://custom-icon-badges.demolab.com/badge/Windows-0078D6?logo=windows11&logoColor=white" height="25">&nbsp;&nbsp;&nbsp;&nbsp;
-  <img src="https://img.shields.io/github/license/puk06/Color-Changer?style=flat-square" height="25">&nbsp;&nbsp;&nbsp;&nbsp;
-  <img src="https://www.codefactor.io/repository/github/puk06/Color-Changer/badge" height="25">
+  <img src="https://img.shields.io/badge/.NET-512BD4?logo=dotnet&logoColor=fff" width="66.25">&nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="https://custom-icon-badges.demolab.com/badge/C%23-%23239120.svg?logo=cshrp&logoColor=white" width="56.25">&nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="https://custom-icon-badges.demolab.com/badge/Windows-0078D6?logo=windows11&logoColor=white" width="96.25">&nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="https://img.shields.io/github/license/puk06/Color-Changer?style=flat-square" width="97.5">&nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="https://www.codefactor.io/repository/github/puk06/Color-Changer/badge" width="117.5">
 </div>
 
 ---
