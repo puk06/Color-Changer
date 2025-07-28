@@ -331,6 +331,8 @@ internal partial class MainForm : Form
             _previewBitmap = GenerateColoredPreview(_bmp, rawMode: true);
 
             BitmapUtils.SetImage(previewBox, _previewBitmap, disposeImage: false);
+
+            _previewZoomForm.SetGraphics(null);
             _previewZoomForm.SetImage(_previewBitmap, false);
 
             _imageFilePath = path;
@@ -378,6 +380,8 @@ internal partial class MainForm : Form
             balanceMode.Checked = false;
 
             transparentMode.Checked = false;
+
+            _selectionPenSettingsForm.Reset();
 
             Text = FORM_TITLE;
             selectMode.Checked = false;
