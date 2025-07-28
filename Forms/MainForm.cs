@@ -660,6 +660,13 @@ internal partial class MainForm : Form
     /// </summary>
     private void SetupEventHandlers()
     {
+        SetupColorChangeHandlers();
+        SetupFormInteractionHandlers();
+        SetupPreviewZoomHandlers();
+    }
+
+    private void SetupColorChangeHandlers()
+    {
         _balanceModeSettingsForm.ConfigurationChanged += (s, e) =>
         {
             if (_previewBitmap == null || _previousColor == Color.Empty || _newColor == Color.Empty) return;
@@ -670,13 +677,10 @@ internal partial class MainForm : Form
         {
             if (_previewBitmap == null || _previousColor == Color.Empty) return;
 
-            Color color = ColorPickerForm.SelectedColor;
-
-            _newColor = color;
-            newColorBox.BackColor = color;
+            _newColor = ColorPickerForm.SelectedColor;
+            newColorBox.BackColor = _newColor;
 
             UpdateColorData();
-
             BitmapUtils.SetImage(coloredPreviewBox, GenerateColoredPreview(_previewBitmap));
         };
 
@@ -684,30 +688,32 @@ internal partial class MainForm : Form
         {
             if (_previewBitmap == null || _previousColor == Color.Empty) return;
 
-            Color color = _selectColorFromTextureForm.SelectedColor;
-
-            _newColor = color;
-            newColorBox.BackColor = color;
+            _newColor = _selectColorFromTextureForm.SelectedColor;
+            newColorBox.BackColor = _newColor;
             ColorPickerForm.SetColor(_newColor == Color.Empty ? _previousColor : _newColor);
 
             UpdateColorData();
-
             BitmapUtils.SetImage(coloredPreviewBox, GenerateColoredPreview(_previewBitmap));
         };
+    }
 
-        _selectedAreaListForm.OnCheckedChanged += (s, e)
-            => UpdateSelectedArea();
-
-        _advancedColorSettingsForm.ConfigurationChanged += (s, e)
-            => UpdateColorConfigulation();
+    private void SetupFormInteractionHandlers()
+    {
+        _selectedAreaListForm.OnCheckedChanged += (s, e) => UpdateSelectedArea();
+        _advancedColorSettingsForm.ConfigurationChanged += (s, e) => UpdateColorConfigulation();
 
         _selectionPenSettingsForm.SelectionConfirmed += (s, e) =>
         {
-            if (s is bool isEraserLayer) OnSelectionEnd(isEraserLayer);
+            if (s is bool isEraserLayer)
+                OnSelectionEnd(isEraserLayer);
+
             _selectionPenSettingsForm.Reset();
             previewBox.Invalidate();
         };
+    }
 
+    private void SetupPreviewZoomHandlers()
+    {
         _previewZoomForm.PreviewMouseMoved += (s, e) =>
         {
             if (s is not Point pointLocation) return;
@@ -720,8 +726,7 @@ internal partial class MainForm : Form
 
         _previewZoomForm.RequestImageUpdate += (s, e) =>
         {
-            if (_previewBitmap == null) return;
-            if (s is not int selectedIndex) return;
+            if (_previewBitmap == null || s is not int selectedIndex) return;
 
             switch (selectedIndex)
             {
