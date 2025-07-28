@@ -251,7 +251,6 @@ internal static class ColorUtils
                     gradientStart,
                     gradientEnd,
                     grayScale
-
                 );
 
                 pixel.B = CalculateGradientValue(
