@@ -6,13 +6,33 @@ namespace ColorChanger.Forms;
 internal partial class SelectionPenSettingsForm : Form
 {
     internal bool PenEnaled => enablePen.Checked;
-    internal bool IsEraser => eraserMode.Checked;
 
+    /// <summary>
+    /// 選択状況が確定した際に発生するイベント
+    /// </summary>
     internal event EventHandler? SelectionConfirmed;
 
+    /// <summary>
+    /// 選択状況が１個前に戻った時に発生するイベント
+    /// </summary>
+    internal event EventHandler? SelectionReverted;
+
     private BitArray _currentSelectedArea = BitArrayUtils.GetEmpty();
-    internal bool Initialized => _currentSelectedArea.Count != 0;
-    internal BitArray GetCurrentSelectedArea => _currentSelectedArea;
+
+    private BitArray _totalSelectedArea = BitArrayUtils.GetEmpty();
+    internal BitArray GetTotalSelectedArea
+    {
+        get
+        {
+            BitArrayUtils.Merge(ref _totalSelectedArea, _currentSelectedArea);
+            return _totalSelectedArea;
+        }
+    }
+
+    private bool _initialized = false;
+    internal bool Initialized => _initialized;
+
+    private bool _endSelection = false;
 
     private int PenWidth => penWidth.Value;
 
@@ -35,7 +55,13 @@ internal partial class SelectionPenSettingsForm : Form
         _width = bitmapSize.Width;
         _height = bitmapSize.Height;
         _currentSelectedArea = new BitArray(_width * _height);
+        _totalSelectedArea = new BitArray(_width * _height);
+
+        _initialized = true;
     }
+
+    internal void EndSelection()
+        => _endSelection = true;
 
     /// <summary>
     /// 渡されたPointから、選択エリアを作成します。
@@ -44,6 +70,13 @@ internal partial class SelectionPenSettingsForm : Form
     internal void SetSelectionArea(Point center)
     {
         if (!Initialized || PenWidth <= 0) return;
+
+        if (_endSelection)
+        {
+            BitArrayUtils.Merge(ref _totalSelectedArea, _currentSelectedArea);
+            _currentSelectedArea = new BitArray(_width * _height);
+            _endSelection = false;
+        }
 
         bool value = !eraserMode.Checked;
 
@@ -101,7 +134,7 @@ internal partial class SelectionPenSettingsForm : Form
                     for (int x = startX; x < endX; x++)
                     {
                         int index = PixelUtils.GetPixelIndex(x, y, _width);
-                        if (_currentSelectedArea[index])
+                        if (_totalSelectedArea[index] || _currentSelectedArea[index])
                         {
                             selected = true;
                             break;
@@ -124,6 +157,15 @@ internal partial class SelectionPenSettingsForm : Form
         _width = 0;
         _height = 0;
         _currentSelectedArea = BitArrayUtils.GetEmpty();
+        _totalSelectedArea = BitArrayUtils.GetEmpty();
+
+        _initialized = false;
+    }
+
+    private void UndoSelection()
+    {
+        _currentSelectedArea = new BitArray(_width * _height);
+        SelectionReverted?.Invoke(null, EventArgs.Empty);
     }
 
     #region イベントハンドラー
@@ -133,6 +175,17 @@ internal partial class SelectionPenSettingsForm : Form
     private void RefleshPenWidthLabel()
         => penWidthLabel.Text = $"- {penWidth.Value}px";
 
+    private void Undo_Click(object sender, EventArgs e)
+        => UndoSelection();
+
+    private void SelectionPenSettingsForm_KeyDown(object sender, KeyEventArgs e)
+    {
+        if (e.Control && e.KeyCode == Keys.Z)
+        {
+            UndoSelection();
+        }
+    }
+
     private void AddLayer_Click(object sender, EventArgs e)
         => SelectionConfirmed?.Invoke(false, EventArgs.Empty);
 
@@ -141,5 +194,13 @@ internal partial class SelectionPenSettingsForm : Form
 
     private void CancelSelection_Click(object sender, EventArgs e)
         => SelectionConfirmed?.Invoke(null, EventArgs.Empty);
+    #endregion
+
+    #region フォーム関連
+    private void SelectionPenSettingsForm_FormClosing(object sender, FormClosingEventArgs e)
+    {
+        Visible = false;
+        e.Cancel = true;
+    }
     #endregion
 }

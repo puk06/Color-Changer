@@ -650,7 +650,7 @@ internal partial class MainForm : Form
     private void OnSelectionEnd(bool isEraserLayer)
     {
         if (!_selectionPenSettingsForm.Initialized) return;
-        _selectedAreaListForm.Add(_selectionPenSettingsForm.GetCurrentSelectedArea, isEraserLayer);
+        _selectedAreaListForm.Add(_selectionPenSettingsForm.GetTotalSelectedArea, isEraserLayer);
     }
     #endregion
 
@@ -710,6 +710,9 @@ internal partial class MainForm : Form
             _selectionPenSettingsForm.Reset();
             previewBox.Invalidate();
         };
+
+        _selectionPenSettingsForm.SelectionReverted += (s, e)
+            => previewBox.Invalidate();
     }
 
     private void SetupPreviewZoomHandlers()
@@ -768,6 +771,7 @@ internal partial class MainForm : Form
 
     private void PreviewBox_MouseUp(object? sender, MouseEventArgs e)
     {
+        if (selectMode.Checked && _selectionPenSettingsForm.PenEnaled) _selectionPenSettingsForm.EndSelection();
         if (e.Button != MouseButtons.Left) return;
         if (_previewBitmap == null || _newColor == Color.Empty || _previousColor == Color.Empty) return;
 

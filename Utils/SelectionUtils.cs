@@ -2,6 +2,8 @@
 
 internal static class SelectionUtils
 {
+    private static readonly SolidBrush _selectionOverlayBrush = new SolidBrush(Color.FromArgb(150, 255, 0, 0));
+
     internal static void SetSelectionPreviewMap(Graphics graphics, bool[,] previewMap)
     {
         int width = previewMap.GetLength(0);
@@ -13,7 +15,7 @@ internal static class SelectionUtils
             {
                 if (previewMap[x, y])
                 {
-                    graphics.FillRectangle(Brushes.Red, x, y, 1, 1);
+                    graphics.FillRectangle(_selectionOverlayBrush, x, y, 1, 1);
                 }
             }
         }

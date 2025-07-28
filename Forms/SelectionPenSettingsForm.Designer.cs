@@ -37,6 +37,7 @@
             addLayer = new Button();
             addEraserLayer = new Button();
             cancelSelection = new Button();
+            undo = new Button();
             ((System.ComponentModel.ISupportInitialize)penWidth).BeginInit();
             SuspendLayout();
             // 
@@ -106,7 +107,7 @@
             // addLayer
             // 
             addLayer.Font = new Font("Yu Gothic UI", 12F);
-            addLayer.Location = new Point(12, 154);
+            addLayer.Location = new Point(10, 243);
             addLayer.Name = "addLayer";
             addLayer.Size = new Size(337, 45);
             addLayer.TabIndex = 7;
@@ -117,7 +118,7 @@
             // addEraserLayer
             // 
             addEraserLayer.Font = new Font("Yu Gothic UI", 12F);
-            addEraserLayer.Location = new Point(12, 208);
+            addEraserLayer.Location = new Point(10, 297);
             addEraserLayer.Name = "addEraserLayer";
             addEraserLayer.Size = new Size(337, 45);
             addEraserLayer.TabIndex = 8;
@@ -128,7 +129,7 @@
             // cancelSelection
             // 
             cancelSelection.Font = new Font("Yu Gothic UI", 12F);
-            cancelSelection.Location = new Point(12, 259);
+            cancelSelection.Location = new Point(10, 348);
             cancelSelection.Name = "cancelSelection";
             cancelSelection.Size = new Size(337, 45);
             cancelSelection.TabIndex = 9;
@@ -136,11 +137,23 @@
             cancelSelection.UseVisualStyleBackColor = true;
             cancelSelection.Click += CancelSelection_Click;
             // 
+            // undo
+            // 
+            undo.Font = new Font("Yu Gothic UI", 12F);
+            undo.Location = new Point(10, 154);
+            undo.Name = "undo";
+            undo.Size = new Size(337, 45);
+            undo.TabIndex = 10;
+            undo.Text = "元に戻す";
+            undo.UseVisualStyleBackColor = true;
+            undo.Click += Undo_Click;
+            // 
             // SelectionPenSettingsForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(363, 310);
+            ClientSize = new Size(363, 403);
+            Controls.Add(undo);
             Controls.Add(cancelSelection);
             Controls.Add(addEraserLayer);
             Controls.Add(addLayer);
@@ -151,10 +164,13 @@
             Controls.Add(enablePen);
             Controls.Add(label1);
             FormBorderStyle = FormBorderStyle.FixedSingle;
+            KeyPreview = true;
             MaximizeBox = false;
             Name = "SelectionPenSettingsForm";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Selection Pen By Color Changer";
+            FormClosing += SelectionPenSettingsForm_FormClosing;
+            KeyDown += SelectionPenSettingsForm_KeyDown;
             ((System.ComponentModel.ISupportInitialize)penWidth).EndInit();
             ResumeLayout(false);
             PerformLayout();
@@ -171,5 +187,6 @@
         private Button addLayer;
         private Button addEraserLayer;
         private Button cancelSelection;
+        private Button undo;
     }
 }

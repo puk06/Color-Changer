@@ -4,6 +4,8 @@ namespace ColorChanger.Utils;
 
 internal static class BitArrayUtils
 {
+    private static readonly BitArray _emptyBitArray = new BitArray(0);
+
     /// <summary>
     /// 指定されたBitArrayのvalue値の個数を取得する
     /// </summary>
@@ -28,7 +30,7 @@ internal static class BitArrayUtils
     /// </summary>
     /// <returns></returns>
     internal static BitArray GetEmpty()
-        => new BitArray(0);
+        => _emptyBitArray;
 
     /// <summary>
     /// BitArrayをマージする。Eraserレイヤーの場合はマージ時に削除する。
@@ -36,7 +38,7 @@ internal static class BitArrayUtils
     /// <param name="bitArray1"></param>
     /// <param name="bitArray2"></param>
     /// <param name="isEraser"></param>
-    internal static void Merge(ref BitArray bitArray1, BitArray bitArray2, bool isEraser)
+    internal static void Merge(ref BitArray bitArray1, BitArray bitArray2, bool isEraser = false)
     {
         if (bitArray1.Length == 0) bitArray1 = new BitArray(bitArray2.Length);
         bool value = !isEraser;
