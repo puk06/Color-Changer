@@ -604,12 +604,14 @@ internal partial class MainForm : Form
     private void HandleSelectionMode(MouseEventArgs e, Color color, Point originalCoordinates, bool isMouseMoving)
     {
         if (_bmp == null) return;
+
         if (e.Button == MouseButtons.Right)
         {
             _backgroundColor = color;
             backgroundColorBox.BackColor = color;
             return;
         }
+
         if (_previousColor == Color.Empty || _newColor == Color.Empty)
         {
             FormUtils.ShowError("色が選択されていません。（プレビューが作成できません）");
