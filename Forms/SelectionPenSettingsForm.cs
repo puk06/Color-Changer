@@ -8,6 +8,7 @@ internal partial class SelectionPenSettingsForm : Form
     internal bool PenEnaled => enablePen.Checked;
     internal bool IsEraser => eraserMode.Checked;
 
+    internal event EventHandler? SelectionConfirmed;
 
     private BitArray _currentSelectedArea = BitArrayUtils.GetEmpty();
     internal bool Initialized => _currentSelectedArea.Count != 0;
@@ -44,6 +45,8 @@ internal partial class SelectionPenSettingsForm : Form
     {
         if (!Initialized || PenWidth <= 0) return;
 
+        bool value = !eraserMode.Checked;
+
         int radius = PenWidth / 2;
         int startX = Math.Max(center.X - radius, 0);
         int endX = Math.Min(center.X + radius, _width - 1);
@@ -60,7 +63,7 @@ internal partial class SelectionPenSettingsForm : Form
                 if ((dx * dx) + (dy * dy) <= radius * radius)
                 {
                     int index = PixelUtils.GetPixelIndex(x, y, _width);
-                    _currentSelectedArea[index] = true;
+                    _currentSelectedArea[index] = value;
                 }
             }
         }
@@ -123,9 +126,20 @@ internal partial class SelectionPenSettingsForm : Form
         _currentSelectedArea = BitArrayUtils.GetEmpty();
     }
 
+    #region イベントハンドラー
     private void PenWidth_ValueChanged(object sender, EventArgs e)
         => RefleshPenWidthLabel();
 
     private void RefleshPenWidthLabel()
         => penWidthLabel.Text = $"- {penWidth.Value}px";
+
+    private void AddLayer_Click(object sender, EventArgs e)
+        => SelectionConfirmed?.Invoke(false, EventArgs.Empty);
+
+    private void AddEraserLayer_Click(object sender, EventArgs e)
+        => SelectionConfirmed?.Invoke(true, EventArgs.Empty);
+
+    private void CancelSelection_Click(object sender, EventArgs e)
+        => SelectionConfirmed?.Invoke(null, EventArgs.Empty);
+    #endregion
 }

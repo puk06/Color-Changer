@@ -643,31 +643,10 @@ internal partial class MainForm : Form
         _selectedAreaListForm.Add(values);
     }
 
-    private void GeneratePenSelectionPreview(PaintEventArgs e)
-    {
-        bool[,] previewMap = _selectionPenSettingsForm.GeneratePreviewSelectionMap(previewBox.Size);
-
-        int width = previewMap.GetLength(0);
-        int height = previewMap.GetLength(1);
-
-        for (int y = 0; y < height; y++)
-        {
-            for (int x = 0; x < width; x++)
-            {
-                if (previewMap[x, y])
-                {
-                    e.Graphics.FillRectangle(Brushes.Red, x, y, 1, 1);
-                }
-            }
-        }
-    }
-
-    private void OnSelectionEnd()
+    private void OnSelectionEnd(bool isEraserLayer)
     {
         if (!_selectionPenSettingsForm.Initialized) return;
-        _selectedAreaListForm.Add(_selectionPenSettingsForm.GetCurrentSelectedArea, _selectionPenSettingsForm.IsEraser);
-        _selectionPenSettingsForm.Reset();
-        previewBox.Invalidate();
+        _selectedAreaListForm.Add(_selectionPenSettingsForm.GetCurrentSelectedArea, isEraserLayer);
     }
     #endregion
 
@@ -718,6 +697,13 @@ internal partial class MainForm : Form
         _advancedColorSettingsForm.ConfigurationChanged += (s, e)
             => UpdateColorConfigulation();
 
+        _selectionPenSettingsForm.SelectionConfirmed += (s, e) =>
+        {
+            if (s is bool isEraserLayer) OnSelectionEnd(isEraserLayer);
+            _selectionPenSettingsForm.Reset();
+            previewBox.Invalidate();
+        };
+
         _previewZoomForm.PreviewMouseMoved += (s, e) =>
         {
             if (s is not Point pointLocation) return;
@@ -758,13 +744,21 @@ internal partial class MainForm : Form
         e.Graphics.DrawLine(pen, _clickedPoint.X, _clickedPoint.Y - 5, _clickedPoint.X, _clickedPoint.Y + 5);
 
         if (pictureBox.Name != "previewBox") return;
-        if (selectMode.Checked && _selectionPenSettingsForm.PenEnaled) GeneratePenSelectionPreview(e);
+        if (selectMode.Checked && _selectionPenSettingsForm.PenEnaled)
+        {
+            bool[,] previewMap = _selectionPenSettingsForm.GeneratePreviewSelectionMap(previewBox.Size);
+
+            SelectionUtils.SetSelectionPreviewMap(e.Graphics, previewMap);
+            _previewZoomForm.SetGraphics(previewMap);
+        }
+        else
+        {
+            _previewZoomForm.SetGraphics(null);
+        }
     }
 
     private void PreviewBox_MouseUp(object? sender, MouseEventArgs e)
     {
-        if (selectMode.Checked && _selectionPenSettingsForm.PenEnaled) OnSelectionEnd();
-
         if (e.Button != MouseButtons.Left) return;
         if (_previewBitmap == null || _newColor == Color.Empty || _previousColor == Color.Empty) return;
 

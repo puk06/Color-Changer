@@ -20,6 +20,7 @@ internal partial class PreviewZoomForm : Form
     private Point _panStart;
     private bool isPanning = false;
     private bool _canDispose = false;
+    private bool[,]? _selectionPenMap = null;
 
     internal PreviewZoomForm()
     {
@@ -47,6 +48,13 @@ internal partial class PreviewZoomForm : Form
         _image = image;
 
         if (_panOffset == Point.Empty) CenterImage();
+        Invalidate();
+    }
+
+    internal void SetGraphics(bool[,]? selectionPenMap)
+    {
+        if (_selectionPenMap == null && selectionPenMap == null) return;
+        _selectionPenMap = selectionPenMap;
         Invalidate();
     }
 
@@ -157,6 +165,8 @@ internal partial class PreviewZoomForm : Form
         e.Graphics.TranslateTransform(_panOffset.X, _panOffset.Y);
         e.Graphics.ScaleTransform(_zoom, _zoom);
         e.Graphics.DrawImage(_image, 0, 0);
+
+        if (_selectionPenMap != null) SelectionUtils.SetSelectionPreviewMap(e.Graphics, _selectionPenMap);
 
         e.Graphics.ResetTransform();
 
