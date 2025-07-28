@@ -283,7 +283,6 @@ internal partial class SelectedAreaListForm : Form
         }
     }
 
-
     private void SelectedValuesList_SelectedIndexChanged(object sender, EventArgs e)
         => selectedValuesList.SelectedIndex = -1;
 
