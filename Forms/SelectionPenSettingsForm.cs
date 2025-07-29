@@ -7,7 +7,7 @@ internal partial class SelectionPenSettingsForm : Form
 {
     private const string UNDO_BUTTON_TEXT = "元に戻す";
 
-    internal bool PenEnaled => enablePen.Checked;
+    internal bool PenEnaled => Visible && enablePen.Checked;
 
     /// <summary>
     /// 選択状況が確定した際に発生するイベント
@@ -34,6 +34,7 @@ internal partial class SelectionPenSettingsForm : Form
 
     internal SelectionPenSettingsForm()
     {
+        TopMost = true;
         InitializeComponent();
         Icon = FormUtils.GetSoftwareIcon();
 
@@ -223,6 +224,8 @@ internal partial class SelectionPenSettingsForm : Form
     {
         Visible = false;
         e.Cancel = true;
+
+        SelectionConfirmed?.Invoke(null, EventArgs.Empty);
     }
     #endregion
 }
