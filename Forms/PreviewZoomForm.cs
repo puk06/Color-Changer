@@ -52,6 +52,17 @@ internal partial class PreviewZoomForm : Form
         Invalidate();
     }
 
+    /// <summary>
+    /// 画像データを強制的にリセットします。
+    /// </summary>
+    internal void ResetImage()
+    {
+        _image?.Dispose();
+        _image = null;
+
+        Invalidate();
+    }
+
     internal void SetGraphics(bool[,]? selectionPenMap)
     {
         _selectionPenMap = selectionPenMap;

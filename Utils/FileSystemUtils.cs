@@ -9,7 +9,7 @@ internal static class FileSystemUtils
     /// </summary>
     internal static void OpenFilePath(string path)
     {
-        var result = FormUtils.ShowConfirm("出力先のファイルのパスを開きますか？");
+        bool result = FormUtils.ShowConfirm("出力先のファイルのパスを開きますか？");
         if (!result) return;
 
         try

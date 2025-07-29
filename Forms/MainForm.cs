@@ -354,6 +354,9 @@ internal partial class MainForm : Form
             BitmapUtils.DisposeBitmap(ref _previewBitmap);
             BitmapUtils.ResetImage(previewBox);
 
+            _previewZoomForm.SetGraphics(null);
+            _previewZoomForm.ResetImage();
+
             _imageFilePath = null;
         }
         finally

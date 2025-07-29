@@ -120,34 +120,32 @@ internal partial class SelectionPenSettingsForm : Form
         float scaleX = (float)_width / targetWidth;
         float scaleY = (float)_height / targetHeight;
 
-        for (int ty = 0; ty < targetHeight; ty++)
+        ParallelUtils.ForEach2D(targetHeight, targetWidth, (tx, ty) =>
         {
-            for (int tx = 0; tx < targetWidth; tx++)
+            int startX = (int)(tx * scaleX);
+            int endX = Math.Min((int)((tx + 1) * scaleX), _width);
+
+            int startY = (int)(ty * scaleY);
+            int endY = Math.Min((int)((ty + 1) * scaleY), _height);
+
+            bool selected = false;
+
+            for (int y = startY; y < endY && !selected; y++)
             {
-                int startX = (int)(tx * scaleX);
-                int startY = (int)(ty * scaleY);
-
-                int endX = Math.Min((int)((tx + 1) * scaleX), _width);
-                int endY = Math.Min((int)((ty + 1) * scaleY), _height);
-
-                bool selected = false;
-
-                for (int y = startY; y < endY && !selected; y++)
+                int rowStart = y * _width;
+                for (int x = startX; x < endX; x++)
                 {
-                    for (int x = startX; x < endX; x++)
+                    int index = rowStart + x;
+                    if (_totalSelectedArea[index] || _currentSelectedArea[index])
                     {
-                        int index = PixelUtils.GetPixelIndex(x, y, _width);
-                        if (_totalSelectedArea[index] || _currentSelectedArea[index])
-                        {
-                            selected = true;
-                            break;
-                        }
+                        selected = true;
+                        break;
                     }
                 }
-
-                previewMap[tx, ty] = selected;
             }
-        }
+
+            previewMap[tx, ty] = selected;
+        });
 
         return previewMap;
     }
