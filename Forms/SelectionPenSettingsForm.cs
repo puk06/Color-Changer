@@ -5,6 +5,8 @@ namespace ColorChanger.Forms;
 
 internal partial class SelectionPenSettingsForm : Form
 {
+    private const string UNDO_BUTTON_TEXT = "元に戻す";
+
     internal bool PenEnaled => enablePen.Checked;
 
     /// <summary>
@@ -17,22 +19,13 @@ internal partial class SelectionPenSettingsForm : Form
     /// </summary>
     internal event EventHandler? SelectionReverted;
 
-    private BitArray _currentSelectedArea = BitArrayUtils.GetEmpty();
+    private readonly List<BitArray> _selectedHistory = new List<BitArray>();
 
     private BitArray _totalSelectedArea = BitArrayUtils.GetEmpty();
-    internal BitArray GetTotalSelectedArea
-    {
-        get
-        {
-            BitArrayUtils.Merge(ref _totalSelectedArea, _currentSelectedArea);
-            return _totalSelectedArea;
-        }
-    }
+    internal BitArray GetTotalSelectedArea => _totalSelectedArea;
 
     private bool _initialized = false;
     internal bool Initialized => _initialized;
-
-    private bool _endSelection = false;
 
     private int PenWidth => penWidth.Value;
 
@@ -43,7 +36,9 @@ internal partial class SelectionPenSettingsForm : Form
     {
         InitializeComponent();
         Icon = FormUtils.GetSoftwareIcon();
+
         RefleshPenWidthLabel();
+        RefleshUndoButton();
     }
 
     /// <summary>
@@ -54,17 +49,18 @@ internal partial class SelectionPenSettingsForm : Form
     {
         _width = bitmapSize.Width;
         _height = bitmapSize.Height;
-        _currentSelectedArea = new BitArray(_width * _height);
+
+        _selectedHistory.Clear();
         _totalSelectedArea = new BitArray(_width * _height);
+        RefleshUndoButton();
 
         _initialized = true;
     }
 
+    private bool _endSelection = false;
+
     internal void EndSelection()
-    {
-        _endSelection = true;
-        undo.Enabled = true;
-    }
+        => _endSelection = true;
 
     /// <summary>
     /// 渡されたPointから、選択エリアを作成します。
@@ -74,10 +70,11 @@ internal partial class SelectionPenSettingsForm : Form
     {
         if (!Initialized || PenWidth <= 0) return;
 
-        if (_endSelection && !eraserMode.Checked)
+        if (_endSelection || _selectedHistory.Count == 0)
         {
-            BitArrayUtils.Merge(ref _totalSelectedArea, _currentSelectedArea);
-            _currentSelectedArea = new BitArray(_width * _height);
+            _selectedHistory.Add(new BitArray(_totalSelectedArea));
+            RefleshUndoButton();
+
             _endSelection = false;
         }
 
@@ -99,7 +96,7 @@ internal partial class SelectionPenSettingsForm : Form
                 if ((dx * dx) + (dy * dy) <= radius * radius)
                 {
                     int index = PixelUtils.GetPixelIndex(x, y, _width);
-                    _currentSelectedArea[index] = value;
+                    _totalSelectedArea[index] = value;
                 }
             }
         }
@@ -136,7 +133,7 @@ internal partial class SelectionPenSettingsForm : Form
                 for (int x = startX; x < endX; x++)
                 {
                     int index = rowStart + x;
-                    if (_totalSelectedArea[index] || _currentSelectedArea[index])
+                    if (_totalSelectedArea[index])
                     {
                         selected = true;
                         break;
@@ -157,19 +154,35 @@ internal partial class SelectionPenSettingsForm : Form
     {
         _width = 0;
         _height = 0;
-        _currentSelectedArea = BitArrayUtils.GetEmpty();
-        _totalSelectedArea = BitArrayUtils.GetEmpty();
 
-        undo.Enabled = false;
+        _selectedHistory.Clear();
+        _totalSelectedArea = BitArrayUtils.GetEmpty();
+        RefleshUndoButton();
 
         _initialized = false;
     }
 
     private void UndoSelection()
     {
-        _currentSelectedArea = new BitArray(_width * _height);
+        int lastIndex = _selectedHistory.Count - 1;
+        if (lastIndex < 0) return;
+
+        BitArray lastSelectedPoints = _selectedHistory[lastIndex];
+        for (int i = 0; i < lastSelectedPoints.Count; i++)
+        {
+            _totalSelectedArea[i] = lastSelectedPoints[i];
+        }
+
+        _selectedHistory.RemoveAt(lastIndex);
+        RefleshUndoButton();
+
         SelectionReverted?.Invoke(null, EventArgs.Empty);
-        undo.Enabled = false;
+    }
+
+    private void RefleshUndoButton()
+    {
+        undo.Text = $"{UNDO_BUTTON_TEXT} - {_selectedHistory.Count}個の履歴";
+        undo.Enabled = _selectedHistory.Count != 0;
     }
 
     #region イベントハンドラー
@@ -197,7 +210,12 @@ internal partial class SelectionPenSettingsForm : Form
         => SelectionConfirmed?.Invoke(true, EventArgs.Empty);
 
     private void CancelSelection_Click(object sender, EventArgs e)
-        => SelectionConfirmed?.Invoke(null, EventArgs.Empty);
+    {
+        bool result = FormUtils.ShowConfirm("現在のペンの選択状況を全て無視して、取り消しますか？");
+        if (!result) return;
+
+        SelectionConfirmed?.Invoke(null, EventArgs.Empty);
+    }
     #endregion
 
     #region フォーム関連
