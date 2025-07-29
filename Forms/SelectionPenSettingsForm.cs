@@ -34,7 +34,6 @@ internal partial class SelectionPenSettingsForm : Form
 
     internal SelectionPenSettingsForm()
     {
-        TopMost = true;
         InitializeComponent();
         Icon = FormUtils.GetSoftwareIcon();
 
@@ -82,22 +81,25 @@ internal partial class SelectionPenSettingsForm : Form
         bool value = !eraserMode.Checked;
 
         int radius = PenWidth / 2;
-        int startX = Math.Max(center.X - radius, 0);
-        int endX = Math.Min(center.X + radius, _width - 1);
-        int startY = Math.Max(center.Y - radius, 0);
-        int endY = Math.Min(center.Y + radius, _height - 1);
+        int radiusSquared = radius * radius;
 
-        for (int y = startY; y <= endY; y++)
+        int minX = Math.Max(center.X - radius, 0);
+        int maxX = Math.Min(center.X + radius, _width - 1);
+        int minY = Math.Max(center.Y - radius, 0);
+        int maxY = Math.Min(center.Y + radius, _height - 1);
+
+        for (int y = minY; y <= maxY; y++)
         {
-            for (int x = startX; x <= endX; x++)
+            int dy = y - center.Y;
+            int dy2 = dy * dy;
+            int rowStart = y * _width;
+
+            for (int x = minX; x <= maxX; x++)
             {
                 int dx = x - center.X;
-                int dy = y - center.Y;
-
-                if ((dx * dx) + (dy * dy) <= radius * radius)
+                if ((dx * dx) + dy2 <= radiusSquared)
                 {
-                    int index = PixelUtils.GetPixelIndex(x, y, _width);
-                    _totalSelectedArea[index] = value;
+                    _totalSelectedArea[rowStart + x] = value;
                 }
             }
         }
