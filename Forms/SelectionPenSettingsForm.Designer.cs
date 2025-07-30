@@ -107,7 +107,7 @@
             // addLayer
             // 
             addLayer.Font = new Font("Yu Gothic UI", 12F);
-            addLayer.Location = new Point(10, 243);
+            addLayer.Location = new Point(10, 225);
             addLayer.Name = "addLayer";
             addLayer.Size = new Size(337, 45);
             addLayer.TabIndex = 7;
@@ -118,7 +118,7 @@
             // addEraserLayer
             // 
             addEraserLayer.Font = new Font("Yu Gothic UI", 12F);
-            addEraserLayer.Location = new Point(10, 297);
+            addEraserLayer.Location = new Point(10, 276);
             addEraserLayer.Name = "addEraserLayer";
             addEraserLayer.Size = new Size(337, 45);
             addEraserLayer.TabIndex = 8;
@@ -129,7 +129,7 @@
             // cancelSelection
             // 
             cancelSelection.Font = new Font("Yu Gothic UI", 12F);
-            cancelSelection.Location = new Point(10, 348);
+            cancelSelection.Location = new Point(10, 327);
             cancelSelection.Name = "cancelSelection";
             cancelSelection.Size = new Size(337, 45);
             cancelSelection.TabIndex = 9;
@@ -152,7 +152,7 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(363, 403);
+            ClientSize = new Size(363, 381);
             Controls.Add(undo);
             Controls.Add(cancelSelection);
             Controls.Add(addEraserLayer);
