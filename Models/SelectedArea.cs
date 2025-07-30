@@ -13,9 +13,8 @@ internal class SelectedArea(int index, bool enabled, BitArray selectedPoints, bo
     internal bool IsEraser { get; set; } = isEraser;
 
     internal string GetLayerName()
-    => string.IsNullOrEmpty(CustomLayerName) ? $"{(IsEraser ? "消去レイヤー" : "選択レイヤー")} {Index}" : CustomLayerName;
+        => $"{(string.IsNullOrEmpty(CustomLayerName) ? $"レイヤー {Index}" : CustomLayerName)}";
 
-
-    public override string ToString()
-        => $"{GetLayerName()}  /  ピクセル数: {Count:N0}";
+    internal string ToString(int index)
+        => $"{(index == -1 ? "N/A" : index)}  |  {(IsEraser ? "消去" : "選択")}  |  {GetLayerName()}  ({Count:N0}px)";
 }

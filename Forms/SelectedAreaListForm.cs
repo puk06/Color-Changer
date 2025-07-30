@@ -135,7 +135,7 @@ internal partial class SelectedAreaListForm : Form
         SelectedArea selectedArea = new SelectedArea(index, true, values, isEraser);
 
         _selectedAreas.Add(selectedArea);
-        selectedValuesList.Items.Add(selectedArea.ToString(), true);
+        selectedValuesList.Items.Add(selectedArea.ToString(-1), true);
 
         RefleshPriorityText();
     }
@@ -144,7 +144,7 @@ internal partial class SelectedAreaListForm : Form
     {
         for (int i = 0; i < selectedValuesList.Items.Count; i++)
         {
-            selectedValuesList.Items[i] = $"{i + 1}  |  {_selectedAreas[i]}";
+            selectedValuesList.Items[i] = _selectedAreas[i].ToString(i + 1);
         }
     }
 

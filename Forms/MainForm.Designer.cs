@@ -58,6 +58,7 @@
             toolMenu = new ToolStripMenuItem();
             selectColorFromTexture = new ToolStripMenuItem();
             selectionPenTool = new ToolStripMenuItem();
+            previewZoomTool = new ToolStripMenuItem();
             helpUseButton = new ToolStripMenuItem();
             aboutThisSoftware = new ToolStripMenuItem();
             donationButton = new ToolStripMenuItem();
@@ -82,7 +83,7 @@
             label1 = new Label();
             selectModePanel = new Panel();
             label12 = new Label();
-            previewZoomTool = new ToolStripMenuItem();
+            updateCheck = new ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)previewBox).BeginInit();
             ((System.ComponentModel.ISupportInitialize)previousColorBox).BeginInit();
             ((System.ComponentModel.ISupportInitialize)newColorBox).BeginInit();
@@ -123,8 +124,6 @@
             previewBox.TabIndex = 4;
             previewBox.TabStop = false;
             previewBox.Paint += OnPaint;
-            previewBox.MouseDown += (s, e) => SelectPreviousColor(false, e);
-            previewBox.MouseMove += (s, e) => SelectPreviousColor(true, e);
             previewBox.MouseUp += PreviewBox_MouseUp;
             // 
             // label4
@@ -182,8 +181,6 @@
             coloredPreviewBox.TabIndex = 12;
             coloredPreviewBox.TabStop = false;
             coloredPreviewBox.Paint += OnPaint;
-            coloredPreviewBox.MouseDown += (s, e) => SelectPreviousColor(false, e);
-            coloredPreviewBox.MouseMove += (s, e) => SelectPreviousColor(true, e);
             coloredPreviewBox.MouseUp += PreviewBox_MouseUp;
             // 
             // previousRGBLabel
@@ -301,7 +298,7 @@
             // menuToolBar
             // 
             menuToolBar.Font = new Font("Yu Gothic UI", 19F);
-            menuToolBar.Items.AddRange(new ToolStripItem[] { fileMenu, balanceModeSettingsButton, selectedAreaListButton, advancedColorSettingsButton, toolMenu, helpUseButton, aboutThisSoftware, donationButton });
+            menuToolBar.Items.AddRange(new ToolStripItem[] { fileMenu, balanceModeSettingsButton, selectedAreaListButton, advancedColorSettingsButton, toolMenu, helpUseButton, aboutThisSoftware, updateCheck, donationButton });
             menuToolBar.Location = new Point(0, 0);
             menuToolBar.Name = "menuToolBar";
             menuToolBar.Size = new Size(1256, 24);
@@ -388,6 +385,13 @@
             selectionPenTool.Text = "選択ペンツール";
             selectionPenTool.Click += SelectionPenTool_Click;
             // 
+            // previewZoomTool
+            // 
+            previewZoomTool.Name = "previewZoomTool";
+            previewZoomTool.Size = new Size(182, 22);
+            previewZoomTool.Text = "拡大プレビュー";
+            previewZoomTool.Click += PreviewZoomTool_Click;
+            // 
             // helpUseButton
             // 
             helpUseButton.Font = new Font("Yu Gothic UI", 9F);
@@ -423,7 +427,7 @@
             label5.TabIndex = 39;
             label5.Text = "画像生成オプション";
             // 
-            // panel
+            // panel1
             // 
             panel1.BackColor = SystemColors.WindowFrame;
             panel1.Controls.Add(label17);
@@ -664,12 +668,13 @@
             label12.TabIndex = 28;
             label12.Text = "選択モード";
             // 
-            // previewZoomTool
+            // updateCheck
             // 
-            previewZoomTool.Name = "previewZoomTool";
-            previewZoomTool.Size = new Size(182, 22);
-            previewZoomTool.Text = "拡大プレビュー";
-            previewZoomTool.Click += PreviewZoomTool_Click;
+            updateCheck.Font = new Font("Yu Gothic UI", 9F);
+            updateCheck.Name = "updateCheck";
+            updateCheck.Size = new Size(102, 20);
+            updateCheck.Text = "アップデートチェック";
+            updateCheck.Click += UpdateCheck_Click;
             // 
             // MainForm
             // 
@@ -772,5 +777,6 @@
         private ToolStripMenuItem selectionPenTool;
         private ToolStripSeparator separator;
         private ToolStripMenuItem previewZoomTool;
+        private ToolStripMenuItem updateCheck;
     }
 }

@@ -40,7 +40,7 @@
             selectedValuesList.HorizontalScrollbar = true;
             selectedValuesList.Location = new Point(12, 74);
             selectedValuesList.Name = "selectedValuesList";
-            selectedValuesList.Size = new Size(363, 388);
+            selectedValuesList.Size = new Size(372, 388);
             selectedValuesList.TabIndex = 0;
             selectedValuesList.ItemCheck += SelectedValuesList_ItemCheck;
             selectedValuesList.SelectedIndexChanged += SelectedValuesList_SelectedIndexChanged;
@@ -59,18 +59,18 @@
             // layerLabel
             // 
             layerLabel.AutoSize = true;
-            layerLabel.Font = new Font("Yu Gothic UI", 13F);
-            layerLabel.Location = new Point(7, 46);
+            layerLabel.Font = new Font("Yu Gothic UI", 11F);
+            layerLabel.Location = new Point(9, 52);
             layerLabel.Name = "layerLabel";
-            layerLabel.Size = new Size(331, 25);
+            layerLabel.Size = new Size(303, 20);
             layerLabel.TabIndex = 2;
-            layerLabel.Text = "優先順位  |   レイヤー名   /   選択ピクセル数";
+            layerLabel.Text = "優先順位  |   タイプ   |   レイヤー名   /   ピクセル数";
             // 
             // SelectedAreaListForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(387, 472);
+            ClientSize = new Size(396, 472);
             Controls.Add(layerLabel);
             Controls.Add(label1);
             Controls.Add(selectedValuesList);

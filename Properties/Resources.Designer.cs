@@ -71,6 +71,15 @@ namespace ColorChanger.Properties {
         }
         
         /// <summary>
+        ///   https://github.com/puk06/Color-Changer に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string GithubURL {
+            get {
+                return ResourceManager.GetString("GithubURL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   https://pukorufu.booth.pm/items/6519471 に類似しているローカライズされた文字列を検索します。
         /// </summary>
         internal static string ItemURL {
@@ -86,6 +95,15 @@ namespace ColorChanger.Properties {
             get {
                 object obj = ResourceManager.GetObject("RGB", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   https://update.pukosrv.net/check/colorchanger に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string UpdateCheckURL {
+            get {
+                return ResourceManager.GetString("UpdateCheckURL", resourceCulture);
             }
         }
     }

@@ -15,13 +15,6 @@ internal partial class MainForm : Form
     private static readonly Point VERSION_LABEL_POSITION = new Point(275, 54);
     private const int COLOR_UPDATE_DEBOUNCE_MS = 14;
 
-    private static readonly string ITEM_URL = Properties.Resources.ItemURL;
-    private static readonly ProcessStartInfo UrlProcessStartInfo = new ProcessStartInfo()
-    {
-        FileName = ITEM_URL,
-        UseShellExecute = true
-    };
-
     private Color _previousColor = Color.Empty;
     private Color _newColor = Color.Empty;
     private Color _backgroundColor = Color.Empty;
@@ -66,6 +59,7 @@ internal partial class MainForm : Form
         _balanceModeSettingsForm = new BalanceModeSettingsForm(this);
 
         InitializeComponent();
+        RegisterPreviewMouseEvents();
         Icon = FormUtils.GetSoftwareIcon();
         Text = FORM_TITLE;
 
@@ -82,6 +76,14 @@ internal partial class MainForm : Form
         UpdateTextureData();
         UpdateColorData();
         UpdateColorConfigulation();
+    }
+
+    private void RegisterPreviewMouseEvents()
+    {
+        previewBox.MouseDown += (s, e) => SelectPreviousColor(false, e);
+        previewBox.MouseMove += (s, e) => SelectPreviousColor(true, e);
+        coloredPreviewBox.MouseDown += (s, e) => SelectPreviousColor(false, e);
+        coloredPreviewBox.MouseMove += (s, e) => SelectPreviousColor(true, e);
     }
 
     #region 色選択関連
@@ -491,7 +493,7 @@ internal partial class MainForm : Form
         if (_bmp == null || _previewBitmap == null || _previousColor == Color.Empty || _newColor == Color.Empty) return;
 
         BitArray allSelectedAreas = _selectedAreaListForm.SelectedArea;
-        
+
         int enabledCount = _selectedAreaListForm.EnabledCount;
         int enabledEraserCount = _selectedAreaListForm.EnabledEraserAreaCount;
 
@@ -890,7 +892,7 @@ internal partial class MainForm : Form
     {
         OpenFileDialog dialog = new OpenFileDialog()
         {
-            Filter = "画像ファイル|*.png;*.jpg;*.jpeg;*.bmp;",
+            Filter = "画像ファイル|*.png;*.jpg;*.jpeg;*.bmp;*.gif;*.tif;*.tiff;*.ico|すべてのファイル|*.*",
             Title = "画像ファイルを選択してください"
         };
 
@@ -968,7 +970,7 @@ internal partial class MainForm : Form
     {
         string message = "Color Changer For Texture " + CURRENT_VERSION + "\n\n";
         message += "柔軟なテクスチャ色変換ツール\n指定した色の差分をもとに、テクスチャの色を簡単に変更できます。\n\n";
-        message += "ツール情報:\n制作者: ぷこるふ\nTwitter: @pukorufu\nGithub: https://github.com/puk06/Color-Changer\n\n";
+        message += $"ツール情報:\n制作者: ぷこるふ\nTwitter: @pukorufu\nGithub: {ItemUtils.GithubURL}\n\n";
         message += "このソフトウェアは、個人の趣味で作成されたものです。\nもしこのソフトウェアが役に立ったと感じたら、ぜひ支援をお願いします！\n\n";
         message += "ライセンス:\nこのソフトウェアは、MITライセンスのもとで配布されています。";
 
@@ -980,25 +982,20 @@ internal partial class MainForm : Form
         _balanceModeSettingsForm.Show();
         _balanceModeSettingsForm.BringToFront();
     }
+    private void UpdateCheck_Click(object sender, EventArgs e)
+        => UpdateUtils.CheckUpdate(CURRENT_VERSION);
 
     private void DonationButton_Click(object sender, EventArgs e)
     {
         bool result = FormUtils.ShowConfirm(
             "支援していただける場合は、以下のリンクを開きます。\n\n" +
-            "支援先: https://pukorufu.booth.pm/items/6519471\n\n" +
+            $"支援先: {ItemUtils.ItemURL}\n\n" +
             "支援は任意です。無理のない範囲でお願いします。"
         );
 
         if (!result) return;
 
-        try
-        {
-            Process.Start(UrlProcessStartInfo);
-        }
-        catch (Exception ex)
-        {
-            FormUtils.ShowError($"リンクを開くことができませんでした。\n{ex.Message}");
-        }
+        ItemUtils.OpenItemURL();
     }
 
     private void ImportColorSettings_Click(object sender, EventArgs e)
