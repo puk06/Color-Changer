@@ -17,7 +17,7 @@ internal static class UpdateUtils
             if (versionData.LatestVersion != currentVersion)
             {
                 bool result = FormUtils.ShowConfirm(
-                    "新しいColor-Changerのバージョンが利用可能です！\n\n" +
+                    "新しいColor Changerのバージョンが利用可能です！\n\n" +
                     "「はい」をクリックすると商品ページを開きます。\n\n" +
                     $"現在のバージョン: {currentVersion}\n" +
                     $"最新のバージョン: {versionData.LatestVersion}\n\n" +
@@ -32,7 +32,7 @@ internal static class UpdateUtils
             else if (versionData.LatestVersion == currentVersion)
             {
                 FormUtils.ShowInfo(
-                    "ご利用中のColor-Changerは最新版です！\n\n" +
+                    "ご利用中のColor Changerは最新版です！\n\n" +
                     "いつもご利用いただき、ありがとうございます。\n" +
                     "今後のアップデートもぜひお楽しみに！\n\n" +
                     $"以下は最新版（{versionData.LatestVersion}）の変更内容です。\n\n" +
