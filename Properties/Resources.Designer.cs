@@ -89,16 +89,6 @@ namespace ColorChanger.Properties {
         }
         
         /// <summary>
-        ///   型 System.Drawing.Bitmap のローカライズされたリソースを検索します。
-        /// </summary>
-        internal static System.Drawing.Bitmap RGB {
-            get {
-                object obj = ResourceManager.GetObject("RGB", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
         ///   https://update.pukosrv.net/check/colorchanger に類似しているローカライズされた文字列を検索します。
         /// </summary>
         internal static string UpdateCheckURL {

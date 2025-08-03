@@ -1,4 +1,6 @@
-﻿namespace ColorChanger.Forms
+﻿using ColorChanger.UserControls;
+
+namespace ColorChanger.Forms
 {
     partial class ColorPickerForm
     {
@@ -29,7 +31,6 @@
         private void InitializeComponent()
         {
             redBar = new TrackBar();
-            colorPaletteBox = new PictureBox();
             blueBar = new TrackBar();
             greenBar = new TrackBar();
             previewColorBox = new PictureBox();
@@ -40,13 +41,12 @@
             redTextBox = new TextBox();
             greenTextBox = new TextBox();
             blueTextBox = new TextBox();
-            label4 = new Label();
             label5 = new Label();
             colorCodeTextBox = new TextBox();
             label6 = new Label();
             resetButton = new Button();
+            label4 = new Label();
             ((System.ComponentModel.ISupportInitialize)redBar).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)colorPaletteBox).BeginInit();
             ((System.ComponentModel.ISupportInitialize)blueBar).BeginInit();
             ((System.ComponentModel.ISupportInitialize)greenBar).BeginInit();
             ((System.ComponentModel.ISupportInitialize)previewColorBox).BeginInit();
@@ -62,20 +62,6 @@
             redBar.TickFrequency = 85;
             redBar.Scroll += HandleSliderChanged;
             redBar.MouseUp += HandleSliderEnd;
-            // 
-            // colorPaletteBox
-            // 
-            colorPaletteBox.Image = Properties.Resources.RGB;
-            colorPaletteBox.Location = new Point(26, 25);
-            colorPaletteBox.Name = "colorPaletteBox";
-            colorPaletteBox.Size = new Size(315, 202);
-            colorPaletteBox.SizeMode = PictureBoxSizeMode.StretchImage;
-            colorPaletteBox.TabIndex = 1;
-            colorPaletteBox.TabStop = false;
-            colorPaletteBox.Paint += ColorPaletteBox_Paint;
-            colorPaletteBox.MouseDown += (_, e) => ColorPaletteBox_MouseEvent(e, true);
-            colorPaletteBox.MouseMove += (_, e) => ColorPaletteBox_MouseEvent(e, true);
-            colorPaletteBox.MouseUp += (_, e) => ColorPaletteBox_MouseEvent(e, false);
             // 
             // blueBar
             // 
@@ -101,7 +87,7 @@
             // 
             // previewColorBox
             // 
-            previewColorBox.Location = new Point(284, 233);
+            previewColorBox.Location = new Point(280, 241);
             previewColorBox.Name = "previewColorBox";
             previewColorBox.Size = new Size(55, 55);
             previewColorBox.TabIndex = 5;
@@ -184,21 +170,11 @@
             blueTextBox.KeyDown += HandleTextKeyDown;
             blueTextBox.Leave += OnColorTextChanged;
             // 
-            // label4
-            // 
-            label4.AutoSize = true;
-            label4.Font = new Font("Yu Gothic UI", 10F);
-            label4.Location = new Point(26, 3);
-            label4.Name = "label4";
-            label4.Size = new Size(104, 19);
-            label4.TabIndex = 13;
-            label4.Text = "RGBカラーパレット";
-            // 
             // label5
             // 
             label5.AutoSize = true;
             label5.Font = new Font("Yu Gothic UI", 14F);
-            label5.Location = new Point(64, 231);
+            label5.Location = new Point(60, 239);
             label5.Name = "label5";
             label5.Size = new Size(89, 25);
             label5.TabIndex = 14;
@@ -207,7 +183,7 @@
             // colorCodeTextBox
             // 
             colorCodeTextBox.Font = new Font("Yu Gothic UI", 12F);
-            colorCodeTextBox.Location = new Point(50, 259);
+            colorCodeTextBox.Location = new Point(46, 267);
             colorCodeTextBox.Name = "colorCodeTextBox";
             colorCodeTextBox.Size = new Size(120, 29);
             colorCodeTextBox.TabIndex = 15;
@@ -218,7 +194,7 @@
             // 
             label6.AutoSize = true;
             label6.Font = new Font("Yu Gothic UI", 14F);
-            label6.Location = new Point(202, 249);
+            label6.Location = new Point(198, 257);
             label6.Name = "label6";
             label6.Size = new Size(75, 25);
             label6.TabIndex = 16;
@@ -235,16 +211,35 @@
             resetButton.UseVisualStyleBackColor = true;
             resetButton.Click += ResetButton_Click;
             // 
+            // label4
+            // 
+            label4.AutoSize = true;
+            label4.Font = new Font("Yu Gothic UI", 12F, FontStyle.Bold, GraphicsUnit.Point, 128);
+            label4.Location = new Point(11, 9);
+            label4.Name = "label4";
+            label4.Size = new Size(91, 21);
+            label4.TabIndex = 19;
+            label4.Text = "カラーパレット";
+            // 
+            // colorPalette
+            // 
+            colorPalette.BackColor = SystemColors.ActiveBorder;
+            colorPalette.Location = new Point(11, 33);
+            colorPalette.Name = "colorPalette";
+            colorPalette.Size = new Size(347, 202);
+            colorPalette.TabIndex = 18;
+            // 
             // ColorPickerForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(370, 506);
+            Controls.Add(label4);
+            Controls.Add(colorPalette);
             Controls.Add(resetButton);
             Controls.Add(label6);
             Controls.Add(colorCodeTextBox);
             Controls.Add(label5);
-            Controls.Add(label4);
             Controls.Add(blueTextBox);
             Controls.Add(greenTextBox);
             Controls.Add(redTextBox);
@@ -255,7 +250,6 @@
             Controls.Add(previewColorBox);
             Controls.Add(greenBar);
             Controls.Add(blueBar);
-            Controls.Add(colorPaletteBox);
             Controls.Add(redBar);
             FormBorderStyle = FormBorderStyle.FixedSingle;
             MaximizeBox = false;
@@ -265,7 +259,6 @@
             Text = "Color Picker by Color Changer";
             FormClosing += ColorPicker_FormClosing;
             ((System.ComponentModel.ISupportInitialize)redBar).EndInit();
-            ((System.ComponentModel.ISupportInitialize)colorPaletteBox).EndInit();
             ((System.ComponentModel.ISupportInitialize)blueBar).EndInit();
             ((System.ComponentModel.ISupportInitialize)greenBar).EndInit();
             ((System.ComponentModel.ISupportInitialize)previewColorBox).EndInit();
@@ -276,7 +269,6 @@
         #endregion
 
         private TrackBar redBar;
-        private PictureBox colorPaletteBox;
         private TrackBar blueBar;
         private TrackBar greenBar;
         private PictureBox previewColorBox;
@@ -287,10 +279,11 @@
         private TextBox redTextBox;
         private TextBox greenTextBox;
         private TextBox blueTextBox;
-        private Label label4;
         private Label label5;
         private TextBox colorCodeTextBox;
         private Label label6;
         private Button resetButton;
+        private UserControls.ColorPalette colorPalette;
+        private Label label4;
     }
 }

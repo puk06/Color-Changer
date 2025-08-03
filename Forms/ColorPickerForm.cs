@@ -1,12 +1,10 @@
 ﻿using ColorChanger.Utils;
-using System.Diagnostics;
+using ColorChanger.UserControls;
 
 namespace ColorChanger.Forms;
 
 internal partial class ColorPickerForm : Form
 {
-    private const int COLOR_UPDATE_DEBOUNCE_MS = 14;
-
     /// <summary>
     /// 色が変更されたときに発生するイベント
     /// </summary>
@@ -18,15 +16,20 @@ internal partial class ColorPickerForm : Form
     internal Color SelectedColor { get; private set; } = Color.Empty;
 
     private Color _initialColor = Color.Empty;
-    private Point _clickedPoint = Point.Empty;
-    private readonly Stopwatch _updateDebounceStopwatch = Stopwatch.StartNew();
 
     internal ColorPickerForm()
     {
+        colorPalette = new ColorPalette();
         InitializeComponent();
+        RegisterEvents();
         Icon = FormUtils.GetSoftwareIcon();
 
         UpdateSelectedColor(SelectedColor);
+    }
+
+    private void RegisterEvents()
+    {
+        colorPalette.ColorSelected += (_, color) => UpdateSelectedColor(color);
     }
 
     #region 色設定関連
@@ -38,7 +41,11 @@ internal partial class ColorPickerForm : Form
     internal void SetColor(Color newColor, bool skipUpdate = false)
     {
         SelectedColor = newColor == Color.Empty ? Color.White : newColor;
-        if (!skipUpdate) UpdateSelectedColor(SelectedColor);
+        if (!skipUpdate)
+        {
+            UpdateSelectedColor(SelectedColor);
+            colorPalette.SelectColor(SelectedColor);
+        }
     }
 
     /// <summary>
@@ -49,39 +56,12 @@ internal partial class ColorPickerForm : Form
         => _initialColor = initialColor;
 
     /// <summary>
-    /// 色を選択する
-    /// </summary>
-    /// <param name="e"></param>
-    /// <param name="suppressMove"></param>
-    private void HandleColorSelection(MouseEventArgs e, bool suppressMove)
-    {
-        if (e.Button != MouseButtons.Left) return;
-        if (colorPaletteBox.Image is not Bitmap bmp) return;
-
-        if (suppressMove && _updateDebounceStopwatch.ElapsedMilliseconds <= COLOR_UPDATE_DEBOUNCE_MS) return;
-        _updateDebounceStopwatch.Restart();
-
-        Point originalCoords = BitmapUtils.GetOriginalCoordinates(e.Location, bmp.Size, colorPaletteBox.Size);
-        if (!BitmapUtils.IsValidCoordinate(originalCoords, bmp.Size)) return;
-
-        Color color = bmp.GetPixel(originalCoords.X, originalCoords.Y);
-
-        UpdateSelectedColor(color, suppressMove);
-
-        _clickedPoint = e.Location;
-        colorPaletteBox.Invalidate();
-    }
-
-    /// <summary>
     /// 色を更新する
     /// </summary>
     /// <param name="color"></param>
-    /// <param name="suppressMove"></param>
-    private void UpdateSelectedColor(Color color, bool suppressMove = false)
+    private void UpdateSelectedColor(Color color)
     {
         SelectedColor = color;
-
-        if (!suppressMove) NotifyColorChanged();
 
         previewColorBox.BackColor = color;
 
@@ -94,20 +74,7 @@ internal partial class ColorPickerForm : Form
         blueTextBox.Text = color.B.ToString();
 
         colorCodeTextBox.Text = ColorUtils.GetColorCodeFromColor(color);
-
-        if (suppressMove || colorPaletteBox.Image is not Bitmap bitmap) return;
-
-        Point closestPoint = ColorUtils.GetClosestColorPoint(color, bitmap);
-
-        float scaleX = (float)colorPaletteBox.Width / bitmap.Width;
-        float scaleY = (float)colorPaletteBox.Height / bitmap.Height;
-
-        _clickedPoint = new Point(
-            (int)(closestPoint.X * scaleX),
-            (int)(closestPoint.Y * scaleY)
-        );
-
-        colorPaletteBox.Invalidate();
+        NotifyColorChanged();
     }
 
     /// <summary>
@@ -119,31 +86,23 @@ internal partial class ColorPickerForm : Form
         int g = MathUtils.ParseAndClamp(greenTextBox.Text);
         int b = MathUtils.ParseAndClamp(blueTextBox.Text);
 
-        UpdateSelectedColor(Color.FromArgb(r, g, b));
+        Color color = Color.FromArgb(r, g, b);
+        UpdateSelectedColor(color);
+        colorPalette.SelectColor(color);
     }
     #endregion
 
     #region イベントハンドラー
-    private void ColorPaletteBox_Paint(object sender, PaintEventArgs e)
+
+    private void HandleSliderChanged(object sender, EventArgs e)
+        => UpdateSelectedColor(Color.FromArgb(redBar.Value, greenBar.Value, blueBar.Value));
+
+    private void HandleSliderEnd(object sender, EventArgs e)
     {
-        if (colorPaletteBox.Image is not Bitmap) return;
-        if (_clickedPoint == Point.Empty) return;
-
-        Color inverseColor = Color.FromArgb(255 - SelectedColor.R, 255 - SelectedColor.G, 255 - SelectedColor.B);
-
-        using Pen pen = new Pen(inverseColor, 2);
-        e.Graphics.DrawLine(pen, _clickedPoint.X - 5, _clickedPoint.Y, _clickedPoint.X + 5, _clickedPoint.Y);
-        e.Graphics.DrawLine(pen, _clickedPoint.X, _clickedPoint.Y - 5, _clickedPoint.X, _clickedPoint.Y + 5);
+        Color color = Color.FromArgb(redBar.Value, greenBar.Value, blueBar.Value);
+        UpdateSelectedColor(color);
+        colorPalette.SelectColor(color);
     }
-
-    private void ColorPaletteBox_MouseEvent(MouseEventArgs e, bool suppressMove)
-        => HandleColorSelection(e, suppressMove);
-
-    private void HandleSliderChanged(object sender, EventArgs e) =>
-        UpdateSelectedColor(Color.FromArgb(redBar.Value, greenBar.Value, blueBar.Value), true);
-
-    private void HandleSliderEnd(object sender, EventArgs e) =>
-        UpdateSelectedColor(Color.FromArgb(redBar.Value, greenBar.Value, blueBar.Value));
 
     private void HandleTextKeyDown(object sender, KeyEventArgs e)
     {
@@ -161,6 +120,7 @@ internal partial class ColorPickerForm : Form
         if (color == Color.Empty) return;
 
         UpdateSelectedColor(color);
+        colorPalette.SelectColor(color);
         SelectNextControl((Control)sender, true, true, true, true);
     }
 
@@ -168,7 +128,10 @@ internal partial class ColorPickerForm : Form
         => SetColorFromTextFields();
 
     private void ResetButton_Click(object sender, EventArgs e)
-        => UpdateSelectedColor(_initialColor);
+    {
+        UpdateSelectedColor(_initialColor);
+        colorPalette.SelectColor(_initialColor);
+    }
 
     private void SelectButton_Click(object sender, EventArgs e)
     {

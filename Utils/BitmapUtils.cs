@@ -437,4 +437,48 @@ internal static class BitmapUtils
 
         return dest;
     }
+
+    /// <summary>
+    /// 指定された色に一番近い部分の座標を返します。
+    /// </summary>
+    /// <param name="bitmap"></param>
+    /// <param name="color"></param>
+    /// <returns></returns>
+    internal static Point GetClosestPoint(Bitmap bitmap, Color color)
+    {
+        double minDistance = double.MaxValue;
+        Point bestPoint = Point.Empty;
+
+        Rectangle rect = GetRectangle(bitmap);
+        BitmapData? bitmapData = LockBitmap(bitmap, rect, ImageLockMode.ReadOnly);
+        if (bitmapData == null) return bestPoint;
+
+        try
+        {
+            unsafe
+            {
+                Span<ColorPixel> pixels = GetPixelSpan(bitmapData);
+
+                for (int i = 0; i < pixels.Length; i++)
+                {
+                    double distance = ColorUtils.GetColorDistance(pixels[i], color);
+
+                    if (distance < minDistance)
+                    {
+                        minDistance = distance;
+
+                        int x = i % bitmapData.Width;
+                        int y = i / bitmapData.Width;
+                        bestPoint = new Point(x, y);
+                    }
+                }
+            }
+        }
+        finally
+        {
+            bitmap.UnlockBits(bitmapData);
+        }
+
+        return bestPoint;
+    }
 }

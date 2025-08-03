@@ -442,6 +442,96 @@ internal static class ColorUtils
         => Color.FromArgb(255 - color.R, 255 - color.G, 255 - color.B);
 
     /// <summary>
+    /// HSVからRGBのColorを返します。
+    /// </summary>
+    /// <param name="hue"></param>
+    /// <param name="saturation"></param>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    internal static Color ColorFromHSV(double hue, double saturation, double value)
+    {
+        int hi = Convert.ToInt32(Math.Floor(hue / 60)) % 6;
+        double f = hue / 60 - Math.Floor(hue / 60);
+
+        value *= 255;
+        int v = Convert.ToInt32(value);
+        int p = Convert.ToInt32(value * (1 - saturation));
+        int q = Convert.ToInt32(value * (1 - f * saturation));
+        int t = Convert.ToInt32(value * (1 - (1 - f) * saturation));
+
+        return hi switch
+        {
+            0 => Color.FromArgb(255, v, t, p),
+            1 => Color.FromArgb(255, q, v, p),
+            2 => Color.FromArgb(255, p, v, t),
+            3 => Color.FromArgb(255, p, q, v),
+            4 => Color.FromArgb(255, t, p, v),
+            _ => Color.FromArgb(255, v, p, q),
+        };
+    }
+
+    /// <summary>
+    /// RGBをHSVに変換します。
+    /// </summary>
+    /// <param name="color"></param>
+    /// <param name="hue"></param>
+    /// <param name="saturation"></param>
+    /// <param name="value"></param>
+    internal static void RGBtoHSV(Color color, out double hue, out double saturation, out double value)
+    {
+        double r = color.R / 255.0;
+        double g = color.G / 255.0;
+        double b = color.B / 255.0;
+
+        double max = Math.Max(r, Math.Max(g, b));
+        double min = Math.Min(r, Math.Min(g, b));
+        double delta = max - min;
+
+        if (delta == 0)
+        {
+            hue = 0;
+        }
+        else if (max == r)
+        {
+            hue = 60 * (((g - b) / delta) % 6);
+        }
+        else if (max == g)
+        {
+            hue = 60 * (((b - r) / delta) + 2);
+        }
+        else
+        {
+            hue = 60 * (((r - g) / delta) + 4);
+        }
+
+        if (hue < 0) hue += 360;
+
+        saturation = (max == 0) ? 0 : delta / max;
+
+        value = max;
+    }
+
+    /// <summary>
+    /// 指定した色を元に、彩度と明度を調整した物を返します。
+    /// </summary>
+    /// <param name="target"></param>
+    /// <param name="saturation"></param>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    internal static Color InterpolateColor(Color target, float saturation, float value)
+    {
+        int r = (int)(255 + (target.R - 255) * saturation);
+        int g = (int)(255 + (target.G - 255) * saturation);
+        int b = (int)(255 + (target.B - 255) * saturation);
+
+        r = MathUtils.ClampColorValue((int)(r * value));
+        g = MathUtils.ClampColorValue((int)(g * value));
+        b = MathUtils.ClampColorValue((int)(b * value));
+
+        return Color.FromArgb(r, g, b);
+    }
+
+    /// <summary>
     /// 透明なピクセルを取得する
     /// </summary>
     internal static ColorPixel TransparentPixel

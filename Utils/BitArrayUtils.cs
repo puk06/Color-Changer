@@ -1,8 +1,7 @@
 ﻿using System.Collections;
+using System.Reflection;
 
-namespace ColorChanger.Utils;
-
-internal static class BitArrayUtils
+internal static unsafe class BitArrayUtils
 {
     private static readonly BitArray _emptyBitArray = new BitArray(0);
 
@@ -14,42 +13,47 @@ internal static class BitArrayUtils
     /// <returns></returns>
     internal static int GetCount(BitArray bitArray, bool value = true)
     {
-        int count = 0;
+        var m_arrayField = typeof(BitArray).GetField("m_array", BindingFlags.NonPublic | BindingFlags.Instance);
+        int[]? arr = (int[]?)m_arrayField?.GetValue(bitArray);
+        if (arr == null || arr.Length == 0) return 0;
 
-        for (int i = 0; i < bitArray.Count; i++)
+        int count = 0;
+        int length = bitArray.Length;
+        int intLength = arr.Length;
+
+        fixed (int* p = arr)
         {
-            if (bitArray[i] != value) continue;
-            count++;
+            int fullInts = length / 32;
+            int remainingBits = length % 32;
+
+            for (int i = 0; i < fullInts; i++)
+            {
+                int bits = p[i];
+                count += CountBits(value ? bits : ~bits);
+            }
+
+            if (remainingBits > 0)
+            {
+                int mask = (1 << remainingBits) - 1;
+                int bits = p[fullInts] & mask;
+                count += CountBits(value ? bits : ~bits & mask);
+            }
         }
 
         return count;
     }
 
-    /// <summary>
-    /// 空のBitArrayを取得する
-    /// </summary>
-    /// <returns></returns>
-    internal static BitArray GetEmpty()
-        => _emptyBitArray;
-
-    /// <summary>
-    /// BitArrayをマージする。Eraserレイヤーの場合はマージ時に削除する。
-    /// </summary>
-    /// <param name="bitArray1"></param>
-    /// <param name="bitArray2"></param>
-    /// <param name="isEraser"></param>
-    internal static void Merge(ref BitArray bitArray1, BitArray bitArray2, bool isEraser = false)
+    private static int CountBits(int v)
     {
-        if (bitArray1.Length == 0) bitArray1 = new BitArray(bitArray2.Length);
-        bool value = !isEraser;
-
-        for (int i = 0; i < bitArray2.Count; i++)
+        // Brian Kernighan's Bit Counting Algorithm
+        // Reference: https://yuminlee2.medium.com/brian-kernighans-algorithm-count-set-bits-in-a-number-18ab05edca93
+        int c = 0;
+        while (v != 0)
         {
-            if (bitArray2[i])
-            {
-                bitArray1[i] = value;
-            }
+            v &= v - 1;
+            c++;
         }
+        return c;
     }
 
     /// <summary>
@@ -62,14 +66,70 @@ internal static class BitArrayUtils
     {
         if (bitArray1.Length != bitArray2.Length) return false;
 
-        for (int i = 0; i < bitArray1.Count; i++)
+        var m_arrayField = typeof(BitArray).GetField("m_array", BindingFlags.NonPublic | BindingFlags.Instance);
+
+        int[]? arr1 = (int[]?)m_arrayField?.GetValue(bitArray1);
+        int[]? arr2 = (int[]?)m_arrayField?.GetValue(bitArray2);
+
+        if (arr1 == null || arr2 == null) return false;
+
+        int length = (bitArray1.Length + 31) / 32;
+
+        fixed (int* p1 = arr1)
+        fixed (int* p2 = arr2)
         {
-            if (bitArray1[i] != bitArray2[i])
+            for (int i = 0; i < length; i++)
             {
-                return false;
+                if (p1[i] != p2[i]) return false;
             }
         }
 
         return true;
     }
+
+    /// <summary>
+    /// BitArrayをマージする。Eraserレイヤーの場合はマージ時に削除する。
+    /// </summary>
+    /// <param name="bitArray1"></param>
+    /// <param name="bitArray2"></param>
+    /// <param name="isEraser"></param>
+    internal static void Merge(ref BitArray bitArray1, BitArray bitArray2, bool isEraser = false)
+    {
+        if (bitArray1.Length == 0) bitArray1 = new BitArray(bitArray2.Length);
+
+        var m_arrayField = typeof(BitArray).GetField("m_array", BindingFlags.NonPublic | BindingFlags.Instance);
+
+        int[]? arrSrc = (int[]?)m_arrayField?.GetValue(bitArray2);
+        int[]? arrDst = (int[]?)m_arrayField?.GetValue(bitArray1);
+
+        if (arrSrc == null || arrDst == null) return;
+
+        int length = (bitArray2.Length + 31) / 32;
+
+        fixed (int* pSrc = arrSrc)
+        fixed (int* pDst = arrDst)
+        {
+            if (isEraser)
+            {
+                for (int i = 0; i < length; i++)
+                {
+                    pDst[i] &= ~pSrc[i];
+                }
+            }
+            else
+            {
+                for (int i = 0; i < length; i++)
+                {
+                    pDst[i] |= pSrc[i];
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// 空のBitArrayを取得する
+    /// </summary>
+    /// <returns></returns>
+    internal static BitArray GetEmpty()
+        => _emptyBitArray;
 }
