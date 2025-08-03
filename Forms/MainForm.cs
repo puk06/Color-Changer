@@ -76,6 +76,14 @@ internal partial class MainForm : Form
         UpdateTextureData();
         UpdateColorData();
         UpdateColorConfigulation();
+
+        CheckUpdate();
+    }
+
+    private async void CheckUpdate()
+    {
+        bool result = await UpdateUtils.CheckUpdate(CURRENT_VERSION, true);
+        if (result) updateCheck.BackColor = Color.LightGreen;
     }
 
     private void RegisterPreviewMouseEvents()

@@ -7,13 +7,15 @@ internal static class UpdateUtils
 {
     private static readonly HttpClient _httpClient = new HttpClient();
 
-    internal async static void CheckUpdate(string currentVersion)
+    internal async static Task<bool> CheckUpdate(string currentVersion, bool silent = false)
     {
         try
         {
             string response = await _httpClient.GetStringAsync(ItemUtils.UpdateCheckURL);
             VersionData? versionData = JsonSerializer.Deserialize<VersionData>(response) ?? throw new Exception("アップデート情報の取得中にエラーが発生しました");
 
+            if (silent) return versionData.LatestVersion != currentVersion;
+            
             if (versionData.LatestVersion != currentVersion)
             {
                 bool result = FormUtils.ShowConfirm(
@@ -25,9 +27,12 @@ internal static class UpdateUtils
                     string.Join("\n", versionData.ChangeLog.Select(log => $"・{log}"))
                 );
 
-                if (!result) return;
+                if (result)
+                {
+                    ItemUtils.OpenItemURL();
+                }
 
-                ItemUtils.OpenItemURL();
+                return true;
             }
             else if (versionData.LatestVersion == currentVersion)
             {
@@ -39,13 +44,20 @@ internal static class UpdateUtils
                     string.Join("\n", versionData.ChangeLog.Select(log => $"・{log}"))
                 );
             }
+
+            return false;
         }
         catch
         {
-            FormUtils.ShowError(
-                "アップデート情報の取得中にエラーが発生しました。\n" +
-                "通信環境やサーバーの状況が原因の可能性があります。"
-            );
+            if (!silent)
+            {
+                FormUtils.ShowError(
+                    "アップデート情報の取得中にエラーが発生しました。\n" +
+                    "通信環境やサーバーの状況が原因の可能性があります。"
+                );
+            }
+
+            return false;
         }
     }
 }
