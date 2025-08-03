@@ -5,7 +5,7 @@ namespace ColorChanger.UserControls;
 
 public partial class ColorPalette : UserControl
 {
-    private long _colorUpdateDebounceTime = 14;
+    private const int COLOR_UPDATE_DEBOUNCE_TIME = 30;
 
     public event EventHandler<Color>? ColorSelected;
 
@@ -48,7 +48,7 @@ public partial class ColorPalette : UserControl
     {
         if (e.Button != MouseButtons.Left) return;
 
-        if (_updateDebounceStopwatch.ElapsedMilliseconds <= _colorUpdateDebounceTime) return;
+        if (_updateDebounceStopwatch.ElapsedMilliseconds <= COLOR_UPDATE_DEBOUNCE_TIME) return;
         _updateDebounceStopwatch.Restart();
 
         _clickedHueY = e.Y;
@@ -62,7 +62,7 @@ public partial class ColorPalette : UserControl
     {
         if (e.Button != MouseButtons.Left) return;
 
-        if (_updateDebounceStopwatch.ElapsedMilliseconds <= _colorUpdateDebounceTime) return;
+        if (_updateDebounceStopwatch.ElapsedMilliseconds <= COLOR_UPDATE_DEBOUNCE_TIME) return;
         _updateDebounceStopwatch.Restart();
 
         UpdateColor(e.Location);
@@ -119,14 +119,11 @@ public partial class ColorPalette : UserControl
 
     private void UpdateBitmapImage(int hueY)
     {
-        Stopwatch stopwatch = Stopwatch.StartNew();
         Color hueColor = CalculateHueColor(hueY, hueSlider.Height);
 
         colorMap.Image?.Dispose();
         colorMap.Image = null;
         colorMap.Image = GenerateColorGradient(hueColor, colorMap.Width, colorMap.Height);
-
-        _colorUpdateDebounceTime = stopwatch.ElapsedMilliseconds + 10;
     }
     #endregion
 
