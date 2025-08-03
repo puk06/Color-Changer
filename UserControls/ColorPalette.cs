@@ -5,7 +5,7 @@ namespace ColorChanger.UserControls;
 
 internal partial class ColorPalette : UserControl
 {
-    private const int COLOR_UPDATE_DEBOUNCE_MS = 14;
+    private long _colorUpdateDebounceTime = 14;
 
     internal event EventHandler<Color>? ColorSelected;
 
@@ -48,7 +48,7 @@ internal partial class ColorPalette : UserControl
     {
         if (e.Button != MouseButtons.Left) return;
 
-        if (_updateDebounceStopwatch.ElapsedMilliseconds <= COLOR_UPDATE_DEBOUNCE_MS) return;
+        if (_updateDebounceStopwatch.ElapsedMilliseconds <= _colorUpdateDebounceTime) return;
         _updateDebounceStopwatch.Restart();
 
         _clickedHueY = e.Y;
@@ -61,16 +61,16 @@ internal partial class ColorPalette : UserControl
     private void HandleColorMapSelection(object? sender, MouseEventArgs e)
     {
         if (e.Button != MouseButtons.Left) return;
+
+        if (_updateDebounceStopwatch.ElapsedMilliseconds <= _colorUpdateDebounceTime) return;
+        _updateDebounceStopwatch.Restart();
+
         UpdateColor(e.Location);
     }
 
     private void UpdateColor(Point pointLocation, bool updateLocation = true)
     {
         if (colorMap.Image is not Bitmap colorMapBitmap) return;
-
-        if (_updateDebounceStopwatch.ElapsedMilliseconds <= COLOR_UPDATE_DEBOUNCE_MS) return;
-        _updateDebounceStopwatch.Restart();
-
         if (pointLocation.X < 0 || pointLocation.Y < 0 || pointLocation.X >= colorMapBitmap.Width || pointLocation.Y >= colorMapBitmap.Height) return;
 
         _selectedColor = colorMapBitmap.GetPixel(pointLocation.X, pointLocation.Y);
@@ -119,11 +119,14 @@ internal partial class ColorPalette : UserControl
 
     private void UpdateBitmapImage(int hueY)
     {
+        Stopwatch stopwatch = Stopwatch.StartNew();
         Color hueColor = CalculateHueColor(hueY, hueSlider.Height);
 
         colorMap.Image?.Dispose();
         colorMap.Image = null;
         colorMap.Image = GenerateColorGradient(hueColor, colorMap.Width, colorMap.Height);
+
+        _colorUpdateDebounceTime = stopwatch.ElapsedMilliseconds + 10;
     }
     #endregion
 
