@@ -990,8 +990,9 @@ internal partial class MainForm : Form
         _balanceModeSettingsForm.Show();
         _balanceModeSettingsForm.BringToFront();
     }
-    private void UpdateCheck_Click(object sender, EventArgs e)
-        => UpdateUtils.CheckUpdate(CURRENT_VERSION);
+
+    private async void UpdateCheck_Click(object sender, EventArgs e)
+        => await UpdateUtils.CheckUpdate(CURRENT_VERSION);
 
     private void DonationButton_Click(object sender, EventArgs e)
     {
