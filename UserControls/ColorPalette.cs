@@ -11,6 +11,7 @@ public partial class ColorPalette : UserControl
 
     private readonly Stopwatch _updateDebounceStopwatch = Stopwatch.StartNew();
     private int _clickedHueY = 1;
+    private Color _hueColor = Color.Empty;
     private Point _clickedPoint = Point.Empty;
     private Color _selectedColor = Color.Empty;
 
@@ -19,7 +20,7 @@ public partial class ColorPalette : UserControl
         InitializeComponent();
 
         hueSlider.Image = GenerateHueSlider(hueSlider.Size);
-        UpdateBitmapImage(_clickedHueY);
+        UpdateHueColor(1);
     }
 
     /// <summary>
@@ -33,8 +34,7 @@ public partial class ColorPalette : UserControl
         int hueY = (int)((targetHue / 360.0) * (hueSlider.Height - 1));
         hueY = Math.Clamp(hueY, 0, hueSlider.Height - 1);
 
-        _clickedHueY = hueY;
-        UpdateBitmapImage(_clickedHueY);
+        UpdateHueColor(hueY);
 
         if (colorMap.Image is not Bitmap colorMapBitmap) return;
         _clickedPoint = BitmapUtils.GetClosestPoint(colorMapBitmap, target);
@@ -51,8 +51,7 @@ public partial class ColorPalette : UserControl
         if (_updateDebounceStopwatch.ElapsedMilliseconds <= COLOR_UPDATE_DEBOUNCE_TIME) return;
         _updateDebounceStopwatch.Restart();
 
-        _clickedHueY = e.Y;
-        UpdateBitmapImage(_clickedHueY);
+        UpdateHueColor(e.Y);
 
         if (_clickedPoint != Point.Empty) UpdateColor(_clickedPoint, false);
         hueSlider.Invalidate();
@@ -66,6 +65,13 @@ public partial class ColorPalette : UserControl
         _updateDebounceStopwatch.Restart();
 
         UpdateColor(e.Location);
+    }
+
+    private void UpdateHueColor(int y)
+    {
+        _clickedHueY = y;
+        _hueColor = CalculateHueColor(_clickedHueY, hueSlider.Height);
+        UpdateBitmapImage();
     }
 
     private void UpdateColor(Point pointLocation, bool updateLocation = true)
@@ -117,13 +123,11 @@ public partial class ColorPalette : UserControl
         return bmp;
     }
 
-    private void UpdateBitmapImage(int hueY)
+    private void UpdateBitmapImage()
     {
-        Color hueColor = CalculateHueColor(hueY, hueSlider.Height);
-
         colorMap.Image?.Dispose();
         colorMap.Image = null;
-        colorMap.Image = GenerateColorGradient(hueColor, colorMap.Width, colorMap.Height);
+        colorMap.Image = GenerateColorGradient(_hueColor, colorMap.Width, colorMap.Height);
     }
     #endregion
 
@@ -141,7 +145,7 @@ public partial class ColorPalette : UserControl
 
     private void HueSlider_Paint(object sender, PaintEventArgs e)
     {
-        Color inverseColor = ColorUtils.InverseColor(CalculateHueColor(_clickedHueY, hueSlider.Height));
+        Color inverseColor = ColorUtils.InverseColor(_hueColor);
 
         using Pen pen = new Pen(inverseColor, 2);
         e.Graphics.DrawLine(pen, 0, _clickedHueY, hueSlider.Width, _clickedHueY);
