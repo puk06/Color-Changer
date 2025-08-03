@@ -105,7 +105,7 @@ internal partial class ColorPalette : UserControl
 
         for (int y = 0; y < height; y++)
         {
-            float v = 1.0f - (float)y / (height - 1);
+            float v = 1.0f - ((float)y / (height - 1));
             for (int x = 0; x < width; x++)
             {
                 float s = (float)x / (width - 1);

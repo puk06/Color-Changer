@@ -451,13 +451,13 @@ internal static class ColorUtils
     internal static Color ColorFromHSV(double hue, double saturation, double value)
     {
         int hi = Convert.ToInt32(Math.Floor(hue / 60)) % 6;
-        double f = hue / 60 - Math.Floor(hue / 60);
+        double f = (hue / 60) - Math.Floor(hue / 60);
 
         value *= 255;
         int v = Convert.ToInt32(value);
         int p = Convert.ToInt32(value * (1 - saturation));
-        int q = Convert.ToInt32(value * (1 - f * saturation));
-        int t = Convert.ToInt32(value * (1 - (1 - f) * saturation));
+        int q = Convert.ToInt32(value * (1 - (f * saturation)));
+        int t = Convert.ToInt32(value * (1 - ((1 - f) * saturation)));
 
         return hi switch
         {
@@ -520,9 +520,9 @@ internal static class ColorUtils
     /// <returns></returns>
     internal static Color InterpolateColor(Color target, float saturation, float value)
     {
-        int r = (int)(255 + (target.R - 255) * saturation);
-        int g = (int)(255 + (target.G - 255) * saturation);
-        int b = (int)(255 + (target.B - 255) * saturation);
+        int r = (int)(255 + ((target.R - 255) * saturation));
+        int g = (int)(255 + ((target.G - 255) * saturation));
+        int b = (int)(255 + ((target.B - 255) * saturation));
 
         r = MathUtils.ClampColorValue((int)(r * value));
         g = MathUtils.ClampColorValue((int)(g * value));
