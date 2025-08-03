@@ -3,30 +3,30 @@ using System.Diagnostics;
 
 namespace ColorChanger.UserControls;
 
-internal partial class ColorPalette : UserControl
+public partial class ColorPalette : UserControl
 {
     private long _colorUpdateDebounceTime = 14;
 
-    internal event EventHandler<Color>? ColorSelected;
+    public event EventHandler<Color>? ColorSelected;
 
     private readonly Stopwatch _updateDebounceStopwatch = Stopwatch.StartNew();
     private int _clickedHueY = 1;
     private Point _clickedPoint = Point.Empty;
     private Color _selectedColor = Color.Empty;
 
-    internal ColorPalette()
+    public ColorPalette()
     {
         InitializeComponent();
 
         hueSlider.Image = GenerateHueSlider(hueSlider.Size);
-        colorMap.Image = GenerateColorGradient(CalculateHueColor(_clickedHueY, hueSlider.Height), colorMap.Width, colorMap.Height);
+        UpdateBitmapImage(_clickedHueY);
     }
 
     /// <summary>
     /// 渡された色をカラーパレット内で選択します。
     /// </summary>
     /// <param name="target"></param>
-    internal void SelectColor(Color target)
+    public void SelectColor(Color target)
     {
         ColorUtils.RGBtoHSV(target, out double targetHue, out double _, out double _);
 

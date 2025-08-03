@@ -10,7 +10,7 @@ namespace ColorChanger.Forms;
 
 internal partial class MainForm : Form
 {
-    private const string CURRENT_VERSION = "v1.0.18";
+    private const string CURRENT_VERSION = "v1.0.19";
     private static readonly string FORM_TITLE = $"Color Changer For Texture {CURRENT_VERSION}";
     private static readonly Point VERSION_LABEL_POSITION = new Point(275, 54);
     private const int COLOR_UPDATE_DEBOUNCE_MS = 14;

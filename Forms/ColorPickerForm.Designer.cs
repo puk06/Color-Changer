@@ -46,6 +46,7 @@ namespace ColorChanger.Forms
             label6 = new Label();
             resetButton = new Button();
             label4 = new Label();
+            colorPalette = new ColorPalette();
             ((System.ComponentModel.ISupportInitialize)redBar).BeginInit();
             ((System.ComponentModel.ISupportInitialize)blueBar).BeginInit();
             ((System.ComponentModel.ISupportInitialize)greenBar).BeginInit();
@@ -54,10 +55,11 @@ namespace ColorChanger.Forms
             // 
             // redBar
             // 
-            redBar.Location = new Point(55, 307);
+            redBar.AutoSize = false;
+            redBar.Location = new Point(55, 319);
             redBar.Maximum = 255;
             redBar.Name = "redBar";
-            redBar.Size = new Size(222, 45);
+            redBar.Size = new Size(238, 35);
             redBar.TabIndex = 0;
             redBar.TickFrequency = 85;
             redBar.Scroll += HandleSliderChanged;
@@ -65,10 +67,11 @@ namespace ColorChanger.Forms
             // 
             // blueBar
             // 
-            blueBar.Location = new Point(56, 409);
+            blueBar.AutoSize = false;
+            blueBar.Location = new Point(55, 401);
             blueBar.Maximum = 255;
             blueBar.Name = "blueBar";
-            blueBar.Size = new Size(221, 45);
+            blueBar.Size = new Size(238, 35);
             blueBar.TabIndex = 2;
             blueBar.TickFrequency = 85;
             blueBar.Scroll += HandleSliderChanged;
@@ -76,10 +79,11 @@ namespace ColorChanger.Forms
             // 
             // greenBar
             // 
-            greenBar.Location = new Point(56, 358);
+            greenBar.AutoSize = false;
+            greenBar.Location = new Point(56, 360);
             greenBar.Maximum = 255;
             greenBar.Name = "greenBar";
-            greenBar.Size = new Size(221, 45);
+            greenBar.Size = new Size(237, 35);
             greenBar.TabIndex = 3;
             greenBar.TickFrequency = 85;
             greenBar.Scroll += HandleSliderChanged;
@@ -87,7 +91,8 @@ namespace ColorChanger.Forms
             // 
             // previewColorBox
             // 
-            previewColorBox.Location = new Point(280, 241);
+            previewColorBox.BackColor = SystemColors.ActiveBorder;
+            previewColorBox.Location = new Point(278, 244);
             previewColorBox.Name = "previewColorBox";
             previewColorBox.Size = new Size(55, 55);
             previewColorBox.TabIndex = 5;
@@ -97,38 +102,41 @@ namespace ColorChanger.Forms
             // 
             label1.AutoSize = true;
             label1.Font = new Font("Yu Gothic UI", 13F);
-            label1.Location = new Point(24, 307);
+            label1.ForeColor = SystemColors.ControlDarkDark;
+            label1.Location = new Point(4, 320);
             label1.Name = "label1";
-            label1.Size = new Size(23, 25);
+            label1.Size = new Size(43, 25);
             label1.TabIndex = 6;
-            label1.Text = "R";
+            label1.Text = "Red";
             // 
             // label2
             // 
             label2.AutoSize = true;
             label2.Font = new Font("Yu Gothic UI", 13F);
-            label2.Location = new Point(24, 358);
+            label2.ForeColor = SystemColors.ControlDarkDark;
+            label2.Location = new Point(4, 359);
             label2.Name = "label2";
-            label2.Size = new Size(24, 25);
+            label2.Size = new Size(58, 25);
             label2.TabIndex = 7;
-            label2.Text = "G";
+            label2.Text = "Green";
             // 
             // label3
             // 
             label3.AutoSize = true;
             label3.Font = new Font("Yu Gothic UI", 13F);
-            label3.Location = new Point(24, 409);
+            label3.ForeColor = SystemColors.ControlDarkDark;
+            label3.Location = new Point(4, 399);
             label3.Name = "label3";
-            label3.Size = new Size(22, 25);
+            label3.Size = new Size(45, 25);
             label3.TabIndex = 8;
-            label3.Text = "B";
+            label3.Text = "Blue";
             // 
             // selectButton
             // 
             selectButton.Font = new Font("Yu Gothic UI", 11F);
-            selectButton.Location = new Point(240, 460);
+            selectButton.Location = new Point(240, 452);
             selectButton.Name = "selectButton";
-            selectButton.Size = new Size(118, 33);
+            selectButton.Size = new Size(118, 43);
             selectButton.TabIndex = 9;
             selectButton.Text = "選択";
             selectButton.UseVisualStyleBackColor = true;
@@ -137,7 +145,7 @@ namespace ColorChanger.Forms
             // redTextBox
             // 
             redTextBox.Font = new Font("Yu Gothic UI", 11F);
-            redTextBox.Location = new Point(283, 306);
+            redTextBox.Location = new Point(299, 319);
             redTextBox.Name = "redTextBox";
             redTextBox.Size = new Size(59, 27);
             redTextBox.TabIndex = 10;
@@ -149,7 +157,7 @@ namespace ColorChanger.Forms
             // greenTextBox
             // 
             greenTextBox.Font = new Font("Yu Gothic UI", 11F);
-            greenTextBox.Location = new Point(283, 357);
+            greenTextBox.Location = new Point(299, 358);
             greenTextBox.Name = "greenTextBox";
             greenTextBox.Size = new Size(59, 27);
             greenTextBox.TabIndex = 11;
@@ -161,7 +169,7 @@ namespace ColorChanger.Forms
             // blueTextBox
             // 
             blueTextBox.Font = new Font("Yu Gothic UI", 11F);
-            blueTextBox.Location = new Point(283, 408);
+            blueTextBox.Location = new Point(299, 398);
             blueTextBox.Name = "blueTextBox";
             blueTextBox.Size = new Size(59, 27);
             blueTextBox.TabIndex = 12;
@@ -174,7 +182,7 @@ namespace ColorChanger.Forms
             // 
             label5.AutoSize = true;
             label5.Font = new Font("Yu Gothic UI", 14F);
-            label5.Location = new Point(60, 239);
+            label5.Location = new Point(58, 242);
             label5.Name = "label5";
             label5.Size = new Size(89, 25);
             label5.TabIndex = 14;
@@ -183,8 +191,9 @@ namespace ColorChanger.Forms
             // colorCodeTextBox
             // 
             colorCodeTextBox.Font = new Font("Yu Gothic UI", 12F);
-            colorCodeTextBox.Location = new Point(46, 267);
+            colorCodeTextBox.Location = new Point(44, 270);
             colorCodeTextBox.Name = "colorCodeTextBox";
+            colorCodeTextBox.PlaceholderText = "#000000";
             colorCodeTextBox.Size = new Size(120, 29);
             colorCodeTextBox.TabIndex = 15;
             colorCodeTextBox.TextAlign = HorizontalAlignment.Center;
@@ -194,7 +203,7 @@ namespace ColorChanger.Forms
             // 
             label6.AutoSize = true;
             label6.Font = new Font("Yu Gothic UI", 14F);
-            label6.Location = new Point(198, 257);
+            label6.Location = new Point(196, 260);
             label6.Name = "label6";
             label6.Size = new Size(75, 25);
             label6.TabIndex = 16;
@@ -203,9 +212,9 @@ namespace ColorChanger.Forms
             // resetButton
             // 
             resetButton.Font = new Font("Yu Gothic UI", 11F);
-            resetButton.Location = new Point(12, 461);
+            resetButton.Location = new Point(12, 452);
             resetButton.Name = "resetButton";
-            resetButton.Size = new Size(118, 33);
+            resetButton.Size = new Size(118, 43);
             resetButton.TabIndex = 17;
             resetButton.Text = "リセット";
             resetButton.UseVisualStyleBackColor = true;
@@ -233,7 +242,7 @@ namespace ColorChanger.Forms
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(370, 506);
+            ClientSize = new Size(370, 507);
             Controls.Add(label4);
             Controls.Add(colorPalette);
             Controls.Add(resetButton);
