@@ -479,6 +479,7 @@ internal partial class MainForm : Form
 
         _newColor = colorSettings.NewColor.ToColor();
         newColorBox.BackColor = colorSettings.NewColor.ToColor();
+        ColorPickerForm.SetInitialColor(_previousColor);
         ColorPickerForm.SetColor(_newColor == Color.Empty ? _previousColor : _newColor);
 
         _balanceModeSettingsForm.LoadSettings(colorSettings.BalanceModeConfiguration);
