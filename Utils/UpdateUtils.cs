@@ -12,7 +12,12 @@ internal static class UpdateUtils
         try
         {
             string response = await _httpClient.GetStringAsync(ItemUtils.UpdateCheckURL);
-            VersionData? versionData = JsonSerializer.Deserialize<VersionData>(response) ?? throw new Exception("アップデート情報の取得中にエラーが発生しました");
+            VersionData? versionData = JsonSerializer.Deserialize<VersionData>(response);
+            if (versionData == null)
+            {
+                if (!silent) FormUtils.ShowError("アップデート情報の取得中にエラーが発生しました");
+                return false;
+            }
 
             if (silent) return versionData.LatestVersion != currentVersion;
             

@@ -10,7 +10,7 @@ namespace ColorChanger.Forms;
 
 internal partial class MainForm : Form
 {
-    private const string CURRENT_VERSION = "v1.0.19";
+    private const string CURRENT_VERSION = "v1.0.20";
     private static readonly string FORM_TITLE = $"Color Changer For Texture {CURRENT_VERSION}";
     private static readonly Point VERSION_LABEL_POSITION = new Point(275, 54);
     private const int COLOR_UPDATE_DEBOUNCE_MS = 14;
@@ -77,12 +77,12 @@ internal partial class MainForm : Form
         UpdateColorData();
         UpdateColorConfigulation();
 
-        CheckUpdate();
+        _ = CheckUpdate();
     }
 
-    private async void CheckUpdate()
+    private async Task CheckUpdate()
     {
-        bool result = await UpdateUtils.CheckUpdate(CURRENT_VERSION, true);
+        bool result = await UpdateUtils.CheckUpdate(CURRENT_VERSION, silent: true);
         if (result) updateCheck.BackColor = Color.LightGreen;
     }
 
@@ -426,10 +426,16 @@ internal partial class MainForm : Form
         try
         {
             string json = File.ReadAllText(path);
-            ColorSettings? colorSettings = JsonSerializer.Deserialize<ColorSettings>(json) ?? throw new Exception("色情報設定ファイルが読み込めませんでした。");
-            SetColorSettingsValues(colorSettings);
-
-            FormUtils.ShowInfo("色情報設定ファイルの読み込みに成功しました！");
+            ColorSettings? colorSettings = JsonSerializer.Deserialize<ColorSettings>(json);
+            if (colorSettings == null)
+            {
+                FormUtils.ShowError("色情報設定ファイルの読み込みに失敗しました。");
+            }
+            else
+            {
+                SetColorSettingsValues(colorSettings);
+                FormUtils.ShowInfo("色情報設定ファイルの読み込みに成功しました！");
+            }
         }
         catch
         {
