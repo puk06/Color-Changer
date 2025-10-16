@@ -39,6 +39,7 @@
             button7 = new Button();
             button8 = new Button();
             button9 = new Button();
+            button10 = new Button();
             SuspendLayout();
             // 
             // button1
@@ -159,11 +160,23 @@
             button9.UseVisualStyleBackColor = true;
             button9.Click += Button9_Click;
             // 
+            // button10
+            // 
+            button10.Font = new Font("Yu Gothic UI", 10F);
+            button10.Location = new Point(12, 513);
+            button10.Name = "button10";
+            button10.Size = new Size(149, 50);
+            button10.TabIndex = 11;
+            button10.Text = "画像マスクから選択";
+            button10.UseVisualStyleBackColor = true;
+            button10.Click += Button10_Click;
+            // 
             // HelpForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(803, 584);
+            Controls.Add(button10);
             Controls.Add(button9);
             Controls.Add(button8);
             Controls.Add(button7);
@@ -199,5 +212,6 @@
         private Button button7;
         private Button button8;
         private Button button9;
+        private Button button10;
     }
 }

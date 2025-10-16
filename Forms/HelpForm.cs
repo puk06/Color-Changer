@@ -76,6 +76,14 @@ internal partial class HelpForm : Form
         "　- 消去用レイヤー: 選択されているエリアの一部を消去できます。\n\n" +
         "※ 消しゴムツールは、現在の選択状態を編集する際に使用します。";
 
+    private static readonly string SelectAreaFromImageMaskMessage = "マスク画像を使用した選択:\n" +
+        "- 追加のマスク画像を読み込み、そのマスク内で選択タイプに対応する色の部分を選択エリアとして追加します。\n\n" +
+        "1. 通常通り画像を読み込み、あらかじめ変更前の色を設定しておいてください。\n" +
+        "2. 画面上部の「ツール」メニューから「画像マスクから選択」をクリックします。\n" +
+        "3. 表示されたウィンドウに画像をドラッグ＆ドロップするか、画面上部の「ファイル」メニューから「画像ファイルを開く」ボタンをクリックして画像を読み込みます。\n" +
+        "4. 選択タイプを選択します。(指定色の場合は、画像内をクリックして色を選択してください）\n" +
+        "5. 「選択」ボタンをクリックすると、選択されている選択タイプを元に選択エリアが作成されます。";
+
     internal HelpForm()
     {
         InitializeComponent();
@@ -126,6 +134,11 @@ internal partial class HelpForm : Form
     private void Button9_Click(object sender, EventArgs e)
     {
         descriptionText.Text = SelectionPenToolMessage;
+    }
+
+    private void Button10_Click(object sender, EventArgs e)
+    {
+        descriptionText.Text = SelectAreaFromImageMaskMessage;
     }
     #endregion
 

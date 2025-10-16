@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using ColorChanger.Models;
+using System.Collections;
 using System.Drawing.Imaging;
 
 namespace ColorChanger.Utils;
@@ -104,6 +105,104 @@ internal static class BitmapUtils
                 selected[nIndex] = true;
                 queue.Enqueue(new PixelPoint(nx, ny));
             }
+        }
+    }
+
+    /// <summary>
+    /// 選択範囲を取得する
+    /// </summary>
+    /// <param name="rawImage"></param>
+    /// <param name="imageMaskSelectionType"></param>
+    /// <param name="selectionColor"></param>
+    /// <returns></returns>
+    internal static unsafe BitArray? GetSelectedArea(Bitmap rawImage, ImageMaskSelectionType imageMaskSelectionType, Color selectionColor)
+    {
+        int width = rawImage.Width;
+        int height = rawImage.Height;
+        int totalPixels = width * height;
+
+        BitArray selected = new BitArray(totalPixels, false);
+
+        var queue = new Queue<PixelPoint>();
+
+        Rectangle rect = GetRectangle(rawImage);
+        BitmapData bmpData = rawImage.LockBits(rect, ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+
+        try
+        {
+            Span<ColorPixel> pixels = new(
+                (void*)bmpData.Scan0,
+                totalPixels
+            );
+
+            switch (imageMaskSelectionType)
+            {
+                case ImageMaskSelectionType.Black:
+                    {
+                        for (int i = 0; i < totalPixels; i++)
+                        {
+                            selected[i] = pixels[i].Equals(Color.Black);
+                        }
+
+                        break;
+                    }
+
+                case ImageMaskSelectionType.White:
+                    {
+                        for (int i = 0; i < totalPixels; i++)
+                        {
+                            selected[i] = pixels[i].Equals(Color.White);
+                        }
+
+                        break;
+                    }
+
+                case ImageMaskSelectionType.Opaque:
+                    {
+                        for (int i = 0; i < totalPixels; i++)
+                        {
+                            selected[i] = pixels[i].A == 255;
+                        }
+
+                        break;
+                    }
+
+                case ImageMaskSelectionType.Opaque1:
+                    {
+                        for (int i = 0; i < totalPixels; i++)
+                        {
+                            selected[i] = !pixels[i].IsTransparent;
+                        }
+
+                        break;
+                    }
+
+                case ImageMaskSelectionType.Transparent:
+                    {
+                        for (int i = 0; i < totalPixels; i++)
+                        {
+                            selected[i] = pixels[i].IsTransparent;
+                        }
+
+                        break;
+                    }
+
+                case ImageMaskSelectionType.CustomColor:
+                    {
+                        for (int i = 0; i < totalPixels; i++)
+                        {
+                            selected[i] = pixels[i].Equals(selectionColor);
+                        }
+
+                        break;
+                    }
+            }
+
+            return selected;
+        }
+        finally
+        {
+            rawImage.UnlockBits(bmpData);
         }
     }
 

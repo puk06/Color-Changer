@@ -29,15 +29,15 @@
         private void InitializeComponent()
         {
             previewBox = new PictureBox();
+            label15 = new Label();
+            label13 = new Label();
             OpenFile = new Button();
+            label1 = new Label();
             ApplyColor = new Button();
             RGBText = new TextBox();
             ColorCodeText = new TextBox();
             selectedColorBox = new PictureBox();
             label2 = new Label();
-            label15 = new Label();
-            label1 = new Label();
-            label13 = new Label();
             ((System.ComponentModel.ISupportInitialize)previewBox).BeginInit();
             ((System.ComponentModel.ISupportInitialize)selectedColorBox).BeginInit();
             SuspendLayout();
@@ -55,6 +55,28 @@
             previewBox.MouseDown += SelectPreviousColor;
             previewBox.MouseMove += SelectPreviousColor;
             // 
+            // label15
+            // 
+            label15.AutoSize = true;
+            label15.Font = new Font("Yu Gothic UI", 15F);
+            label15.ForeColor = Color.DimGray;
+            label15.Location = new Point(441, 259);
+            label15.Name = "label15";
+            label15.Size = new Size(58, 28);
+            label15.TabIndex = 64;
+            label15.Text = "RGB :";
+            // 
+            // label13
+            // 
+            label13.AutoSize = true;
+            label13.Font = new Font("Yu Gothic UI", 16F, FontStyle.Bold);
+            label13.ForeColor = Color.DimGray;
+            label13.Location = new Point(438, 229);
+            label13.Name = "label13";
+            label13.Size = new Size(79, 30);
+            label13.TabIndex = 65;
+            label13.Text = "色情報";
+            // 
             // OpenFile
             // 
             OpenFile.Font = new Font("Yu Gothic UI", 13F);
@@ -65,6 +87,17 @@
             OpenFile.Text = "ファイルを開く";
             OpenFile.UseVisualStyleBackColor = true;
             OpenFile.Click += OpenFile_Click;
+            // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.Font = new Font("Yu Gothic UI", 15F);
+            label1.ForeColor = Color.DimGray;
+            label1.Location = new Point(441, 294);
+            label1.Name = "label1";
+            label1.Size = new Size(104, 28);
+            label1.TabIndex = 67;
+            label1.Text = "カラーコード :";
             // 
             // ApplyColor
             // 
@@ -119,39 +152,6 @@
             label2.TabIndex = 72;
             label2.Text = "選択された色";
             // 
-            // label15
-            // 
-            label15.AutoSize = true;
-            label15.Font = new Font("Yu Gothic UI", 15F);
-            label15.ForeColor = Color.DimGray;
-            label15.Location = new Point(441, 259);
-            label15.Name = "label15";
-            label15.Size = new Size(58, 28);
-            label15.TabIndex = 64;
-            label15.Text = "RGB :";
-            // 
-            // label1
-            // 
-            label1.AutoSize = true;
-            label1.Font = new Font("Yu Gothic UI", 15F);
-            label1.ForeColor = Color.DimGray;
-            label1.Location = new Point(441, 294);
-            label1.Name = "label1";
-            label1.Size = new Size(104, 28);
-            label1.TabIndex = 67;
-            label1.Text = "カラーコード :";
-            // 
-            // label13
-            // 
-            label13.AutoSize = true;
-            label13.Font = new Font("Yu Gothic UI", 16F, FontStyle.Bold);
-            label13.ForeColor = Color.DimGray;
-            label13.Location = new Point(438, 229);
-            label13.Name = "label13";
-            label13.Size = new Size(79, 30);
-            label13.TabIndex = 65;
-            label13.Text = "色情報";
-            // 
             // SelectColorFromTextureForm
             // 
             AllowDrop = true;
@@ -173,11 +173,11 @@
             Name = "SelectColorFromTextureForm";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Select Color From Texture by Color Changer";
+            FormClosing += SelectColorFromTextureForm_FormClosing;
             DragDrop += SelectColorFromTextureForm_DragDrop;
             DragEnter += SelectColorFromTextureForm_DragEnter;
             ((System.ComponentModel.ISupportInitialize)previewBox).EndInit();
             ((System.ComponentModel.ISupportInitialize)selectedColorBox).EndInit();
-            FormClosing += SelectColorFromTextureForm_FormClosing;
             ResumeLayout(false);
             PerformLayout();
         }
@@ -185,14 +185,14 @@
         #endregion
 
         private PictureBox previewBox;
+        private Label label15;
+        private Label label13;
         private Button OpenFile;
+        private Label label1;
         private Button ApplyColor;
         private TextBox RGBText;
         private TextBox ColorCodeText;
         private PictureBox selectedColorBox;
         private Label label2;
-        private Label label15;
-        private Label label1;
-        private Label label13;
     }
 }

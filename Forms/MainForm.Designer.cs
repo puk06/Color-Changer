@@ -59,8 +59,10 @@
             selectColorFromTexture = new ToolStripMenuItem();
             selectionPenTool = new ToolStripMenuItem();
             previewZoomTool = new ToolStripMenuItem();
+            selectAreaFromImageMask = new ToolStripMenuItem();
             helpUseButton = new ToolStripMenuItem();
             aboutThisSoftware = new ToolStripMenuItem();
+            updateCheck = new ToolStripMenuItem();
             donationButton = new ToolStripMenuItem();
             label5 = new Label();
             panel1 = new Panel();
@@ -83,7 +85,6 @@
             label1 = new Label();
             selectModePanel = new Panel();
             label12 = new Label();
-            updateCheck = new ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)previewBox).BeginInit();
             ((System.ComponentModel.ISupportInitialize)previousColorBox).BeginInit();
             ((System.ComponentModel.ISupportInitialize)newColorBox).BeginInit();
@@ -365,7 +366,7 @@
             // 
             // toolMenu
             // 
-            toolMenu.DropDownItems.AddRange(new ToolStripItem[] { selectColorFromTexture, selectionPenTool, previewZoomTool });
+            toolMenu.DropDownItems.AddRange(new ToolStripItem[] { selectColorFromTexture, selectionPenTool, previewZoomTool, selectAreaFromImageMask });
             toolMenu.Font = new Font("Yu Gothic UI", 9F);
             toolMenu.Name = "toolMenu";
             toolMenu.Size = new Size(46, 20);
@@ -392,6 +393,13 @@
             previewZoomTool.Text = "拡大プレビュー";
             previewZoomTool.Click += PreviewZoomTool_Click;
             // 
+            // selectAreaFromImageMask
+            // 
+            selectAreaFromImageMask.Name = "selectAreaFromImageMask";
+            selectAreaFromImageMask.Size = new Size(182, 22);
+            selectAreaFromImageMask.Text = "画像マスクから選択";
+            selectAreaFromImageMask.Click += SelectAreaFromImageMask_Click;
+            // 
             // helpUseButton
             // 
             helpUseButton.Font = new Font("Yu Gothic UI", 9F);
@@ -407,6 +415,14 @@
             aboutThisSoftware.Size = new Size(99, 20);
             aboutThisSoftware.Text = "このソフトについて";
             aboutThisSoftware.Click += AboutThisSoftware_Click;
+            // 
+            // updateCheck
+            // 
+            updateCheck.Font = new Font("Yu Gothic UI", 9F);
+            updateCheck.Name = "updateCheck";
+            updateCheck.Size = new Size(102, 20);
+            updateCheck.Text = "アップデートチェック";
+            updateCheck.Click += UpdateCheck_Click;
             // 
             // donationButton
             // 
@@ -668,14 +684,6 @@
             label12.TabIndex = 28;
             label12.Text = "選択モード";
             // 
-            // updateCheck
-            // 
-            updateCheck.Font = new Font("Yu Gothic UI", 9F);
-            updateCheck.Name = "updateCheck";
-            updateCheck.Size = new Size(102, 20);
-            updateCheck.Text = "アップデートチェック";
-            updateCheck.Click += UpdateCheck_Click;
-            // 
             // MainForm
             // 
             AllowDrop = true;
@@ -778,5 +786,6 @@
         private ToolStripSeparator separator;
         private ToolStripMenuItem previewZoomTool;
         private ToolStripMenuItem updateCheck;
+        private ToolStripMenuItem selectAreaFromImageMask;
     }
 }

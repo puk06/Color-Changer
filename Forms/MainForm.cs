@@ -37,6 +37,7 @@ internal partial class MainForm : Form
     private readonly SelectColorFromTextureForm _selectColorFromTextureForm = new SelectColorFromTextureForm();
     private readonly SelectionPenSettingsForm _selectionPenSettingsForm = new SelectionPenSettingsForm();
     private readonly PreviewZoomForm _previewZoomForm = new PreviewZoomForm();
+    private readonly SelectAreaFromImageMaskForm _selectAreaFromImageMaskForm = new SelectAreaFromImageMaskForm();
 
     private readonly ColorDifference _colorDifference = new ColorDifference(Color.Empty, Color.Empty);
     private ColorDifference ColorDifference
@@ -690,6 +691,7 @@ internal partial class MainForm : Form
         SetupColorChangeHandlers();
         SetupFormInteractionHandlers();
         SetupPreviewZoomHandlers();
+        SetupImageMaskHandlers();
     }
 
     private void SetupColorChangeHandlers()
@@ -765,6 +767,33 @@ internal partial class MainForm : Form
                     _previewZoomForm.SetImage(GenerateColoredPreview(_previewBitmap), true);
                     break;
             }
+        };
+    }
+
+    private void SetupImageMaskHandlers()
+    {
+        _selectAreaFromImageMaskForm.AreaChanged += (s, e) =>
+        {
+            if (_bmp == null || _previewBitmap == null)
+            {
+                FormUtils.ShowError("画像が読み込まれていません。");
+                return;
+            }
+
+            if (_selectAreaFromImageMaskForm.SelectedArea == null || _selectAreaFromImageMaskForm.SelectedArea.Length == 0)
+            {
+                FormUtils.ShowError("選択エリアがありません。");
+                return;
+            }
+            
+            if ((_bmp.Width * _bmp.Height) != _selectAreaFromImageMaskForm.SelectedArea.Length)
+            {
+                FormUtils.ShowError("選択エリアが元画像のサイズと異なります。");
+                return;
+            }
+
+            _selectedAreaListForm.Add(_selectAreaFromImageMaskForm.SelectedArea);
+            BitmapUtils.SetImage(coloredPreviewBox, GenerateColoredPreview(_previewBitmap));
         };
     }
 
@@ -976,6 +1005,12 @@ internal partial class MainForm : Form
     {
         _previewZoomForm.Show();
         _previewZoomForm.BringToFront();
+    }
+    
+    private void SelectAreaFromImageMask_Click(object sender, EventArgs e)
+    {
+        _selectAreaFromImageMaskForm.Show();
+        _selectAreaFromImageMaskForm.BringToFront();
     }
 
     private void UndoButton_Click(object sender, EventArgs e)

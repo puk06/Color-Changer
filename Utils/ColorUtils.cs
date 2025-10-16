@@ -13,8 +13,8 @@ internal struct ColorPixel(byte r, byte g, byte b, byte a)
 
     internal readonly bool IsTransparent => A == 0;
 
-    internal readonly bool Equals(Color other) =>
-        R == other.R && G == other.G && B == other.B && A == other.A;
+    internal readonly bool Equals(Color other)
+        => R == other.R && G == other.G && B == other.B && A == other.A;
 
     public static ColorPixel operator +(ColorPixel pixel, ColorDifference colorDiff)
     {
