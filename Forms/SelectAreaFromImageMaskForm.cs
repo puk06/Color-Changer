@@ -104,6 +104,7 @@ public partial class SelectAreaFromImageMaskForm : Form
 
         try
         {
+            BitmapUtils.DisposeBitmap(ref _bmp);
             BitmapUtils.DisposeBitmap(ref _previewBitmap);
 
             using var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read);
