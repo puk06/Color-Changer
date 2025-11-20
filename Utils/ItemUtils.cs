@@ -13,9 +13,9 @@ internal static class ItemUtils
         UseShellExecute = true
     };
 
-    internal static string ItemURL = ITEM_URL;
-    internal static string GithubURL = GITHUB_URL;
-    internal static string UpdateCheckURL = UPDATE_CHECK_URL;
+    internal static string ItemURL => ITEM_URL;
+    internal static string GithubURL => GITHUB_URL;
+    internal static string UpdateCheckURL => UPDATE_CHECK_URL;
 
     internal static void OpenItemURL()
     {
