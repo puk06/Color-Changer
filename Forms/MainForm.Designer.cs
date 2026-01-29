@@ -85,6 +85,7 @@
             label1 = new Label();
             selectModePanel = new Panel();
             label12 = new Label();
+            maskMode = new CheckBox();
             ((System.ComponentModel.ISupportInitialize)previewBox).BeginInit();
             ((System.ComponentModel.ISupportInitialize)previousColorBox).BeginInit();
             ((System.ComponentModel.ISupportInitialize)newColorBox).BeginInit();
@@ -446,6 +447,7 @@
             // panel1
             // 
             panel1.BackColor = SystemColors.WindowFrame;
+            panel1.Controls.Add(maskMode);
             panel1.Controls.Add(label17);
             panel1.Controls.Add(textureType);
             panel1.Controls.Add(label16);
@@ -684,6 +686,18 @@
             label12.TabIndex = 28;
             label12.Text = "選択モード";
             // 
+            // maskMode
+            // 
+            maskMode.AutoSize = true;
+            maskMode.Font = new Font("Yu Gothic UI", 13F);
+            maskMode.ForeColor = Color.White;
+            maskMode.Location = new Point(18, 533);
+            maskMode.Name = "maskMode";
+            maskMode.Size = new Size(183, 29);
+            maskMode.TabIndex = 68;
+            maskMode.Text = "マスク画像作成モード";
+            maskMode.UseVisualStyleBackColor = true;
+            // 
             // MainForm
             // 
             AllowDrop = true;
@@ -787,5 +801,6 @@
         private ToolStripMenuItem previewZoomTool;
         private ToolStripMenuItem updateCheck;
         private ToolStripMenuItem selectAreaFromImageMask;
+        private CheckBox maskMode;
     }
 }

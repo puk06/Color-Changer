@@ -84,6 +84,12 @@ internal partial class HelpForm : Form
         "4. 選択タイプを選択します。(指定色の場合は、画像内をクリックして色を選択してください）\n" +
         "5. 「選択」ボタンをクリックすると、選択されている選択タイプを元に選択エリアが作成されます。";
 
+    private static readonly string MaskModeMessage = "マスク画像作成モード:\n" +
+        "- このモードでは、選択した部分が黒、そうでない部分が白のマスク画像を生成します。\n\n" +
+        "1. 選択モードで、黒くしたい部分を選択します。\n" +
+        "2. 画面右下の「マスク画像作成モード」にチェックを入れてください。\n" +
+        "3. 「作成」ボタンを押すと、選択された部分のみ黒くなっているマスク画像が生成されます。";
+
     internal HelpForm()
     {
         InitializeComponent();
@@ -139,6 +145,11 @@ internal partial class HelpForm : Form
     private void Button10_Click(object sender, EventArgs e)
     {
         descriptionText.Text = SelectAreaFromImageMaskMessage;
+    }
+
+    private void Button11_Click(object sender, EventArgs e)
+    {
+        descriptionText.Text = MaskModeMessage;
     }
     #endregion
 

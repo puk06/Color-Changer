@@ -148,6 +148,21 @@ internal class ImageProcessor
         }
     }
 
+    internal static void ProcessMaskImage(
+        Span<ColorPixel> source,
+        BitArray selectedPoints,
+        bool inverse
+    )
+    {
+        var selectedColor = inverse ? ColorUtils.WhitePixel : ColorUtils.BlackPixel;
+        var unselectedColor = inverse ? ColorUtils.BlackPixel : ColorUtils.WhitePixel;
+        
+        for (int i = 0; i < selectedPoints.Length; i++)
+        {
+            source[i] = selectedPoints[i] ? selectedColor : unselectedColor;
+        }
+    }
+
     internal void ProcessTransparentAndInversePixels(
         Span<ColorPixel> source,
         BitArray selectedPoints

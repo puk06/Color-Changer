@@ -28,8 +28,6 @@ internal struct ColorPixel(byte r, byte g, byte b, byte a)
 
 internal static class ColorUtils
 {
-    private static ColorPixel TransparentColorPixel = new ColorPixel(0, 0, 0, 0);
-
     /// <summary>
     /// RGB値からカラーコードを取得する
     /// </summary>
@@ -534,24 +532,30 @@ internal static class ColorUtils
     /// <summary>
     /// 透明なピクセルを取得する
     /// </summary>
-    internal static ColorPixel TransparentPixel
-        => TransparentColorPixel;
+    internal static readonly ColorPixel TransparentPixel = new ColorPixel(0, 0, 0, 0);
+
+    /// <summary>
+    /// 黒のピクセルを取得する
+    /// </summary>
+    internal static readonly ColorPixel BlackPixel = new ColorPixel(0, 0, 0, 255);
+
+    /// <summary>
+    /// 白のピクセルを取得する
+    /// </summary>
+    internal static readonly ColorPixel WhitePixel = new ColorPixel(255, 255, 255, 255);
 
     /// <summary>
     /// デフォルトの背景色を取得する
     /// </summary>
-    internal static Color DefaultBackgroundColor
-        => Color.LightGray;
+    internal static readonly Color DefaultBackgroundColor = Color.LightGray;
 
     /// <summary>
     /// デフォルトの色を取得する
     /// </summary>
-    internal static Color DefaultForeColor
-        => Color.LightGreen;
+    internal static readonly Color DefaultForegroundColor = Color.LightGreen;
 
     /// <summary>
     /// デフォルトの未選択時の色を取得する
     /// </summary>
-    internal static Color DefaultUnselectedColor
-        => Color.LightCoral;
+    internal static readonly Color DefaultUnselectedColor = Color.LightCoral;
 }

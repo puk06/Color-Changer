@@ -10,7 +10,7 @@ namespace ColorChanger.Forms;
 
 internal partial class MainForm : Form
 {
-    private const string CURRENT_VERSION = "v1.0.20";
+    private const string CURRENT_VERSION = "v1.0.21";
     private static readonly string FORM_TITLE = $"Color Changer For Texture {CURRENT_VERSION}";
     private static readonly Point VERSION_LABEL_POSITION = new Point(275, 54);
     private const int COLOR_UPDATE_DEBOUNCE_MS = 14;
@@ -244,7 +244,7 @@ internal partial class MainForm : Form
         {
             if (transparentMode.Checked)
             {
-                FormUtils.ShowInfo("選択エリアがなかったため、透過モードはスキップされます。");
+                FormUtils.ShowInfo("選択エリアがなかったため、透過モード、マスクモードはスキップされます。");
                 skipped = true;
             }
 
@@ -263,6 +263,10 @@ internal partial class MainForm : Form
 
                 processor.ProcessTransparentSelectedPixels(sourcePixels, transPixels, selectedPoints);
             }
+        }
+        else if (maskMode.Checked)
+        {
+            ImageProcessor.ProcessMaskImage(sourcePixels, selectedPoints, inverseMode.Checked);
         }
         else if (inverseMode.Checked)
         {
@@ -541,7 +545,7 @@ internal partial class MainForm : Form
         if (_advancedColorSettingsForm.Configuration.Enabled)
         {
             advancedColorConfigStatus.Text = "有効";
-            advancedColorConfigStatus.ForeColor = ColorUtils.DefaultForeColor;
+            advancedColorConfigStatus.ForeColor = ColorUtils.DefaultForegroundColor;
         }
         else
         {
@@ -558,7 +562,7 @@ internal partial class MainForm : Form
     /// </summary>
     private void UpdateTextureData()
     {
-        Color foreColor = _bmp != null ? ColorUtils.DefaultForeColor : ColorUtils.DefaultUnselectedColor;
+        Color foreColor = _bmp != null ? ColorUtils.DefaultForegroundColor : ColorUtils.DefaultUnselectedColor;
 
         if (_bmp == null)
         {
@@ -591,7 +595,7 @@ internal partial class MainForm : Form
         else
         {
             previousRGBLabel.Text = $"{_previousColor.R}, {_previousColor.G}, {_previousColor.B}";
-            previousRGBLabel.ForeColor = ColorUtils.DefaultForeColor;
+            previousRGBLabel.ForeColor = ColorUtils.DefaultForegroundColor;
         }
 
         if (_newColor == Color.Empty)
@@ -602,7 +606,7 @@ internal partial class MainForm : Form
         else
         {
             newRGBLabel.Text = $"{_newColor.R}, {_newColor.G}, {_newColor.B}";
-            newRGBLabel.ForeColor = ColorUtils.DefaultForeColor;
+            newRGBLabel.ForeColor = ColorUtils.DefaultForegroundColor;
         }
 
         if (_previousColor == Color.Empty || _newColor == Color.Empty)
@@ -613,7 +617,7 @@ internal partial class MainForm : Form
         else
         {
             calculatedRGBLabel.Text = ColorDifference.ToString();
-            calculatedRGBLabel.ForeColor = ColorUtils.DefaultForeColor;
+            calculatedRGBLabel.ForeColor = ColorUtils.DefaultForegroundColor;
         }
     }
     #endregion

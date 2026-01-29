@@ -40,6 +40,7 @@
             button8 = new Button();
             button9 = new Button();
             button10 = new Button();
+            button11 = new Button();
             SuspendLayout();
             // 
             // button1
@@ -171,11 +172,23 @@
             button10.UseVisualStyleBackColor = true;
             button10.Click += Button10_Click;
             // 
+            // button11
+            // 
+            button11.Font = new Font("Yu Gothic UI", 11F);
+            button11.Location = new Point(12, 569);
+            button11.Name = "button11";
+            button11.Size = new Size(149, 50);
+            button11.TabIndex = 12;
+            button11.Text = "マスク画像作成モード";
+            button11.UseVisualStyleBackColor = true;
+            button11.Click += Button11_Click;
+            // 
             // HelpForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(803, 584);
+            ClientSize = new Size(803, 635);
+            Controls.Add(button11);
             Controls.Add(button10);
             Controls.Add(button9);
             Controls.Add(button8);
@@ -213,5 +226,6 @@
         private Button button8;
         private Button button9;
         private Button button10;
+        private Button button11;
     }
 }
