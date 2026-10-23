@@ -8,6 +8,8 @@ internal static class AppInfo
 
     internal static string ItemUrl => Properties.Resources.ItemURL;
 
+    internal static string CCUnityUrl => Properties.Resources.CCUnityURL;
+
     internal static string GithubUrl => Properties.Resources.GithubURL;
 
     internal static string UpdateCheckUrl => Properties.Resources.UpdateCheckURL;

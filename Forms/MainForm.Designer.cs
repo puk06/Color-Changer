@@ -63,7 +63,7 @@
             helpUseButton = new ToolStripMenuItem();
             aboutThisSoftware = new ToolStripMenuItem();
             updateCheck = new ToolStripMenuItem();
-            donationButton = new ToolStripMenuItem();
+            unityButton = new ToolStripMenuItem();
             label5 = new Label();
             panel1 = new Panel();
             label17 = new Label();
@@ -300,7 +300,7 @@
             // menuToolBar
             // 
             menuToolBar.Font = new Font("Yu Gothic UI", 19F);
-            menuToolBar.Items.AddRange(new ToolStripItem[] { fileMenu, balanceModeSettingsButton, selectedAreaListButton, advancedColorSettingsButton, toolMenu, helpUseButton, aboutThisSoftware, updateCheck, donationButton });
+            menuToolBar.Items.AddRange(new ToolStripItem[] { fileMenu, balanceModeSettingsButton, selectedAreaListButton, advancedColorSettingsButton, toolMenu, helpUseButton, aboutThisSoftware, updateCheck, unityButton });
             menuToolBar.Location = new Point(0, 0);
             menuToolBar.Name = "menuToolBar";
             menuToolBar.Size = new Size(1256, 24);
@@ -425,13 +425,13 @@
             updateCheck.Text = "アップデートチェック";
             updateCheck.Click += UpdateCheck_Click;
             // 
-            // donationButton
+            // unityButton
             // 
-            donationButton.Font = new Font("Yu Gothic UI", 9F);
-            donationButton.Name = "donationButton";
-            donationButton.Size = new Size(43, 20);
-            donationButton.Text = "支援";
-            donationButton.Click += DonationButton_Click;
+            unityButton.Font = new Font("Yu Gothic UI", 9F);
+            unityButton.Name = "unityButton";
+            unityButton.Size = new Size(80, 20);
+            unityButton.Text = "非破壊のUnity版はこちらから";
+            unityButton.Click += UnityButton_Click;
             // 
             // label5
             // 
@@ -777,7 +777,7 @@
         private Label label1;
         private Label label11;
         private Label versionLabel;
-        private ToolStripMenuItem donationButton;
+        private ToolStripMenuItem unityButton;
         private Panel selectModePanel;
         private Label label12;
         private ToolStripMenuItem advancedColorSettingsButton;

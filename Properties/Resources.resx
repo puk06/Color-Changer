@@ -127,6 +127,9 @@
   <data name="ItemURL" xml:space="preserve">
     <value>https://pukorufu.booth.pm/items/6519471</value>
   </data>
+  <data name="CCUnityURL" xml:space="preserve">
+    <value>https://pukorufu.booth.pm/items/7315019</value>
+  </data>
   <data name="UpdateCheckURL" xml:space="preserve">
     <value>https://update.pukosrv.net/check/colorchanger</value>
   </data>

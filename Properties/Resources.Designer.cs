@@ -87,6 +87,15 @@ namespace ColorChanger.Properties {
                 return ResourceManager.GetString("ItemURL", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   https://pukorufu.booth.pm/items/7315019 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string CCUnityURL {
+            get {
+                return ResourceManager.GetString("CCUnityURL", resourceCulture);
+            }
+        }
         
         /// <summary>
         ///   https://update.pukosrv.net/check/colorchanger に類似しているローカライズされた文字列を検索します。

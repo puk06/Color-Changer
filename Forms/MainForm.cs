@@ -891,17 +891,19 @@ internal partial class MainForm : Form
     private async void UpdateCheck_Click(object sender, EventArgs e)
         => await CheckUpdateAsync(silent: false);
 
-    private void DonationButton_Click(object sender, EventArgs e)
+    private void UnityButton_Click(object sender, EventArgs e)
     {
         var result = FormUtils.ShowConfirm(
-            "支援していただける場合は、以下のリンクを開きます。\n\n" +
-            $"支援先: {AppInfo.ItemUrl}\n\n" +
-            "支援は任意です。無理のない範囲でお願いします。"
+            "VRC Color ChangerのUnity移行版「Color Changer For Unity」のご紹介！\n\n" +
+            "このツールは、VRC Color Changerの色改変（バランスモードなど）をUnity内でアバター単位で行える非破壊色改変ツールです。\n" +
+            "※ このツールにはオブジェクト選択機能がないため、このソフトでマスクを作って使うと便利です！\n\n" +
+            $"開くリンク: {AppInfo.CCUnityUrl}\n\n" +
+            "このツールはVPM経由で追加でき、無料です！\n" +
+            "Boothリンクを開きますか？"
         );
-
         if (!result) return;
 
-        OpenUrl(AppInfo.ItemUrl);
+        OpenUrl(AppInfo.CCUnityUrl);
     }
 
     private void ImportColorSettings_Click(object sender, EventArgs e)
