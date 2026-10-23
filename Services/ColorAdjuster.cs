@@ -16,9 +16,9 @@ internal static class ColorAdjuster
         BalanceModeConfiguration balanceModeConfiguration
     )
     {
-        double distance = ColorService.GetColorDistance(pixel, diff.PreviousColor);
+        var distance = ColorService.GetColorDistance(pixel, diff.PreviousColor);
 
-        double adjustmentFactor = 0.0;
+        var adjustmentFactor = 0.0;
 
         switch (balanceModeConfiguration.ModeVersion)
         {
@@ -59,14 +59,14 @@ internal static class ColorAdjuster
                 const double grayScaleWeightG = 0.587;
                 const double grayScaleWeightB = 0.114;
 
-                double grayScale = (
+                var grayScale = (
                     (grayScaleWeightR * (pixel.R / 255.0)) +
                     (grayScaleWeightG * (pixel.G / 255.0)) +
                     (grayScaleWeightB * (pixel.B / 255.0))
                 );
 
-                double gradientStart = balanceModeConfiguration.V3GradientStart / 100.0;
-                double gradientEnd = balanceModeConfiguration.V3GradientEnd / 100.0;
+                var gradientStart = balanceModeConfiguration.V3GradientStart / 100.0;
+                var gradientEnd = balanceModeConfiguration.V3GradientEnd / 100.0;
 
                 pixel.R = ColorService.CalculateGradientValue(diff.NewColor.R, balanceModeConfiguration.V3GradientColor.R, gradientStart, gradientEnd, grayScale);
                 pixel.G = ColorService.CalculateGradientValue(diff.NewColor.G, balanceModeConfiguration.V3GradientColor.G, gradientStart, gradientEnd, grayScale);
@@ -84,16 +84,16 @@ internal static class ColorAdjuster
     /// </summary>
     internal static (bool hasIntersection, double IntersectionDistance) GetRGBIntersectionDistance(Color baseColor, ColorPixel targetColor)
     {
-        int baseR = baseColor.R;
-        int baseG = baseColor.G;
-        int baseB = baseColor.B;
+        var baseR = baseColor.R;
+        var baseG = baseColor.G;
+        var baseB = baseColor.B;
 
-        int dx = targetColor.R - baseR;
-        int dy = targetColor.G - baseG;
-        int dz = targetColor.B - baseB;
+        var dx = targetColor.R - baseR;
+        var dy = targetColor.G - baseG;
+        var dz = targetColor.B - baseB;
 
         // 無限線分を RGB 空間の壁に交差する点まで伸ばす（各軸で）
-        List<double> tValues = new();
+        var tValues = new List<double>();
 
         // 各チャンネルの0と255の壁について、t値（ベクトル方向に進むスカラー量）を求める
         if (dx != 0)
@@ -115,12 +115,12 @@ internal static class ColorAdjuster
         }
 
         // 最小正の t を探す（延長線上、前方方向）
-        double minPositiveT = double.MaxValue;
-        foreach (double t in tValues.Where(t => t > 0))
+        var minPositiveT = double.MaxValue;
+        foreach (var t in tValues.Where(t => t > 0))
         {
-            double x = baseR + (t * dx);
-            double y = baseG + (t * dy);
-            double z = baseB + (t * dz);
+            var x = baseR + (t * dx);
+            var y = baseG + (t * dy);
+            var z = baseB + (t * dz);
 
             if (
                 x >= 0 && x <= 255 &&
@@ -136,7 +136,7 @@ internal static class ColorAdjuster
         // 最短距離 = ベクトルの長さ * t
         if (Math.Abs(minPositiveT - double.MaxValue) > MathHelper.EPSILON)
         {
-            double length = Math.Sqrt((dx * dx) + (dy * dy) + (dz * dz));
+            var length = Math.Sqrt((dx * dx) + (dy * dy) + (dz * dz));
             return (true, minPositiveT * length);
         }
 
@@ -149,7 +149,7 @@ internal static class ColorAdjuster
     internal static double CalculateColorChangeRate(bool hasIntersection, double intersectionDistance, double distance, double graphWeight, double minValue)
     {
         if (!hasIntersection || Math.Abs(intersectionDistance) < MathHelper.EPSILON) return 1;
-        double changeRate = Math.Pow(1 - (distance / intersectionDistance), graphWeight);
+        var changeRate = Math.Pow(1 - (distance / intersectionDistance), graphWeight);
         return Math.Max(minValue, changeRate);
     }
 

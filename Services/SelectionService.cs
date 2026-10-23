@@ -17,19 +17,19 @@ internal static class SelectionService
     /// <returns>選択できなかった場合は null</returns>
     internal static BitArray? SelectByFloodFill(Bitmap image, Point start, Color background)
     {
-        int width = image.Width;
-        int height = image.Height;
+        var width = image.Width;
+        var height = image.Height;
 
         if (start.X < 0 || start.Y < 0 || start.X >= width || start.Y >= height) return null;
 
-        using PixelLock pixelLock = new PixelLock(image, ImageLockMode.ReadOnly);
-        Span<ColorPixel> pixels = pixelLock.Pixels;
+        using var pixelLock = new PixelLock(image, ImageLockMode.ReadOnly);
+        var pixels = pixelLock.Pixels;
 
-        int startIndex = (start.Y * width) + start.X;
+        var startIndex = (start.Y * width) + start.X;
         if (pixels[startIndex].Equals(background)) return null;
 
-        BitArray selected = new BitArray(width * height, false);
-        Queue<(int X, int Y)> queue = new Queue<(int X, int Y)>();
+        var selected = new BitArray(width * height, false);
+        var queue = new Queue<(int X, int Y)>();
 
         selected[startIndex] = true;
         queue.Enqueue((start.X, start.Y));
@@ -40,12 +40,12 @@ internal static class SelectionService
 
             foreach (var (dx, dy) in Directions)
             {
-                int nx = x + dx;
-                int ny = y + dy;
+                var nx = x + dx;
+                var ny = y + dy;
 
                 if (nx < 0 || nx >= width || ny < 0 || ny >= height) continue;
 
-                int nIndex = (ny * width) + nx;
+                var nIndex = (ny * width) + nx;
                 if (selected[nIndex]) continue;
 
                 if (!pixels[nIndex].Equals(background))
@@ -64,13 +64,13 @@ internal static class SelectionService
     /// </summary>
     internal static BitArray SelectByMask(Bitmap image, ImageMaskSelectionType selectionType, Color selectionColor)
     {
-        int totalPixels = image.Width * image.Height;
-        BitArray selected = new BitArray(totalPixels, false);
+        var totalPixels = image.Width * image.Height;
+        var selected = new BitArray(totalPixels, false);
 
-        using PixelLock pixelLock = new PixelLock(image, ImageLockMode.ReadOnly);
-        Span<ColorPixel> pixels = pixelLock.Pixels;
+        using var pixelLock = new PixelLock(image, ImageLockMode.ReadOnly);
+        var pixels = pixelLock.Pixels;
 
-        for (int i = 0; i < totalPixels; i++)
+        for (var i = 0; i < totalPixels; i++)
         {
             selected[i] = selectionType switch
             {
@@ -92,28 +92,28 @@ internal static class SelectionService
     /// </summary>
     internal static BitArray ToPreviewSelection(BitArray selected, Size sourceSize, Size previewSize, bool inverse)
     {
-        int previewWidth = previewSize.Width;
-        int previewHeight = previewSize.Height;
+        var previewWidth = previewSize.Width;
+        var previewHeight = previewSize.Height;
 
-        float ratioX = (float)sourceSize.Width / previewWidth;
-        float ratioY = (float)sourceSize.Height / previewHeight;
+        var ratioX = (float)sourceSize.Width / previewWidth;
+        var ratioY = (float)sourceSize.Height / previewHeight;
 
-        BitArray result = new BitArray(previewWidth * previewHeight, inverse);
+        var result = new BitArray(previewWidth * previewHeight, inverse);
 
-        for (int y = 0; y < previewHeight; y++)
+        for (var y = 0; y < previewHeight; y++)
         {
-            int sourceY = (int)(y * ratioY);
+            var sourceY = (int)(y * ratioY);
             if (sourceY >= sourceSize.Height) continue;
 
-            for (int x = 0; x < previewWidth; x++)
+            for (var x = 0; x < previewWidth; x++)
             {
-                int sourceX = (int)(x * ratioX);
+                var sourceX = (int)(x * ratioX);
                 if (sourceX >= sourceSize.Width) continue;
 
-                int sourceIndex = (sourceY * sourceSize.Width) + sourceX;
+                var sourceIndex = (sourceY * sourceSize.Width) + sourceX;
                 if (!selected[sourceIndex]) continue;
 
-                int previewIndex = (y * previewWidth) + x;
+                var previewIndex = (y * previewWidth) + x;
                 result[previewIndex] = !result[previewIndex];
             }
         }
@@ -129,13 +129,13 @@ internal static class SelectionService
         const int stripeInterval = 7;
         const int lineWidth = 2;
 
-        BitArray result = new BitArray(selected.Length);
+        var result = new BitArray(selected.Length);
 
-        for (int y = 0; y < height; y++)
+        for (var y = 0; y < height; y++)
         {
-            for (int x = 0; x < width; x++)
+            for (var x = 0; x < width; x++)
             {
-                int index = (y * width) + x;
+                var index = (y * width) + x;
 
                 if (!selected[index])
                 {
@@ -161,8 +161,8 @@ internal static class SelectionService
     /// </summary>
     internal static Point ToSourceCoordinates(Point displayPoint, Size displaySize, Size sourceSize)
     {
-        float ratioX = (float)sourceSize.Width / displaySize.Width;
-        float ratioY = (float)sourceSize.Height / displaySize.Height;
+        var ratioX = (float)sourceSize.Width / displaySize.Width;
+        var ratioY = (float)sourceSize.Height / displaySize.Height;
 
         return new Point((int)(displayPoint.X * ratioX), (int)(displayPoint.Y * ratioY));
     }
@@ -172,30 +172,30 @@ internal static class SelectionService
     /// </summary>
     internal static bool[,] BuildPreviewMap(BitArray selected, int width, int height, Size previewSize)
     {
-        int targetWidth = previewSize.Width;
-        int targetHeight = previewSize.Height;
+        var targetWidth = previewSize.Width;
+        var targetHeight = previewSize.Height;
 
-        bool[,] previewMap = new bool[targetWidth, targetHeight];
+        var previewMap = new bool[targetWidth, targetHeight];
 
-        float scaleX = (float)width / targetWidth;
-        float scaleY = (float)height / targetHeight;
+        var scaleX = (float)width / targetWidth;
+        var scaleY = (float)height / targetHeight;
 
         Parallel.For(0, targetHeight, ty =>
         {
-            int startY = (int)(ty * scaleY);
-            int endY = Math.Min((int)((ty + 1) * scaleY), height);
+            var startY = (int)(ty * scaleY);
+            var endY = Math.Min((int)((ty + 1) * scaleY), height);
 
-            for (int tx = 0; tx < targetWidth; tx++)
+            for (var tx = 0; tx < targetWidth; tx++)
             {
-                int startX = (int)(tx * scaleX);
-                int endX = Math.Min((int)((tx + 1) * scaleX), width);
+                var startX = (int)(tx * scaleX);
+                var endX = Math.Min((int)((tx + 1) * scaleX), width);
 
-                bool isSelected = false;
+                var isSelected = false;
 
-                for (int y = startY; y < endY && !isSelected; y++)
+                for (var y = startY; y < endY && !isSelected; y++)
                 {
-                    int rowStart = y * width;
-                    for (int x = startX; x < endX; x++)
+                    var rowStart = y * width;
+                    for (var x = startX; x < endX; x++)
                     {
                         if (selected[rowStart + x])
                         {

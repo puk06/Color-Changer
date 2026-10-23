@@ -55,8 +55,8 @@ internal partial class SelectColorFromTextureForm : HideOnCloseForm
 
         try
         {
-            using Bitmap source = ImageFileService.Load(path);
-            Bitmap preview = PreviewService.CreateRawPreview(source, previewBox.Size);
+            using var source = ImageFileService.Load(path);
+            var preview = PreviewService.CreateRawPreview(source, previewBox.Size);
 
             previewBox.Image = null;
             _preview?.Dispose();
@@ -108,13 +108,13 @@ internal partial class SelectColorFromTextureForm : HideOnCloseForm
 
     private void OpenFile_Click(object sender, EventArgs e)
     {
-        string? path = FormUtils.PickFile("画像ファイル|*.png;*.jpg;*.jpeg;*.bmp;", "画像ファイルを選択してください");
+        var path = FormUtils.PickFile("画像ファイル|*.png;*.jpg;*.jpeg;*.bmp;", "画像ファイルを選択してください");
         if (path != null) LoadPictureFile(path);
     }
 
     private void SelectColorFromTextureForm_DragDrop(object sender, DragEventArgs e)
     {
-        string? path = FormUtils.GetDroppedFile(e);
+        var path = FormUtils.GetDroppedFile(e);
         if (path != null) LoadPictureFile(path);
     }
 

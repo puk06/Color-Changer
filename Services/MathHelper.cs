@@ -11,7 +11,7 @@ internal static class MathHelper
     /// 数値をパースして0〜255にクランプする
     /// </summary>
     internal static int ParseAndClamp(string value)
-        => ClampColorValue(int.TryParse(value, out int result) ? result : 0);
+        => ClampColorValue(int.TryParse(value, out var result) ? result : 0);
 
     /// <summary>
     /// 数値を0〜255にクランプする
@@ -23,5 +23,5 @@ internal static class MathHelper
     /// 文字列をdoubleにパースし、失敗した場合はデフォルト値を返す
     /// </summary>
     internal static double ParseDoubleOrDefault(string input, double defaultValue = 0.0)
-        => double.TryParse(input, out double result) ? result : defaultValue;
+        => double.TryParse(input, out var result) ? result : defaultValue;
 }

@@ -16,10 +16,10 @@ internal static class PreviewService
     /// </summary>
     internal static Bitmap CreateRawPreview(Bitmap source, Size previewSize)
     {
-        Bitmap preview = new Bitmap(previewSize.Width, previewSize.Height, PixelFormat.Format32bppArgb);
+        var preview = new Bitmap(previewSize.Width, previewSize.Height, PixelFormat.Format32bppArgb);
 
-        using PixelLock sourceLock = new PixelLock(source, ImageLockMode.ReadOnly);
-        using PixelLock previewLock = new PixelLock(preview, ImageLockMode.WriteOnly);
+        using var sourceLock = new PixelLock(source, ImageLockMode.ReadOnly);
+        using var previewLock = new PixelLock(preview, ImageLockMode.WriteOnly);
 
         Downscale(sourceLock.Pixels, source.Size, previewLock.Pixels, previewSize);
 
@@ -35,17 +35,17 @@ internal static class PreviewService
     /// <param name="previewSelection">プレビュー座標系での選択エリア</param>
     internal static Bitmap Generate(Bitmap rawPreview, Size previewSize, ConversionSettings settings, BitArray previewSelection)
     {
-        Bitmap preview = new Bitmap(previewSize.Width, previewSize.Height, PixelFormat.Format32bppArgb);
+        var preview = new Bitmap(previewSize.Width, previewSize.Height, PixelFormat.Format32bppArgb);
 
-        using PixelLock sourceLock = new PixelLock(rawPreview, ImageLockMode.ReadOnly);
-        using PixelLock previewLock = new PixelLock(preview, ImageLockMode.WriteOnly);
+        using var sourceLock = new PixelLock(rawPreview, ImageLockMode.ReadOnly);
+        using var previewLock = new PixelLock(preview, ImageLockMode.WriteOnly);
 
-        ImageProcessor processor = new ImageProcessor(settings.ColorDifference, settings.Balance, settings.AdvancedColor);
+        var processor = new ImageProcessor(settings.ColorDifference, settings.Balance, settings.AdvancedColor);
         processor.ProcessAllPixels(sourceLock.Pixels, previewLock.Pixels);
 
         if (previewSelection.Length != 0)
         {
-            BitArray outline = SelectionService.CreateOverlayMask(previewSelection, previewSize.Width, previewSize.Height);
+            var outline = SelectionService.CreateOverlayMask(previewSelection, previewSize.Width, previewSize.Height);
             ImageProcessor.ChangeSelectedPixelsColor(previewLock.Pixels, outline, OutlineColor);
         }
 
@@ -54,22 +54,22 @@ internal static class PreviewService
 
     private static void Downscale(Span<ColorPixel> source, Size sourceSize, Span<ColorPixel> target, Size targetSize)
     {
-        int sourceLength = source.Length;
-        int targetLength = target.Length;
+        var sourceLength = source.Length;
+        var targetLength = target.Length;
 
-        float ratioX = (float)sourceSize.Width / targetSize.Width;
-        float ratioY = (float)sourceSize.Height / targetSize.Height;
+        var ratioX = (float)sourceSize.Width / targetSize.Width;
+        var ratioY = (float)sourceSize.Height / targetSize.Height;
 
-        for (int y = 0; y < targetSize.Height; y++)
+        for (var y = 0; y < targetSize.Height; y++)
         {
-            int sourceY = (int)(y * ratioY);
-            int targetRowOffset = y * targetSize.Width;
+            var sourceY = (int)(y * ratioY);
+            var targetRowOffset = y * targetSize.Width;
 
-            for (int x = 0; x < targetSize.Width; x++)
+            for (var x = 0; x < targetSize.Width; x++)
             {
-                int sourceX = (int)(x * ratioX);
-                int sourceIndex = (sourceY * sourceSize.Width) + sourceX;
-                int targetIndex = targetRowOffset + x;
+                var sourceX = (int)(x * ratioX);
+                var sourceIndex = (sourceY * sourceSize.Width) + sourceX;
+                var targetIndex = targetRowOffset + x;
 
                 if (sourceIndex < 0 || sourceIndex >= sourceLength) continue;
                 if (targetIndex < 0 || targetIndex >= targetLength) continue;

@@ -35,7 +35,7 @@ internal static class FormUtils
     /// </summary>
     internal static void AlignTextRight(Label label, Point point)
     {
-        Size textSize = TextRenderer.MeasureText(label.Text, label.Font);
+        var textSize = TextRenderer.MeasureText(label.Text, label.Font);
         label.Location = new Point(point.X - textSize.Width, point.Y);
     }
 
@@ -57,7 +57,7 @@ internal static class FormUtils
     /// </summary>
     internal static string? PickFile(string filter, string title)
     {
-        using OpenFileDialog dialog = new OpenFileDialog
+        using var dialog = new OpenFileDialog
         {
             Filter = filter,
             Title = title
@@ -88,7 +88,7 @@ internal static class FormUtils
     /// </summary>
     internal static void SetOwnedImage(PictureBox pictureBox, Bitmap? image)
     {
-        Image? previous = pictureBox.Image;
+        var previous = pictureBox.Image;
         pictureBox.Image = image;
         previous?.Dispose();
         pictureBox.Invalidate();
@@ -99,7 +99,7 @@ internal static class FormUtils
     /// </summary>
     internal static void DrawCrosshair(Graphics graphics, Point point, Color color)
     {
-        using Pen pen = new Pen(ColorService.InverseColor(color), 2);
+        using var pen = new Pen(ColorService.InverseColor(color), 2);
         graphics.DrawLine(pen, point.X - 5, point.Y, point.X + 5, point.Y);
         graphics.DrawLine(pen, point.X, point.Y - 5, point.X, point.Y + 5);
     }
@@ -111,12 +111,12 @@ internal static class FormUtils
     /// </summary>
     internal static void DrawSelectionMap(Graphics graphics, bool[,] previewMap)
     {
-        int width = previewMap.GetLength(0);
-        int height = previewMap.GetLength(1);
+        var width = previewMap.GetLength(0);
+        var height = previewMap.GetLength(1);
 
-        for (int y = 0; y < height; y++)
+        for (var y = 0; y < height; y++)
         {
-            for (int x = 0; x < width; x++)
+            for (var x = 0; x < width; x++)
             {
                 if (previewMap[x, y])
                 {

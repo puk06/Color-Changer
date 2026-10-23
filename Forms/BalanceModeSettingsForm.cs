@@ -150,9 +150,9 @@ internal partial class BalanceModeSettingsForm : HideOnCloseForm
 
     private void RefreshGradientPreview()
     {
-        Color startColor = _sourceColor == Color.Empty ? Color.White : _sourceColor;
+        var startColor = _sourceColor == Color.Empty ? Color.White : _sourceColor;
 
-        Bitmap gradientPreviewImage = ColorService.GenerateGradientPreview(
+        var gradientPreviewImage = ColorService.GenerateGradientPreview(
             startColor,
             _configuration.V3GradientColor.ToColor(),
             _configuration.V3GradientStart,
@@ -176,7 +176,7 @@ internal partial class BalanceModeSettingsForm : HideOnCloseForm
     #region イベントハンドラー
     private void BalanceModeComboBox_SelectedIndexChanged(object sender, EventArgs e)
     {
-        int version = balanceModeComboBox.SelectedIndex + 1;
+        var version = balanceModeComboBox.SelectedIndex + 1;
 
         switch (version)
         {

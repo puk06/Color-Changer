@@ -12,8 +12,8 @@ internal static class ImageFileService
     /// </summary>
     internal static Bitmap Load(string path)
     {
-        using FileStream stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read);
-        using Bitmap decoded = new Bitmap(stream);
+        using var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read);
+        using var decoded = new Bitmap(stream);
 
         return CloneAsArgb32(decoded);
     }
@@ -29,8 +29,8 @@ internal static class ImageFileService
     /// </summary>
     internal static double EstimateMemoryUsageMegabytes(Bitmap bitmap)
     {
-        int bitsPerPixel = Image.GetPixelFormatSize(bitmap.PixelFormat);
-        long totalBytes = (long)bitmap.Width * bitmap.Height * bitsPerPixel / 8;
+        var bitsPerPixel = Image.GetPixelFormatSize(bitmap.PixelFormat);
+        var totalBytes = (long)bitmap.Width * bitmap.Height * bitsPerPixel / 8;
 
         return totalBytes / 1024.0 / 1024.0;
     }
@@ -42,10 +42,10 @@ internal static class ImageFileService
     {
         if (string.IsNullOrEmpty(filePath)) return "New Texture.png";
 
-        string originalFileName = Path.GetFileNameWithoutExtension(filePath);
+        var originalFileName = Path.GetFileNameWithoutExtension(filePath);
         if (string.IsNullOrEmpty(originalFileName)) originalFileName = "New Texture";
 
-        string originalExtension = Path.GetExtension(filePath);
+        var originalExtension = Path.GetExtension(filePath);
         if (string.IsNullOrEmpty(originalExtension)) originalExtension = ".png";
 
         return originalFileName + "_new" + originalExtension;

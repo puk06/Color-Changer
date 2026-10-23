@@ -15,7 +15,7 @@ internal static class UpdateService
     /// </summary>
     internal static async Task<VersionData?> FetchLatestVersionAsync()
     {
-        string response = await _httpClient.GetStringAsync(AppInfo.UpdateCheckUrl);
+        var response = await _httpClient.GetStringAsync(AppInfo.UpdateCheckUrl);
         return JsonSerializer.Deserialize<VersionData>(response);
     }
 }

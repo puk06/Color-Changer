@@ -40,21 +40,21 @@ internal static class ColorService
     /// </summary>
     internal static Bitmap GenerateGradientPreview(Color startColor, Color endColor, int start, int end, Size size)
     {
-        double gradientStart = start / 100.0;
-        double gradientEnd = end / 100.0;
+        var gradientStart = start / 100.0;
+        var gradientEnd = end / 100.0;
 
-        Bitmap bmp = new Bitmap(size.Width, size.Height);
-        using Graphics graphics = Graphics.FromImage(bmp);
+        var bmp = new Bitmap(size.Width, size.Height);
+        using var graphics = Graphics.FromImage(bmp);
 
-        for (int x = 0; x < size.Width; x++)
+        for (var x = 0; x < size.Width; x++)
         {
-            double grayRatio = Math.Clamp((double)x / size.Width, 0, 1);
+            var grayRatio = Math.Clamp((double)x / size.Width, 0, 1);
 
-            int r = CalculateGradientValue(startColor.R, endColor.R, gradientStart, gradientEnd, grayRatio);
-            int g = CalculateGradientValue(startColor.G, endColor.G, gradientStart, gradientEnd, grayRatio);
-            int b = CalculateGradientValue(startColor.B, endColor.B, gradientStart, gradientEnd, grayRatio);
+            var r = CalculateGradientValue(startColor.R, endColor.R, gradientStart, gradientEnd, grayRatio);
+            var g = CalculateGradientValue(startColor.G, endColor.G, gradientStart, gradientEnd, grayRatio);
+            var b = CalculateGradientValue(startColor.B, endColor.B, gradientStart, gradientEnd, grayRatio);
 
-            using Brush brush = new SolidBrush(Color.FromArgb(r, g, b));
+            using var brush = new SolidBrush(Color.FromArgb(r, g, b));
             graphics.FillRectangle(brush, x, 0, 1, size.Height);
         }
 
@@ -73,8 +73,8 @@ internal static class ColorService
         if (grayRatio <= gradientStart) return startColorValue;
         if (grayRatio >= gradientEnd) return endColorValue;
 
-        double interpolationFactor = (grayRatio - gradientStart) / (gradientEnd - gradientStart);
-        double interpolatedValue = startColorValue + ((endColorValue - startColorValue) * interpolationFactor);
+        var interpolationFactor = (grayRatio - gradientStart) / (gradientEnd - gradientStart);
+        var interpolatedValue = startColorValue + ((endColorValue - startColorValue) * interpolationFactor);
 
         return MathHelper.ClampColorValue((int)Math.Round(interpolatedValue));
     }
@@ -93,9 +93,9 @@ internal static class ColorService
 
     private static double GetColorDistanceInternal((int R, int G, int B) c1, (int R, int G, int B) c2)
     {
-        double r = Math.Pow(c1.R - c2.R, 2);
-        double g = Math.Pow(c1.G - c2.G, 2);
-        double b = Math.Pow(c1.B - c2.B, 2);
+        var r = Math.Pow(c1.R - c2.R, 2);
+        var g = Math.Pow(c1.G - c2.G, 2);
+        var b = Math.Pow(c1.B - c2.B, 2);
 
         return Math.Sqrt(r + g + b);
     }
@@ -105,15 +105,15 @@ internal static class ColorService
     /// </summary>
     internal static Point FindClosestPoint(Bitmap bitmap, Color color)
     {
-        double minDistance = double.MaxValue;
-        Point bestPoint = Point.Empty;
+        var minDistance = double.MaxValue;
+        var bestPoint = Point.Empty;
 
-        using PixelLock pixelLock = new PixelLock(bitmap, ImageLockMode.ReadOnly);
-        Span<ColorPixel> pixels = pixelLock.Pixels;
+        using var pixelLock = new PixelLock(bitmap, ImageLockMode.ReadOnly);
+        var pixels = pixelLock.Pixels;
 
-        for (int i = 0; i < pixels.Length; i++)
+        for (var i = 0; i < pixels.Length; i++)
         {
-            double distance = GetColorDistance(pixels[i], color);
+            var distance = GetColorDistance(pixels[i], color);
             if (distance < minDistance)
             {
                 minDistance = distance;
@@ -135,14 +135,14 @@ internal static class ColorService
     /// </summary>
     internal static Color ColorFromHSV(double hue, double saturation, double value)
     {
-        int hi = Convert.ToInt32(Math.Floor(hue / 60)) % 6;
-        double f = (hue / 60) - Math.Floor(hue / 60);
+        var hi = Convert.ToInt32(Math.Floor(hue / 60)) % 6;
+        var f = (hue / 60) - Math.Floor(hue / 60);
 
         value *= 255;
-        int v = Convert.ToInt32(value);
-        int p = Convert.ToInt32(value * (1 - saturation));
-        int q = Convert.ToInt32(value * (1 - (f * saturation)));
-        int t = Convert.ToInt32(value * (1 - ((1 - f) * saturation)));
+        var v = Convert.ToInt32(value);
+        var p = Convert.ToInt32(value * (1 - saturation));
+        var q = Convert.ToInt32(value * (1 - (f * saturation)));
+        var t = Convert.ToInt32(value * (1 - ((1 - f) * saturation)));
 
         return hi switch
         {
@@ -160,13 +160,13 @@ internal static class ColorService
     /// </summary>
     internal static void RGBtoHSV(Color color, out double hue, out double saturation, out double value)
     {
-        double r = color.R / 255.0;
-        double g = color.G / 255.0;
-        double b = color.B / 255.0;
+        var r = color.R / 255.0;
+        var g = color.G / 255.0;
+        var b = color.B / 255.0;
 
-        double max = Math.Max(r, Math.Max(g, b));
-        double min = Math.Min(r, Math.Min(g, b));
-        double delta = max - min;
+        var max = Math.Max(r, Math.Max(g, b));
+        var min = Math.Min(r, Math.Min(g, b));
+        var delta = max - min;
 
         if (delta == 0)
         {
@@ -197,9 +197,9 @@ internal static class ColorService
     /// </summary>
     internal static Color InterpolateColor(Color target, float saturation, float value)
     {
-        int r = (int)(255 + ((target.R - 255) * saturation));
-        int g = (int)(255 + ((target.G - 255) * saturation));
-        int b = (int)(255 + ((target.B - 255) * saturation));
+        var r = (int)(255 + ((target.R - 255) * saturation));
+        var g = (int)(255 + ((target.G - 255) * saturation));
+        var b = (int)(255 + ((target.B - 255) * saturation));
 
         r = MathHelper.ClampColorValue((int)(r * value));
         g = MathHelper.ClampColorValue((int)(g * value));

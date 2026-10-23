@@ -24,9 +24,9 @@ internal class ColorDifference(Color previousColor, Color newColor)
 
     public override string ToString()
     {
-        string diffRStr = FormatDiff(DiffR);
-        string diffGStr = FormatDiff(DiffG);
-        string diffBStr = FormatDiff(DiffB);
+        var diffRStr = FormatDiff(DiffR);
+        var diffGStr = FormatDiff(DiffG);
+        var diffBStr = FormatDiff(DiffB);
         
         return $"{diffRStr}, {diffGStr}, {diffBStr}";
     }

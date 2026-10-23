@@ -60,8 +60,8 @@ internal partial class SelectAreaFromImageMaskForm : HideOnCloseForm
 
         try
         {
-            Bitmap source = ImageFileService.Load(path);
-            Bitmap preview = PreviewService.CreateRawPreview(source, previewBox.Size);
+            var source = ImageFileService.Load(path);
+            var preview = PreviewService.CreateRawPreview(source, previewBox.Size);
 
             previewBox.Image = null;
             _source?.Dispose();
@@ -108,7 +108,7 @@ internal partial class SelectAreaFromImageMaskForm : HideOnCloseForm
 
     private void OpenFile_Click(object sender, EventArgs e)
     {
-        string? path = FormUtils.PickFile("画像ファイル|*.png;*.jpg;*.jpeg;*.bmp;", "画像ファイルを選択してください");
+        var path = FormUtils.PickFile("画像ファイル|*.png;*.jpg;*.jpeg;*.bmp;", "画像ファイルを選択してください");
         if (path != null) LoadPictureFile(path);
     }
 
@@ -120,14 +120,14 @@ internal partial class SelectAreaFromImageMaskForm : HideOnCloseForm
             return;
         }
 
-        BitArray selectedArea = SelectionService.SelectByMask(_source, _selectionType, _selectedColor);
+        var selectedArea = SelectionService.SelectByMask(_source, _selectionType, _selectedColor);
         if (selectedArea.Length == 0)
         {
             FormUtils.ShowError("選択エリアがありません。");
             return;
         }
 
-        bool result = FormUtils.ShowConfirm($"マスク画像からの選択処理が完了しました\n\n総ピクセル数: {selectedArea.Length:N0}\n総選択ピクセル数: {BitArrayHelper.CountOf(selectedArea):N0}\n\n選択エリアとして追加しますか？");
+        var result = FormUtils.ShowConfirm($"マスク画像からの選択処理が完了しました\n\n総ピクセル数: {selectedArea.Length:N0}\n総選択ピクセル数: {BitArrayHelper.CountOf(selectedArea):N0}\n\n選択エリアとして追加しますか？");
         if (!result) return;
 
         SelectedArea = selectedArea;
@@ -136,7 +136,7 @@ internal partial class SelectAreaFromImageMaskForm : HideOnCloseForm
 
     private void SelectAreaFromImageMaskForm_DragDrop(object sender, DragEventArgs e)
     {
-        string? path = FormUtils.GetDroppedFile(e);
+        var path = FormUtils.GetDroppedFile(e);
         if (path != null) LoadPictureFile(path);
     }
 

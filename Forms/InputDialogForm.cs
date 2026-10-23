@@ -17,7 +17,7 @@ internal class InputDialogForm : Form
         MaximizeBox = false;
         MinimizeBox = false;
 
-        Label label = new Label
+        var label = new Label
         {
             Left = 10,
             Top = 10,
@@ -34,7 +34,7 @@ internal class InputDialogForm : Form
             Font = new Font("Yu Gothic UI", 10F)
         };
 
-        Button okButton = new Button
+        var okButton = new Button
         {
             Text = "OK",
             Left = 280,

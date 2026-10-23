@@ -24,14 +24,14 @@ internal class SelectionLayers
     /// <returns>追加、または有効化したレイヤーのインデックス</returns>
     internal int Add(BitArray values, bool isEraser)
     {
-        int existing = _items.FindIndex(item => item.IsEraser == isEraser && BitArrayHelper.AreEqual(item.SelectedPoints, values));
+        var existing = _items.FindIndex(item => item.IsEraser == isEraser && BitArrayHelper.AreEqual(item.SelectedPoints, values));
         if (existing >= 0)
         {
             _items[existing].Enabled = true;
             return existing;
         }
 
-        int index = 1;
+        var index = 1;
         while (_items.Any(item => item.Index == index)) index++;
 
         _items.Add(new SelectedArea(index, true, values, isEraser));
@@ -49,7 +49,7 @@ internal class SelectionLayers
 
     internal void Move(int fromIndex, int toIndex)
     {
-        SelectedArea item = _items[fromIndex];
+        var item = _items[fromIndex];
         _items.RemoveAt(fromIndex);
         _items.Insert(toIndex, item);
     }
@@ -71,11 +71,11 @@ internal class SelectionLayers
     /// </summary>
     internal BitArray Combine()
     {
-        BitArray combined = BitArrayHelper.Empty();
+        var combined = BitArrayHelper.Empty();
 
-        for (int i = _items.Count - 1; i >= 0; i--)
+        for (var i = _items.Count - 1; i >= 0; i--)
         {
-            SelectedArea item = _items[i];
+            var item = _items[i];
             if (!item.Enabled) continue;
 
             combined = BitArrayHelper.Merge(combined, item.SelectedPoints, item.IsEraser);

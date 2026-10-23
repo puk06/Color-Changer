@@ -128,7 +128,7 @@ internal partial class SelectionPenSettingsForm : HideOnCloseForm
 
     private void CancelSelection_Click(object sender, EventArgs e)
     {
-        bool result = FormUtils.ShowConfirm("現在のペンの選択状況を全て無視して、取り消しますか？");
+        var result = FormUtils.ShowConfirm("現在のペンの選択状況を全て無視して、取り消しますか？");
         if (!result) return;
 
         Finish(null);

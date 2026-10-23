@@ -20,20 +20,20 @@ internal static class TextureConverter
     /// <returns>生成画像。呼び出し側が Dispose すること。</returns>
     internal static ConversionResult Convert(Bitmap source, ConversionSettings settings, BitArray selection)
     {
-        List<string> notices = new List<string>();
+        var notices = new List<string>();
 
-        Bitmap output = ImageFileService.CloneAsArgb32(source);
-        Bitmap? rawCopy = settings.InverseMode ? ImageFileService.CloneAsArgb32(source) : null;
-        Bitmap? transparent = settings.TransparentMode && !settings.InverseMode && selection.Length != 0
+        var output = ImageFileService.CloneAsArgb32(source);
+        var rawCopy = settings.InverseMode ? ImageFileService.CloneAsArgb32(source) : null;
+        var transparent = settings.TransparentMode && !settings.InverseMode && selection.Length != 0
             ? CreateTransparentLayer(source.Size)
             : null;
 
         Bitmap? result = null;
         try
         {
-            bool skipped = ProcessPixels(output, rawCopy, transparent, settings, selection, notices);
+            var skipped = ProcessPixels(output, rawCopy, transparent, settings, selection, notices);
 
-            bool useTransparentLayer = transparent != null && !skipped;
+            var useTransparentLayer = transparent != null && !skipped;
             result = useTransparentLayer ? transparent : output;
 
             return new ConversionResult(result!, notices);
@@ -49,8 +49,8 @@ internal static class TextureConverter
 
     private static Bitmap CreateTransparentLayer(Size size)
     {
-        Bitmap layer = new Bitmap(size.Width, size.Height, PixelFormat.Format32bppArgb);
-        using Graphics graphics = Graphics.FromImage(layer);
+        var layer = new Bitmap(size.Width, size.Height, PixelFormat.Format32bppArgb);
+        using var graphics = Graphics.FromImage(layer);
         graphics.Clear(Color.Transparent);
         return layer;
     }
@@ -64,17 +64,17 @@ internal static class TextureConverter
         List<string> notices
     )
     {
-        ImageProcessor processor = new ImageProcessor(settings.ColorDifference, settings.Balance, settings.AdvancedColor);
+        var processor = new ImageProcessor(settings.ColorDifference, settings.Balance, settings.AdvancedColor);
 
-        using PixelLock outputLock = new PixelLock(output, ImageLockMode.ReadWrite);
-        using PixelLock? rawLock = rawCopy == null ? null : new PixelLock(rawCopy, ImageLockMode.ReadOnly);
-        using PixelLock? transparentLock = transparent == null ? null : new PixelLock(transparent, ImageLockMode.ReadWrite);
+        using var outputLock = new PixelLock(output, ImageLockMode.ReadWrite);
+        using var rawLock = rawCopy == null ? null : new PixelLock(rawCopy, ImageLockMode.ReadOnly);
+        using var transparentLock = transparent == null ? null : new PixelLock(transparent, ImageLockMode.ReadWrite);
 
-        Span<ColorPixel> sourcePixels = outputLock.Pixels;
+        var sourcePixels = outputLock.Pixels;
 
         if (selection.Length == 0)
         {
-            bool skipped = settings.TransparentMode;
+            var skipped = settings.TransparentMode;
             if (skipped)
             {
                 notices.Add("選択エリアがなかったため、透過モード、マスクモードはスキップされます。");

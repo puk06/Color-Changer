@@ -91,8 +91,8 @@ internal partial class PreviewZoomForm : HideOnCloseForm
     {
         if (_image == null) return Point.Empty;
 
-        float imgX = (clickedPoint.X - _panOffset.X) / _zoom;
-        float imgY = (clickedPoint.Y - _panOffset.Y) / _zoom;
+        var imgX = (clickedPoint.X - _panOffset.X) / _zoom;
+        var imgY = (clickedPoint.Y - _panOffset.Y) / _zoom;
 
         if (imgX >= 0 && imgY >= 0 && imgX < _image.Width && imgY < _image.Height)
         {
@@ -110,7 +110,7 @@ internal partial class PreviewZoomForm : HideOnCloseForm
         const int thumbnailWidth = 160;
         const int thumbnailHeight = 120;
 
-        Rectangle previewBox = new Rectangle(
+        var previewBox = new Rectangle(
             ClientSize.Width - thumbnailWidth - margin,
             ClientSize.Height - thumbnailHeight - margin,
             thumbnailWidth,
@@ -119,29 +119,29 @@ internal partial class PreviewZoomForm : HideOnCloseForm
 
         g.FillRectangle(_backgroundBrush, previewBox);
 
-        float scaleX = (float)thumbnailWidth / _image.Width;
-        float scaleY = (float)thumbnailHeight / _image.Height;
-        float scale = Math.Min(scaleX, scaleY);
+        var scaleX = (float)thumbnailWidth / _image.Width;
+        var scaleY = (float)thumbnailHeight / _image.Height;
+        var scale = Math.Min(scaleX, scaleY);
 
-        int imgDrawWidth = (int)(_image.Width * scale);
-        int imgDrawHeight = (int)(_image.Height * scale);
+        var imgDrawWidth = (int)(_image.Width * scale);
+        var imgDrawHeight = (int)(_image.Height * scale);
 
-        int imgX = previewBox.X + ((thumbnailWidth - imgDrawWidth) / 2);
-        int imgY = previewBox.Y + ((thumbnailHeight - imgDrawHeight) / 2);
+        var imgX = previewBox.X + ((thumbnailWidth - imgDrawWidth) / 2);
+        var imgY = previewBox.Y + ((thumbnailHeight - imgDrawHeight) / 2);
 
         g.DrawImage(_image, imgX, imgY, imgDrawWidth, imgDrawHeight);
 
-        float visibleX = -_panOffset.X / _zoom;
-        float visibleY = (-_panOffset.Y + panel.Height) / _zoom;
-        float visibleW = ClientSize.Width / _zoom;
-        float visibleH = (ClientSize.Height - panel.Height) / _zoom;
+        var visibleX = -_panOffset.X / _zoom;
+        var visibleY = (-_panOffset.Y + panel.Height) / _zoom;
+        var visibleW = ClientSize.Width / _zoom;
+        var visibleH = (ClientSize.Height - panel.Height) / _zoom;
 
-        float clippedX = Math.Max(0, visibleX);
-        float clippedY = Math.Max(0, visibleY);
-        float clippedW = Math.Min(_image.Width - clippedX, visibleW - (clippedX - visibleX));
-        float clippedH = Math.Min(_image.Height - clippedY, visibleH - (clippedY - visibleY));
+        var clippedX = Math.Max(0, visibleX);
+        var clippedY = Math.Max(0, visibleY);
+        var clippedW = Math.Min(_image.Width - clippedX, visibleW - (clippedX - visibleX));
+        var clippedH = Math.Min(_image.Height - clippedY, visibleH - (clippedY - visibleY));
 
-        RectangleF redRect = new RectangleF(
+        var redRect = new RectangleF(
             imgX + (clippedX * scale),
             imgY + (clippedY * scale),
             clippedW * scale,
@@ -158,8 +158,8 @@ internal partial class PreviewZoomForm : HideOnCloseForm
 
         _zoom = 1.0f;
 
-        int x = (Size.Width - (int)(_image.Width * _zoom)) / 2;
-        int y = ((Size.Height - panel.Height - (int)(_image.Height * _zoom)) / 2) + panel.Height;
+        var x = (Size.Width - (int)(_image.Width * _zoom)) / 2;
+        var y = ((Size.Height - panel.Height - (int)(_image.Height * _zoom)) / 2) + panel.Height;
 
         _panOffset = new Point(x, y);
     }
@@ -168,7 +168,7 @@ internal partial class PreviewZoomForm : HideOnCloseForm
     #region イベントハンドラ
     private void ImageZoomForm_MouseWheel(object? sender, MouseEventArgs e)
     {
-        float oldZoom = _zoom;
+        var oldZoom = _zoom;
 
         if (e.Delta > 0) _zoom *= 1.1f;
         else _zoom /= 1.1f;

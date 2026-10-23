@@ -16,19 +16,19 @@ internal static class BitArrayHelper
     /// </summary>
     internal static int CountOf(BitArray bits, bool value = true)
     {
-        int[] words = ToWords(bits);
-        int fullWords = bits.Length / 32;
-        int remainingBits = bits.Length % 32;
+        var words = ToWords(bits);
+        var fullWords = bits.Length / 32;
+        var remainingBits = bits.Length % 32;
 
-        int ones = 0;
-        for (int i = 0; i < fullWords; i++)
+        var ones = 0;
+        for (var i = 0; i < fullWords; i++)
         {
             ones += BitOperations.PopCount((uint)words[i]);
         }
 
         if (remainingBits > 0)
         {
-            int mask = (1 << remainingBits) - 1;
+            var mask = (1 << remainingBits) - 1;
             ones += BitOperations.PopCount((uint)(words[fullWords] & mask));
         }
 
@@ -52,7 +52,7 @@ internal static class BitArrayHelper
     {
         if (target.Length == 0) target = new BitArray(source.Length);
 
-        BitArray result = new BitArray(target);
+        var result = new BitArray(target);
         if (isEraser)
         {
             result.And(new BitArray(source).Not());
@@ -67,7 +67,7 @@ internal static class BitArrayHelper
 
     private static int[] ToWords(BitArray bits)
     {
-        int[] words = new int[(bits.Length + 31) / 32];
+        var words = new int[(bits.Length + 31) / 32];
         bits.CopyTo(words, 0);
         return words;
     }

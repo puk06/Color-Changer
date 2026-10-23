@@ -81,11 +81,11 @@ internal partial class ColorPickerForm : HideOnCloseForm
     /// </summary>
     private void SetColorFromTextFields()
     {
-        int r = MathHelper.ParseAndClamp(redTextBox.Text);
-        int g = MathHelper.ParseAndClamp(greenTextBox.Text);
-        int b = MathHelper.ParseAndClamp(blueTextBox.Text);
+        var r = MathHelper.ParseAndClamp(redTextBox.Text);
+        var g = MathHelper.ParseAndClamp(greenTextBox.Text);
+        var b = MathHelper.ParseAndClamp(blueTextBox.Text);
 
-        Color color = Color.FromArgb(r, g, b);
+        var color = Color.FromArgb(r, g, b);
         UpdateSelectedColor(color);
         colorPalette.SelectColor(color);
     }
@@ -98,7 +98,7 @@ internal partial class ColorPickerForm : HideOnCloseForm
 
     private void HandleSliderEnd(object sender, EventArgs e)
     {
-        Color color = Color.FromArgb(redBar.Value, greenBar.Value, blueBar.Value);
+        var color = Color.FromArgb(redBar.Value, greenBar.Value, blueBar.Value);
         UpdateSelectedColor(color);
         colorPalette.SelectColor(color);
     }
@@ -115,7 +115,7 @@ internal partial class ColorPickerForm : HideOnCloseForm
     {
         if (!FormUtils.IsNavigationKey(e)) return;
 
-        Color color = ColorService.GetColorFromColorCode(colorCodeTextBox.Text);
+        var color = ColorService.GetColorFromColorCode(colorCodeTextBox.Text);
         if (color == Color.Empty) return;
 
         UpdateSelectedColor(color);

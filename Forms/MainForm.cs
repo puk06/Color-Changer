@@ -90,15 +90,15 @@ internal partial class MainForm : Form
     {
         try
         {
-            VersionData? versionData = await UpdateService.FetchLatestVersionAsync();
+            var versionData = await UpdateService.FetchLatestVersionAsync();
             if (versionData == null)
             {
                 if (!silent) FormUtils.ShowError("アップデート情報の取得中にエラーが発生しました");
                 return;
             }
 
-            bool hasUpdate = versionData.LatestVersion != AppInfo.Version;
-            string changeLog = string.Join("\n", versionData.ChangeLog.Select(log => $"・{log}"));
+            var hasUpdate = versionData.LatestVersion != AppInfo.Version;
+            var changeLog = string.Join("\n", versionData.ChangeLog.Select(log => $"・{log}"));
 
             if (silent)
             {
@@ -108,7 +108,7 @@ internal partial class MainForm : Form
 
             if (hasUpdate)
             {
-                bool result = FormUtils.ShowConfirm(
+                var result = FormUtils.ShowConfirm(
                     "新しいColor Changerのバージョンが利用可能です！\n\n" +
                     "「はい」をクリックすると商品ページを開きます。\n\n" +
                     $"現在のバージョン: {AppInfo.Version}\n" +
@@ -172,11 +172,11 @@ internal partial class MainForm : Form
         if (!new Rectangle(Point.Empty, _rawPreview.Size).Contains(e.Location)) return;
         if (!_colorPickThrottle.TryPass()) return;
 
-        Color selectedColor = _rawPreview.GetPixel(e.X, e.Y);
+        var selectedColor = _rawPreview.GetPixel(e.X, e.Y);
 
         if (selectMode.Checked)
         {
-            Point sourcePoint = SelectionService.ToSourceCoordinates(e.Location, previewBox.Size, _sourceBitmap.Size);
+            var sourcePoint = SelectionService.ToSourceCoordinates(e.Location, previewBox.Size, _sourceBitmap.Size);
             HandleSelectionMode(e, selectedColor, sourcePoint, isMouseMoving);
             return;
         }
@@ -257,12 +257,12 @@ internal partial class MainForm : Form
         {
             if (_sourceBitmap == null) return;
 
-            BitArray selection = _selectedAreaListForm.Layers.Combine();
-            TextureConverter.ConversionResult result = TextureConverter.Convert(_sourceBitmap, BuildConversionSettings(), selection);
+            var selection = _selectedAreaListForm.Layers.Combine();
+            var result = TextureConverter.Convert(_sourceBitmap, BuildConversionSettings(), selection);
 
             using (result.Image)
             {
-                foreach (string notice in result.Notices)
+                foreach (var notice in result.Notices)
                 {
                     FormUtils.ShowInfo(notice);
                 }
@@ -307,7 +307,7 @@ internal partial class MainForm : Form
     {
         if (_rawPreview == null || _previousColor == Color.Empty || _newColor == Color.Empty) return;
 
-        Bitmap? preview = GenerateColoredPreview(_rawPreview);
+        var preview = GenerateColoredPreview(_rawPreview);
         if (preview != null) FormUtils.SetOwnedImage(coloredPreviewBox, preview);
     }
 
@@ -324,7 +324,7 @@ internal partial class MainForm : Form
 
         if (_sourceBitmap != null && _previousColor != Color.Empty && _newColor != Color.Empty && !_savedColorSettings)
         {
-            bool result = FormUtils.ShowConfirm("現在の色設定を保存せずに画像を変更しようとしています。\n画像変更前に保存しますか？", "画像変更");
+            var result = FormUtils.ShowConfirm("現在の色設定を保存せずに画像を変更しようとしています。\n画像変更前に保存しますか？", "画像変更");
             if (result) SaveColorSettingsDialog();
         }
 
@@ -332,8 +332,8 @@ internal partial class MainForm : Form
 
         try
         {
-            Bitmap source = ImageFileService.Load(path);
-            Bitmap rawPreview = PreviewService.CreateRawPreview(source, previewBox.Size);
+            var source = ImageFileService.Load(path);
+            var rawPreview = PreviewService.CreateRawPreview(source, previewBox.Size);
 
             _sourceBitmap = source;
             _rawPreview = rawPreview;
@@ -426,7 +426,7 @@ internal partial class MainForm : Form
 
         try
         {
-            ColorSettings? colorSettings = ColorSettingsFileService.Load(path);
+            var colorSettings = ColorSettingsFileService.Load(path);
             if (colorSettings == null)
             {
                 FormUtils.ShowError("色情報設定ファイルの読み込みに失敗しました。");
@@ -450,7 +450,7 @@ internal partial class MainForm : Form
     {
         try
         {
-            ColorSettings colorSettings = new ColorSettings()
+            var colorSettings = new ColorSettings()
             {
                 PreviousColor = new SerializableColor(_previousColor),
                 NewColor = new SerializableColor(_newColor),
@@ -501,7 +501,7 @@ internal partial class MainForm : Form
     {
         if (_sourceBitmap == null || _rawPreview == null || _previousColor == Color.Empty || _newColor == Color.Empty) return;
 
-        BitArray allSelectedAreas = _selectedAreaListForm.Layers.Combine();
+        var allSelectedAreas = _selectedAreaListForm.Layers.Combine();
 
         if (allSelectedAreas.Length == 0)
         {
@@ -514,9 +514,9 @@ internal partial class MainForm : Form
             Text = AppInfo.Title + " - プレビュー用の選択エリア作成中...";
             _selectedPointsForPreview = SelectionService.ToPreviewSelection(allSelectedAreas, _sourceBitmap.Size, previewBox.Size, inverseMode.Checked);
 
-            int totalSelectedPoints = BitArrayHelper.CountOf(allSelectedAreas);
-            int enabledCount = _selectedAreaListForm.Layers.EnabledSelectionCount;
-            int enabledEraserCount = _selectedAreaListForm.Layers.EnabledEraserCount;
+            var totalSelectedPoints = BitArrayHelper.CountOf(allSelectedAreas);
+            var enabledCount = _selectedAreaListForm.Layers.EnabledSelectionCount;
+            var enabledEraserCount = _selectedAreaListForm.Layers.EnabledEraserCount;
 
             Text = AppInfo.Title + $" - {enabledCount} 個の選択エリア / {enabledEraserCount} 個の消去エリア (総選択ピクセル数: {totalSelectedPoints:N0})";
         }
@@ -550,7 +550,7 @@ internal partial class MainForm : Form
     /// </summary>
     private void UpdateTextureData()
     {
-        Color foreColor = _sourceBitmap != null ? FormUtils.DefaultForegroundColor : FormUtils.DefaultUnselectedColor;
+        var foreColor = _sourceBitmap != null ? FormUtils.DefaultForegroundColor : FormUtils.DefaultUnselectedColor;
 
         if (_sourceBitmap == null)
         {
@@ -647,10 +647,10 @@ internal partial class MainForm : Form
             return;
         }
 
-        string previousTitle = Text;
+        var previousTitle = Text;
         Text = AppInfo.Title + " - 選択処理中...";
 
-        BitArray? values = SelectionService.SelectByFloodFill(_sourceBitmap, sourcePoint, _backgroundColor);
+        var values = SelectionService.SelectByFloodFill(_sourceBitmap, sourcePoint, _backgroundColor);
 
         Text = previousTitle;
 
@@ -665,7 +665,7 @@ internal partial class MainForm : Form
 
     private void OnMaskAreaChanged()
     {
-        BitArray? area = _selectAreaFromImageMaskForm.SelectedArea;
+        var area = _selectAreaFromImageMaskForm.SelectedArea;
 
         if (_sourceBitmap == null || _rawPreview == null)
         {
@@ -699,7 +699,7 @@ internal partial class MainForm : Form
                 _previewZoomForm.SetImage(_rawPreview, ownsImage: false);
                 break;
             case 1:
-                Bitmap? colored = GenerateColoredPreview(_rawPreview);
+                var colored = GenerateColoredPreview(_rawPreview);
                 if (colored != null) _previewZoomForm.SetImage(colored, ownsImage: true);
                 break;
         }
@@ -712,8 +712,8 @@ internal partial class MainForm : Form
         if (_clickedPoint == Point.Empty) return;
         if (sender is not PictureBox pictureBox) return;
 
-        bool isPreviewBox = pictureBox == previewBox;
-        Color color = isPreviewBox ? _previousColor : _newColor;
+        var isPreviewBox = pictureBox == previewBox;
+        var color = isPreviewBox ? _previousColor : _newColor;
 
         FormUtils.DrawCrosshair(e.Graphics, _clickedPoint, color);
 
@@ -721,7 +721,7 @@ internal partial class MainForm : Form
 
         if (selectMode.Checked && _selectionPenSettingsForm.PenEnabled)
         {
-            bool[,] previewMap = _selectionPenSettingsForm.BuildPreviewMap(previewBox.Size);
+            var previewMap = _selectionPenSettingsForm.BuildPreviewMap(previewBox.Size);
 
             FormUtils.DrawSelectionMap(e.Graphics, previewMap);
             _previewZoomForm.SetGraphics(previewMap);
@@ -785,8 +785,8 @@ internal partial class MainForm : Form
     {
         if (balanceMode.Checked)
         {
-            int currentBalanceMode = _balanceModeSettingsForm.Configuration.ModeVersion;
-            bool result = FormUtils.ShowConfirm(
+            var currentBalanceMode = _balanceModeSettingsForm.Configuration.ModeVersion;
+            var result = FormUtils.ShowConfirm(
                 "バランスモードが有効化されました！\n\n" +
                 "色を綺麗に改変するためには、以下の設定項目の調整が推奨されます。\n\n" +
                 "推奨設定項目：\n" +
@@ -820,7 +820,7 @@ internal partial class MainForm : Form
 
     private void OpenFile_Click(object sender, EventArgs e)
     {
-        string? path = FormUtils.PickFile("画像ファイル|*.png;*.jpg;*.jpeg;*.bmp;*.gif;*.tif;*.tiff;*.ico|すべてのファイル|*.*", "画像ファイルを選択してください");
+        var path = FormUtils.PickFile("画像ファイル|*.png;*.jpg;*.jpeg;*.bmp;*.gif;*.tif;*.tiff;*.ico|すべてのファイル|*.*", "画像ファイルを選択してください");
         if (path != null) LoadPictureFile(path);
     }
 
@@ -838,10 +838,10 @@ internal partial class MainForm : Form
             return;
         }
 
-        bool result = FormUtils.ShowConfirm("画像を作成しますか？");
+        var result = FormUtils.ShowConfirm("画像を作成しますか？");
         if (!result) return;
 
-        using SaveFileDialog dialog = new SaveFileDialog()
+        using var dialog = new SaveFileDialog()
         {
             Filter = "PNGファイル|*.png;",
             Title = "新規テクスチャ画像の保存先を選択してください",
@@ -876,7 +876,7 @@ internal partial class MainForm : Form
 
     private void AboutThisSoftware_Click(object sender, EventArgs e)
     {
-        string message = "Color Changer For Texture " + AppInfo.Version + "\n\n";
+        var message = "Color Changer For Texture " + AppInfo.Version + "\n\n";
         message += "柔軟なテクスチャ色変換ツール\n指定した色の差分をもとに、テクスチャの色を簡単に変更できます。\n\n";
         message += $"ツール情報:\n制作者: ぷこるふ\nTwitter: @pukorufu\nGithub: {AppInfo.GithubUrl}\n\n";
         message += "このソフトウェアは、個人の趣味で作成されたものです。\nもしこのソフトウェアが役に立ったと感じたら、ぜひ支援をお願いします！\n\n";
@@ -893,7 +893,7 @@ internal partial class MainForm : Form
 
     private void DonationButton_Click(object sender, EventArgs e)
     {
-        bool result = FormUtils.ShowConfirm(
+        var result = FormUtils.ShowConfirm(
             "支援していただける場合は、以下のリンクを開きます。\n\n" +
             $"支援先: {AppInfo.ItemUrl}\n\n" +
             "支援は任意です。無理のない範囲でお願いします。"
@@ -906,7 +906,7 @@ internal partial class MainForm : Form
 
     private void ImportColorSettings_Click(object sender, EventArgs e)
     {
-        string? path = FormUtils.PickFile("色情報設定ファイル|*.ccs", "色情報設定ファイルを選択してください");
+        var path = FormUtils.PickFile("色情報設定ファイル|*.ccs", "色情報設定ファイルを選択してください");
         if (path != null) LoadColorSettingsFile(path);
     }
 
@@ -915,7 +915,7 @@ internal partial class MainForm : Form
 
     private void SaveColorSettingsDialog()
     {
-        using SaveFileDialog dialog = new SaveFileDialog()
+        using var dialog = new SaveFileDialog()
         {
             Filter = "色情報設定ファイル|*.ccs",
             Title = "色情報設定ファイルの保存先を選択してください",
@@ -929,7 +929,7 @@ internal partial class MainForm : Form
 
     private void MainForm_DragDrop(object sender, DragEventArgs e)
     {
-        string? file = FormUtils.GetDroppedFile(e);
+        var file = FormUtils.GetDroppedFile(e);
         if (file == null) return;
 
         if (Path.GetExtension(file) == ".ccs")

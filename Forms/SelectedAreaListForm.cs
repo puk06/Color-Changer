@@ -87,9 +87,9 @@ internal partial class SelectedAreaListForm : HideOnCloseForm
             selectedValuesList.BeginUpdate();
             selectedValuesList.Items.Clear();
 
-            for (int i = 0; i < Layers.Count; i++)
+            for (var i = 0; i < Layers.Count; i++)
             {
-                SelectedArea layer = Layers.Items[i];
+                var layer = Layers.Items[i];
                 selectedValuesList.Items.Add(FormatLayerText(layer, i + 1), layer.Enabled);
             }
 
@@ -156,7 +156,7 @@ internal partial class SelectedAreaListForm : HideOnCloseForm
     {
         if (!IsValidRightClickedIndex) return;
 
-        string? newName = _inputDialogForm.ShowDialog(Layers.Items[_rightClickedIndex].LayerName);
+        var newName = _inputDialogForm.ShowDialog(Layers.Items[_rightClickedIndex].LayerName);
         if (!string.IsNullOrEmpty(newName))
         {
             Layers.Rename(_rightClickedIndex, newName);
@@ -169,8 +169,8 @@ internal partial class SelectedAreaListForm : HideOnCloseForm
     {
         if (!IsValidRightClickedIndex) return;
 
-        SelectedArea layer = Layers.Items[_rightClickedIndex];
-        bool result = FormUtils.ShowConfirm($"このレイヤーを削除しますか？\n\nレイヤー名: {layer.LayerName}\nピクセル数: {layer.Count:N0}");
+        var layer = Layers.Items[_rightClickedIndex];
+        var result = FormUtils.ShowConfirm($"このレイヤーを削除しますか？\n\nレイヤー名: {layer.LayerName}\nピクセル数: {layer.Count:N0}");
         if (!result) return;
 
         Layers.RemoveAt(_rightClickedIndex);
@@ -190,7 +190,7 @@ internal partial class SelectedAreaListForm : HideOnCloseForm
 
     private void SelectedValuesList_MouseDown(object sender, MouseEventArgs e)
     {
-        int clickedIndex = selectedValuesList.IndexFromPoint(e.Location);
+        var clickedIndex = selectedValuesList.IndexFromPoint(e.Location);
 
         if (e.Button == MouseButtons.Right)
         {

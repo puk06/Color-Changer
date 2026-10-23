@@ -26,9 +26,9 @@ public partial class ColorPalette : UserControl
     /// <param name="target"></param>
     public void SelectColor(Color target)
     {
-        ColorService.RGBtoHSV(target, out double targetHue, out double _, out double _);
+        ColorService.RGBtoHSV(target, out var targetHue, out var _, out var _);
 
-        int hueY = (int)((targetHue / 360.0) * (hueSlider.Height - 1));
+        var hueY = (int)((targetHue / 360.0) * (hueSlider.Height - 1));
         hueY = Math.Clamp(hueY, 0, hueSlider.Height - 1);
 
         UpdateHueColor(hueY);
@@ -83,13 +83,13 @@ public partial class ColorPalette : UserControl
     #region カラーパレット生成関連
     private static Bitmap GenerateHueSlider(Size size)
     {
-        Bitmap bmp = new Bitmap(size.Width, size.Height);
+        var bmp = new Bitmap(size.Width, size.Height);
 
-        for (int y = 0; y < size.Height; y++)
+        for (var y = 0; y < size.Height; y++)
         {
-            Color color = CalculateHueColor(y, size.Height);
+            var color = CalculateHueColor(y, size.Height);
 
-            for (int x = 0; x < size.Width; x++)
+            for (var x = 0; x < size.Width; x++)
             {
                 bmp.SetPixel(x, y, color);
             }
@@ -100,15 +100,15 @@ public partial class ColorPalette : UserControl
 
     private static Bitmap GenerateColorGradient(Color targetColor, int width, int height)
     {
-        Bitmap bmp = new Bitmap(width, height);
+        var bmp = new Bitmap(width, height);
 
-        for (int y = 0; y < height; y++)
+        for (var y = 0; y < height; y++)
         {
-            float v = 1.0f - ((float)y / (height - 1));
-            for (int x = 0; x < width; x++)
+            var v = 1.0f - ((float)y / (height - 1));
+            for (var x = 0; x < width; x++)
             {
-                float s = (float)x / (width - 1);
-                Color mixed = ColorService.InterpolateColor(targetColor, s, v);
+                var s = (float)x / (width - 1);
+                var mixed = ColorService.InterpolateColor(targetColor, s, v);
                 bmp.SetPixel(x, y, mixed);
             }
         }
@@ -134,9 +134,9 @@ public partial class ColorPalette : UserControl
 
     private void HueSlider_Paint(object sender, PaintEventArgs e)
     {
-        Color inverseColor = ColorService.InverseColor(_hueColor);
+        var inverseColor = ColorService.InverseColor(_hueColor);
 
-        using Pen pen = new Pen(inverseColor, 2);
+        using var pen = new Pen(inverseColor, 2);
         e.Graphics.DrawLine(pen, 0, _clickedHueY, hueSlider.Width, _clickedHueY);
     }
     #endregion
@@ -144,8 +144,8 @@ public partial class ColorPalette : UserControl
     #region 内部計算
     private static Color CalculateHueColor(int y, int barHeight)
     {
-        double saturation = (double)y / (barHeight - 1);
-        double hue = saturation * 360.0;
+        var saturation = (double)y / (barHeight - 1);
+        var hue = saturation * 360.0;
 
         return ColorService.ColorFromHSV(hue, 1.0f, 1.0f);
     }
