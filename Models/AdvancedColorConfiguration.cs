@@ -1,6 +1,4 @@
-﻿using ColorChanger.Utils;
-
-namespace ColorChanger.Models;
+﻿namespace ColorChanger.Models;
 
 public class AdvancedColorConfiguration
 {
@@ -23,12 +21,18 @@ public class AdvancedColorConfiguration
     /// </summary>
     internal void UpdateComponentActivationStatus()
     {
-        BrightnessEnabled = !MathUtils.EqualDouble(Brightness, 1.0);
-        ContrastEnabled = !MathUtils.EqualDouble(Contrast, 1.0);
-        GammaEnabled = !MathUtils.EqualDouble(Gamma, 1.0);
-        ExposureEnabled = !MathUtils.EqualDouble(Exposure, 0.0);
-        TransparencyEnabled = !MathUtils.EqualDouble(Transparency, 0.0);
+        BrightnessEnabled = !IsSame(Brightness, 1.0);
+        ContrastEnabled = !IsSame(Contrast, 1.0);
+        GammaEnabled = !IsSame(Gamma, 1.0);
+        ExposureEnabled = !IsSame(Exposure, 0.0);
+        TransparencyEnabled = !IsSame(Transparency, 0.0);
 
         Enabled = BrightnessEnabled || ContrastEnabled || GammaEnabled || ExposureEnabled || TransparencyEnabled;
     }
+
+    /// <summary>
+    /// 小数点以下2桁までの値が一致するかを判定する
+    /// </summary>
+    private static bool IsSame(double value1, double value2)
+        => (int)(value1 * 100) == (int)(value2 * 100);
 }

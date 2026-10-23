@@ -79,7 +79,6 @@
             Name = "SelectedAreaListForm";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Selected Area List by Color Changer";
-            FormClosing += SelectedAreaListForm_FormClosing;
             ResumeLayout(false);
             PerformLayout();
         }

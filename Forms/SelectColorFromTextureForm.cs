@@ -1,14 +1,9 @@
-﻿using ColorChanger.ImageProcessing;
-using ColorChanger.Models;
-using ColorChanger.Utils;
-using System.Diagnostics;
+﻿using ColorChanger.Services;
 
 namespace ColorChanger.Forms;
 
-internal partial class SelectColorFromTextureForm : Form
+internal partial class SelectColorFromTextureForm : HideOnCloseForm
 {
-    private const int COLOR_UPDATE_DEBOUNCE_MS = 14;
-
     /// <summary>
     /// 色が変更されたときに発生するイベント
     /// </summary>
@@ -19,77 +14,37 @@ internal partial class SelectColorFromTextureForm : Form
     /// </summary>
     internal Color SelectedColor { get; private set; } = Color.Empty;
 
-    private Bitmap? _previewBitmap;
+    private Bitmap? _preview;
     private Point _clickedPoint = Point.Empty;
-    private readonly Stopwatch _updateDebounceStopwatch = Stopwatch.StartNew();
+    private readonly Throttle _updateThrottle = new Throttle(14);
 
     internal SelectColorFromTextureForm()
     {
         InitializeComponent();
         Icon = FormUtils.GetSoftwareIcon();
 
-        previewBox.BackColor = ColorUtils.DefaultBackgroundColor;
-        selectedColorBox.BackColor = ColorUtils.DefaultBackgroundColor;
+        previewBox.BackColor = FormUtils.DefaultBackgroundColor;
+        selectedColorBox.BackColor = FormUtils.DefaultBackgroundColor;
 
         UpdateColorData();
     }
 
-    #region 色選択関連
-    /// <summary>
-    /// 変更前の色を選択する。
-    /// </summary>
     private void SelectPreviousColor(object sender, MouseEventArgs e)
     {
         if (e.Button != MouseButtons.Left) return;
-        if (_previewBitmap == null) return;
+        if (_preview == null) return;
 
-        if (!BitmapUtils.IsValidCoordinate(e.Location, _previewBitmap.Size)) return;
+        if (!new Rectangle(Point.Empty, _preview.Size).Contains(e.Location)) return;
+        if (!_updateThrottle.TryPass()) return;
 
-        if (_updateDebounceStopwatch.ElapsedMilliseconds <= COLOR_UPDATE_DEBOUNCE_MS) return;
-        _updateDebounceStopwatch.Restart();
-
-        Color selectedColor = _previewBitmap.GetPixel(e.X, e.Y);
-
-        SelectedColor = selectedColor;
+        SelectedColor = _preview.GetPixel(e.X, e.Y);
 
         UpdateColorData();
 
         _clickedPoint = e.Location;
         previewBox.Invalidate();
     }
-    #endregion
 
-    #region 処理関連
-    /// <summary>
-    /// プレビュー用のビットマップを生成する
-    /// </summary>
-    /// <param name="sourceBitmap"></param>
-    /// <param name="rawMode"></param>
-    /// <returns></returns>
-    private Bitmap GenerateColoredPreview(Bitmap sourceBitmap, bool rawMode = false)
-    {
-        try
-        {
-            PreviewConfiguration previewConfig = new PreviewConfiguration
-            {
-                SourceBitmap = sourceBitmap,
-                PreviewBoxSize = previewBox.Size,
-                RawMode = rawMode
-            };
-
-            return ImageProcessorService.GeneratePreview(previewConfig);
-        }
-        catch (Exception ex)
-        {
-            FormUtils.ShowError($"プレビュー画像の生成に失敗しました。\n{ex.Message}");
-            return sourceBitmap;
-        }
-    }
-
-    /// <summary>
-    /// 画像ファイルを読み込む
-    /// </summary>
-    /// <param name="path"></param>
     private void LoadPictureFile(string path)
     {
         if (!File.Exists(path))
@@ -100,14 +55,14 @@ internal partial class SelectColorFromTextureForm : Form
 
         try
         {
-            BitmapUtils.DisposeBitmap(ref _previewBitmap);
+            using Bitmap source = ImageFileService.Load(path);
+            Bitmap preview = PreviewService.CreateRawPreview(source, previewBox.Size);
 
-            using var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read);
-            var rawBitmap = new Bitmap(stream);
-            _previewBitmap = GenerateColoredPreview(rawBitmap, rawMode: true);
+            previewBox.Image = null;
+            _preview?.Dispose();
 
-            BitmapUtils.DisposeBitmap(ref rawBitmap);
-            BitmapUtils.SetImage(previewBox, _previewBitmap, disposeImage: false);
+            _preview = preview;
+            previewBox.Image = _preview;
         }
         catch (Exception exception)
         {
@@ -120,30 +75,27 @@ internal partial class SelectColorFromTextureForm : Form
                 FormUtils.ShowError("画像の読み込みに失敗しました。\n\nエラー: " + exception);
             }
 
-            BitmapUtils.DisposeBitmap(ref _previewBitmap);
-            BitmapUtils.ResetImage(previewBox);
+            previewBox.Image = null;
+            _preview?.Dispose();
+            _preview = null;
         }
     }
 
-    /// <summary>
-    /// 色情報を更新する
-    /// </summary>
     private void UpdateColorData()
     {
         if (SelectedColor == Color.Empty)
         {
             RGBText.Text = "未選択";
             ColorCodeText.Text = "未選択";
-            selectedColorBox.BackColor = ColorUtils.DefaultBackgroundColor;
+            selectedColorBox.BackColor = FormUtils.DefaultBackgroundColor;
         }
         else
         {
             RGBText.Text = $"{SelectedColor.R}, {SelectedColor.G}, {SelectedColor.B}";
-            ColorCodeText.Text = ColorUtils.GetColorCodeFromColor(SelectedColor);
+            ColorCodeText.Text = ColorService.GetColorCodeFromColor(SelectedColor);
             selectedColorBox.BackColor = SelectedColor;
         }
     }
-    #endregion
 
     #region イベントハンドラー
     private void OnPaint(object sender, PaintEventArgs e)
@@ -151,33 +103,19 @@ internal partial class SelectColorFromTextureForm : Form
         if (_clickedPoint == Point.Empty) return;
         if (sender is not PictureBox) return;
 
-        Color inverseColor = ColorUtils.InverseColor(SelectedColor);
-
-        using Pen pen = new Pen(inverseColor, 2);
-        e.Graphics.DrawLine(pen, _clickedPoint.X - 5, _clickedPoint.Y, _clickedPoint.X + 5, _clickedPoint.Y);
-        e.Graphics.DrawLine(pen, _clickedPoint.X, _clickedPoint.Y - 5, _clickedPoint.X, _clickedPoint.Y + 5);
+        FormUtils.DrawCrosshair(e.Graphics, _clickedPoint, SelectedColor);
     }
 
     private void OpenFile_Click(object sender, EventArgs e)
     {
-        OpenFileDialog dialog = new OpenFileDialog()
-        {
-            Filter = "画像ファイル|*.png;*.jpg;*.jpeg;*.bmp;",
-            Title = "画像ファイルを選択してください"
-        };
-
-        if (dialog.ShowDialog() != DialogResult.OK) return;
-        LoadPictureFile(dialog.FileName);
+        string? path = FormUtils.PickFile("画像ファイル|*.png;*.jpg;*.jpeg;*.bmp;", "画像ファイルを選択してください");
+        if (path != null) LoadPictureFile(path);
     }
 
     private void SelectColorFromTextureForm_DragDrop(object sender, DragEventArgs e)
     {
-        if (e.Data == null) return;
-
-        string[]? files = (string[]?)e.Data.GetData(DataFormats.FileDrop, false);
-        if (files == null || files.Length == 0) return;
-
-        LoadPictureFile(files[0]);
+        string? path = FormUtils.GetDroppedFile(e);
+        if (path != null) LoadPictureFile(path);
     }
 
     private void SelectColorFromTextureForm_DragEnter(object sender, DragEventArgs e)
@@ -191,18 +129,7 @@ internal partial class SelectColorFromTextureForm : Form
             return;
         }
 
-        NotifyColorChanged();
-    }
-
-    private void NotifyColorChanged()
-        => ColorChanged?.Invoke(this, EventArgs.Empty);
-    #endregion
-
-    #region フォーム関連
-    private void SelectColorFromTextureForm_FormClosing(object sender, FormClosingEventArgs e)
-    {
-        Visible = false;
-        e.Cancel = true;
+        ColorChanged?.Invoke(this, EventArgs.Empty);
     }
     #endregion
 }

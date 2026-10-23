@@ -1,26 +1,41 @@
-﻿using ColorChanger.Utils;
+﻿using ColorChanger.Services;
 using System.Drawing.Drawing2D;
 
 namespace ColorChanger.Forms;
 
-internal partial class PreviewZoomForm : Form
+internal partial class PreviewZoomForm : HideOnCloseForm
 {
-    internal event MouseEventHandler? PreviewMouseDown;
-    internal event MouseEventHandler? PreviewMouseMoved;
-    internal event MouseEventHandler? PreviewMouseUp;
-    internal event EventHandler? RequestImageUpdate;
+    /// <summary>
+    /// 画像上でマウスが押された（座標は画像のピクセル座標）
+    /// </summary>
+    internal event Action<Point, MouseEventArgs>? PreviewMouseDown;
+
+    /// <summary>
+    /// 画像上でマウスが動いた（座標は画像のピクセル座標）
+    /// </summary>
+    internal event Action<Point, MouseEventArgs>? PreviewMouseMoved;
+
+    /// <summary>
+    /// 画像上でマウスが離された（座標は画像のピクセル座標）
+    /// </summary>
+    internal event Action<Point, MouseEventArgs>? PreviewMouseUp;
+
+    /// <summary>
+    /// 表示モードが変わり、画像の再生成が必要になったときに発生するイベント
+    /// </summary>
+    internal event Action<int>? RequestImageUpdate;
 
     private static readonly SolidBrush _backgroundBrush = new SolidBrush(Color.FromArgb(160, 0, 0, 0));
     private static readonly Pen _redPen = new Pen(Color.Red, 1f);
     private static readonly Pen _borderPen = new Pen(Color.Gray, 1);
 
     private Image? _image;
+    private bool _ownsImage = false;
     private float _zoom = 1.0f;
     private Point _panOffset = Point.Empty;
     private Point _mouseDownPosition;
     private Point _panStart;
-    private bool isPanning = false;
-    private bool _canDispose = false;
+    private bool _isPanning = false;
     private bool[,]? _selectionPenMap = null;
 
     internal PreviewZoomForm()
@@ -35,31 +50,25 @@ internal partial class PreviewZoomForm : Form
     /// <summary>
     /// 画像をセットします。
     /// </summary>
-    /// <param name="image"></param>
-    /// <param name="canDispose"></param>
-    internal void SetImage(Image image, bool canDispose)
+    /// <param name="image">表示する画像</param>
+    /// <param name="ownsImage">true の場合、差し替え時にこのフォームが画像を破棄する</param>
+    internal void SetImage(Image image, bool ownsImage)
     {
-        if (_canDispose)
-        {
-            _image?.Dispose();
-            _image = null;
-        }
+        ReleaseImage();
 
-        _canDispose = canDispose;
         _image = image;
+        _ownsImage = ownsImage;
 
         if (_panOffset == Point.Empty) CenterImage();
         Invalidate();
     }
 
     /// <summary>
-    /// 画像データを強制的にリセットします。
+    /// 表示中の画像を取り除きます。
     /// </summary>
     internal void ResetImage()
     {
-        _image?.Dispose();
-        _image = null;
-
+        ReleaseImage();
         Invalidate();
     }
 
@@ -67,6 +76,14 @@ internal partial class PreviewZoomForm : Form
     {
         _selectionPenMap = selectionPenMap;
         Invalidate();
+    }
+
+    private void ReleaseImage()
+    {
+        if (_ownsImage) _image?.Dispose();
+
+        _image = null;
+        _ownsImage = false;
     }
 
     #region 処理関数
@@ -149,7 +166,6 @@ internal partial class PreviewZoomForm : Form
     #endregion
 
     #region イベントハンドラ
-
     private void ImageZoomForm_MouseWheel(object? sender, MouseEventArgs e)
     {
         float oldZoom = _zoom;
@@ -177,7 +193,7 @@ internal partial class PreviewZoomForm : Form
         e.Graphics.ScaleTransform(_zoom, _zoom);
         e.Graphics.DrawImage(_image, 0, 0);
 
-        if (_selectionPenMap != null) SelectionUtils.SetSelectionPreviewMap(e.Graphics, _selectionPenMap);
+        if (_selectionPenMap != null) FormUtils.DrawSelectionMap(e.Graphics, _selectionPenMap);
 
         e.Graphics.ResetTransform();
 
@@ -188,7 +204,7 @@ internal partial class PreviewZoomForm : Form
     {
         if (ModifierKeys.HasFlag(Keys.Control))
         {
-            if ((e.Button == MouseButtons.Left || e.Button == MouseButtons.Right) && isPanning)
+            if ((e.Button == MouseButtons.Left || e.Button == MouseButtons.Right) && _isPanning)
             {
                 _panOffset = new Point(
                     _panStart.X + (e.X - _mouseDownPosition.X),
@@ -200,7 +216,7 @@ internal partial class PreviewZoomForm : Form
         }
         else
         {
-            NotifyMouseMoved(GetClickedPosition(e.Location), e);
+            PreviewMouseMoved?.Invoke(GetClickedPosition(e.Location), e);
         }
     }
 
@@ -210,26 +226,26 @@ internal partial class PreviewZoomForm : Form
         {
             if (e.Button == MouseButtons.Left || e.Button == MouseButtons.Right)
             {
-                isPanning = true;
+                _isPanning = true;
                 _mouseDownPosition = e.Location;
                 _panStart = _panOffset;
             }
         }
         else
         {
-            NotifyMouseDown(GetClickedPosition(e.Location), e);
+            PreviewMouseDown?.Invoke(GetClickedPosition(e.Location), e);
         }
     }
 
     private void PreviewZoomForm_MouseUp(object sender, MouseEventArgs e)
     {
-        if (ModifierKeys.HasFlag(Keys.Control) || isPanning)
+        if (ModifierKeys.HasFlag(Keys.Control) || _isPanning)
         {
-            isPanning = false;
+            _isPanning = false;
         }
         else
         {
-            NotifyMouseUp(GetClickedPosition(e.Location), e);
+            PreviewMouseUp?.Invoke(GetClickedPosition(e.Location), e);
         }
     }
 
@@ -259,27 +275,7 @@ internal partial class PreviewZoomForm : Form
             "　→ 画像の拡大 / 縮小"
         );
 
-    private void NotifyMouseDown(Point point, MouseEventArgs e)
-        => PreviewMouseDown?.Invoke(point, e);
-
-    private void NotifyMouseMoved(Point point, MouseEventArgs e)
-        => PreviewMouseMoved?.Invoke(point, e);
-
-    private void NotifyMouseUp(Point point, MouseEventArgs e)
-        => PreviewMouseUp?.Invoke(point, e);
-
     private void RequestUpdate()
-    {
-        int selectedIntex = previewImageMode.SelectedIndex;
-        RequestImageUpdate?.Invoke(selectedIntex, EventArgs.Empty);
-    }
-    #endregion
-
-    #region フォーム関連
-    private void PreviewZoomForm_FormClosing(object sender, FormClosingEventArgs e)
-    {
-        Visible = false;
-        e.Cancel = true;
-    }
+        => RequestImageUpdate?.Invoke(previewImageMode.SelectedIndex);
     #endregion
 }

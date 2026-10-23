@@ -1,272 +1,191 @@
-﻿using ColorChanger.Models;
-using ColorChanger.Utils;
-using System.Collections;
+﻿using System.Collections;
+using ColorChanger.Models;
 
 namespace ColorChanger.Forms;
 
-internal partial class SelectedAreaListForm : Form
+internal partial class SelectedAreaListForm : HideOnCloseForm
 {
     /// <summary>
-    /// 選択エリアの有効／無効が変更されたときに発生するイベント
+    /// 選択エリアの追加・削除・有効／無効の変更など、内容が変わったときに発生するイベント
     /// </summary>
-    internal event EventHandler? OnCheckedChanged;
+    internal event EventHandler? LayersChanged;
 
-    private int _selectedAreaCount = 0;
+    internal SelectionLayers Layers { get; } = new SelectionLayers();
 
-    /// <summary>
-    /// 現在有効な選択エリアの数
-    /// </summary>
-    internal int EnabledCount => _selectedAreaCount;
-
-    private int _selectedEraserAreaCount = 0;
-
-    /// <summary>
-    /// 現在有効な消去エリアの数
-    /// </summary>
-    internal int EnabledEraserAreaCount => _selectedEraserAreaCount;
-
-    private readonly List<SelectedArea> _selectedAreas = new List<SelectedArea>();
-
-    /// <summary>
-    /// 現在選択されているすべてのエリア
-    /// </summary>
-    internal BitArray SelectedArea
-    {
-        get
-        {
-            _selectedAreaCount = 0;
-            _selectedEraserAreaCount = 0;
-            BitArray selectedArea = BitArrayUtils.GetEmpty();
-
-            for (int i = _selectedAreas.Count - 1; i >= 0; i--)
-            {
-                var item = _selectedAreas[i];
-
-                if (item.Enabled)
-                {
-                    BitArrayUtils.Merge(ref selectedArea, item.SelectedPoints, item.IsEraser);
-
-                    if (item.IsEraser)
-                    {
-                        _selectedEraserAreaCount++;
-                    }
-                    else
-                    {
-                        _selectedAreaCount++;
-                    }
-                }
-            }
-
-            return selectedArea;
-        }
-    }
-
-    private static readonly ContextMenuStrip _contextMenu = new ContextMenuStrip();
-    private int _rightClickedIndex = -1;
+    private readonly ContextMenuStrip _contextMenu = new ContextMenuStrip();
     private readonly InputDialogForm _inputDialogForm = new InputDialogForm("新しいレイヤー名を入力してください", "レイヤー名の変更");
+
+    private int _rightClickedIndex = -1;
+    private bool _suppressItemCheck = false;
 
     internal SelectedAreaListForm()
     {
         InitializeComponent();
         Icon = FormUtils.GetSoftwareIcon();
 
-        _contextMenu.Items.Add("上へ移動").Click += MoveLayerUp;
-        _contextMenu.Items.Add("下へ移動").Click += MoveLayerDown;
-        _contextMenu.Items.Add("一番上へ移動").Click += MoveCheckedListBoxItemToTop;
-        _contextMenu.Items.Add("一番下へ移動").Click += MoveCheckedListBoxItemToBottom;
+        _contextMenu.Items.Add("上へ移動").Click += (s, e) => MoveLayerUp();
+        _contextMenu.Items.Add("下へ移動").Click += (s, e) => MoveLayerDown();
+        _contextMenu.Items.Add("一番上へ移動").Click += (s, e) => MoveLayerToTop();
+        _contextMenu.Items.Add("一番下へ移動").Click += (s, e) => MoveLayerToBottom();
         _contextMenu.Items.Add(new ToolStripSeparator());
-        _contextMenu.Items.Add("選択用レイヤーに変換").Click += MakeSelectionLayer;
-        _contextMenu.Items.Add("消去用レイヤーに変換").Click += MakeEraserLayer;
+        _contextMenu.Items.Add("選択用レイヤーに変換").Click += (s, e) => SetLayerEraser(false);
+        _contextMenu.Items.Add("消去用レイヤーに変換").Click += (s, e) => SetLayerEraser(true);
         _contextMenu.Items.Add(new ToolStripSeparator());
-        _contextMenu.Items.Add("名前を変更").Click += RenameLayer;
+        _contextMenu.Items.Add("名前を変更").Click += (s, e) => RenameLayer();
         _contextMenu.Items.Add(new ToolStripSeparator());
-        _contextMenu.Items.Add("レイヤーを削除").Click += RemoveLayer;
+        _contextMenu.Items.Add("レイヤーを削除").Click += (s, e) => RemoveLayer();
 
         selectedValuesList.ContextMenuStrip = _contextMenu;
     }
 
     /// <summary>
-    /// 選択エリアをクリアします。
+    /// 選択エリアを追加する。同じ内容のエリアがある場合は有効にする。
     /// </summary>
-    internal void Clear()
+    internal void Add(BitArray values, bool isEraser = false)
     {
-        _selectedAreas.Clear();
-        selectedValuesList.Items.Clear();
+        Layers.Add(values, isEraser);
+        Commit();
     }
 
     /// <summary>
-    /// 最後に追加されたものを削除します。
+    /// 最後に追加されたエリアを削除する。
     /// </summary>
     internal void RemoveLast()
     {
-        if (_selectedAreas.Count == 0) return;
+        if (Layers.Count == 0) return;
 
-        int lastIndex = _selectedAreas.Count - 1;
-
-        _selectedAreas.RemoveAt(lastIndex);
-        selectedValuesList.Items.RemoveAt(lastIndex);
-
-        RefleshPriorityText();
-        TriggerCheckedChanged();
+        Layers.RemoveLast();
+        Commit();
     }
 
     /// <summary>
-    /// 渡されたBitArrayを選択エリアとして追加します。
+    /// 選択エリアをすべて削除する。
     /// </summary>
-    /// <param name="values"></param>
-    /// <param name="isEraser"></param>
-    internal void Add(BitArray values, bool isEraser = false)
+    internal void Clear()
     {
-        for (int i = 0; i < _selectedAreas.Count; i++)
+        Layers.Clear();
+        RebuildList();
+    }
+
+    /// <summary>
+    /// 一覧表示を更新し、変更を通知する
+    /// </summary>
+    private void Commit()
+    {
+        RebuildList();
+        LayersChanged?.Invoke(this, EventArgs.Empty);
+    }
+
+    /// <summary>
+    /// モデルの内容から一覧表示を作り直す
+    /// </summary>
+    private void RebuildList()
+    {
+        _suppressItemCheck = true;
+        try
         {
-            if (_selectedAreas[i].IsEraser == isEraser && BitArrayUtils.Equals(_selectedAreas[i].SelectedPoints, values))
+            selectedValuesList.BeginUpdate();
+            selectedValuesList.Items.Clear();
+
+            for (int i = 0; i < Layers.Count; i++)
             {
-                selectedValuesList.SetItemChecked(i, true);
-                return;
+                SelectedArea layer = Layers.Items[i];
+                selectedValuesList.Items.Add(FormatLayerText(layer, i + 1), layer.Enabled);
             }
-        }
 
-        int index = 1;
-        while (_selectedAreas.Any(selectedArea => selectedArea.Index == index))
+            selectedValuesList.EndUpdate();
+        }
+        finally
         {
-            index++;
+            _suppressItemCheck = false;
         }
-
-        SelectedArea selectedArea = new SelectedArea(index, true, values, isEraser);
-
-        _selectedAreas.Add(selectedArea);
-        selectedValuesList.Items.Add(selectedArea.ToString(-1), true);
-
-        RefleshPriorityText();
     }
 
-    private void RefleshPriorityText()
-    {
-        for (int i = 0; i < selectedValuesList.Items.Count; i++)
-        {
-            selectedValuesList.Items[i] = _selectedAreas[i].ToString(i + 1);
-        }
-    }
+    private static string FormatLayerText(SelectedArea layer, int position)
+        => $"{position}  |  {(layer.IsEraser ? "消去" : "選択")}  |  {layer.LayerName}  ({layer.Count:N0}px)";
+
+    private bool IsValidRightClickedIndex
+        => _rightClickedIndex >= 0 && _rightClickedIndex < Layers.Count;
 
     #region 右クリックメニュー処理
-    private void MoveLayerUp(object? sender, EventArgs e)
+    private void MoveLayerUp()
     {
-        if (_rightClickedIndex <= 0) return;
+        if (_rightClickedIndex <= 0 || _rightClickedIndex >= Layers.Count) return;
 
-        SwapLayers(_rightClickedIndex, _rightClickedIndex - 1);
+        Layers.Move(_rightClickedIndex, _rightClickedIndex - 1);
         _rightClickedIndex--;
-
-        RefleshPriorityText();
-        TriggerCheckedChanged();
+        Commit();
     }
 
-    private void MoveLayerDown(object? sender, EventArgs e)
+    private void MoveLayerDown()
     {
-        if (_rightClickedIndex == -1 || _rightClickedIndex >= _selectedAreas.Count - 1) return;
+        if (!IsValidRightClickedIndex || _rightClickedIndex >= Layers.Count - 1) return;
 
-        SwapLayers(_rightClickedIndex, _rightClickedIndex + 1);
+        Layers.Move(_rightClickedIndex, _rightClickedIndex + 1);
         _rightClickedIndex++;
-
-        RefleshPriorityText();
-        TriggerCheckedChanged();
+        Commit();
     }
 
-    private void MoveCheckedListBoxItemToTop(object? sender, EventArgs e)
+    private void MoveLayerToTop()
     {
-        if (_rightClickedIndex <= 0) return;
+        if (_rightClickedIndex <= 0 || _rightClickedIndex >= Layers.Count) return;
 
-        for (int i = _rightClickedIndex; i > 0; i--)
-        {
-            SwapLayers(i, i - 1);
-        }
-
-        RefleshPriorityText();
-        TriggerCheckedChanged();
+        Layers.Move(_rightClickedIndex, 0);
+        _rightClickedIndex = 0;
+        Commit();
     }
 
-    private void MoveCheckedListBoxItemToBottom(object? sender, EventArgs e)
+    private void MoveLayerToBottom()
     {
-        int last = _selectedAreas.Count - 1;
-        if (_rightClickedIndex == -1 || _rightClickedIndex >= last) return;
+        if (!IsValidRightClickedIndex || _rightClickedIndex >= Layers.Count - 1) return;
 
-        for (int i = _rightClickedIndex; i < last; i++)
-        {
-            SwapLayers(i, i + 1);
-        }
-
-        RefleshPriorityText();
-        TriggerCheckedChanged();
+        Layers.Move(_rightClickedIndex, Layers.Count - 1);
+        _rightClickedIndex = Layers.Count - 1;
+        Commit();
     }
 
-    private void SwapLayers(int index1, int index2)
+    private void SetLayerEraser(bool isEraser)
     {
-        (_selectedAreas[index1], _selectedAreas[index2]) = (_selectedAreas[index2], _selectedAreas[index1]);
-        (selectedValuesList.Items[index2], selectedValuesList.Items[index1]) = (selectedValuesList.Items[index1], selectedValuesList.Items[index2]);
+        if (!IsValidRightClickedIndex) return;
+
+        Layers.SetEraser(_rightClickedIndex, isEraser);
+        Commit();
     }
 
-    private void MakeSelectionLayer(object? sender, EventArgs e)
+    private void RenameLayer()
     {
-        if (_rightClickedIndex == -1) return;
+        if (!IsValidRightClickedIndex) return;
 
-        _selectedAreas[_rightClickedIndex].IsEraser = false;
-
-        RefleshPriorityText();
-        TriggerCheckedChanged();
-    }
-
-    private void MakeEraserLayer(object? sender, EventArgs e)
-    {
-        if (_rightClickedIndex == -1) return;
-
-        _selectedAreas[_rightClickedIndex].IsEraser = true;
-
-        RefleshPriorityText();
-        TriggerCheckedChanged();
-    }
-
-    private void RenameLayer(object? sender, EventArgs e)
-    {
-        if (_rightClickedIndex == -1) return;
-
-        SelectedArea area = _selectedAreas[_rightClickedIndex];
-
-        string? newName = _inputDialogForm.ShowDialog(area.GetLayerName());
-
+        string? newName = _inputDialogForm.ShowDialog(Layers.Items[_rightClickedIndex].LayerName);
         if (!string.IsNullOrEmpty(newName))
         {
-            area.CustomLayerName = newName;
+            Layers.Rename(_rightClickedIndex, newName);
         }
 
-        RefleshPriorityText();
+        RebuildList();
     }
 
-    private void RemoveLayer(object? sender, EventArgs e)
+    private void RemoveLayer()
     {
-        if (_rightClickedIndex == -1) return;
+        if (!IsValidRightClickedIndex) return;
 
-        SelectedArea selectedArea = _selectedAreas[_rightClickedIndex];
-        bool result = FormUtils.ShowConfirm($"このレイヤーを削除しますか？\n\nレイヤー名: {selectedArea.GetLayerName()}\nピクセル数: {selectedArea.Count:N0}");
+        SelectedArea layer = Layers.Items[_rightClickedIndex];
+        bool result = FormUtils.ShowConfirm($"このレイヤーを削除しますか？\n\nレイヤー名: {layer.LayerName}\nピクセル数: {layer.Count:N0}");
         if (!result) return;
 
-        _selectedAreas.RemoveAt(_rightClickedIndex);
-        selectedValuesList.Items.RemoveAt(_rightClickedIndex);
-
-        RefleshPriorityText();
-        TriggerCheckedChanged();
+        Layers.RemoveAt(_rightClickedIndex);
+        Commit();
     }
     #endregion
 
     #region イベントハンドラー
     private void SelectedValuesList_ItemCheck(object? sender, ItemCheckEventArgs e)
     {
-        bool isChecked = e.NewValue == CheckState.Checked;
-        int index = e.Index;
+        if (_suppressItemCheck) return;
+        if (e.Index < 0 || e.Index >= Layers.Count) return;
 
-        if (index < 0 || index >= _selectedAreas.Count) return;
-
-        _selectedAreas[index].Enabled = isChecked;
-
-        TriggerCheckedChanged();
+        Layers.SetEnabled(e.Index, e.NewValue == CheckState.Checked);
+        LayersChanged?.Invoke(this, EventArgs.Empty);
     }
 
     private void SelectedValuesList_MouseDown(object sender, MouseEventArgs e)
@@ -285,16 +204,5 @@ internal partial class SelectedAreaListForm : Form
 
     private void SelectedValuesList_SelectedIndexChanged(object sender, EventArgs e)
         => selectedValuesList.SelectedIndex = -1;
-
-    private void TriggerCheckedChanged()
-        => OnCheckedChanged?.Invoke(this, EventArgs.Empty);
-    #endregion
-
-    #region フォーム関連
-    private void SelectedAreaListForm_FormClosing(object sender, FormClosingEventArgs e)
-    {
-        Visible = false;
-        e.Cancel = true;
-    }
     #endregion
 }

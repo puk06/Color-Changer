@@ -1,4 +1,4 @@
-﻿namespace ColorChanger.UserControls
+﻿namespace ColorChanger.Forms
 {
     partial class ColorPalette
     {

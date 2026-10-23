@@ -390,7 +390,6 @@ namespace ColorChanger.Forms
             Name = "BalanceModeSettingsForm";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Balance Mode Settings by Color Changer";
-            FormClosing += BalanceModeSettings_FormClosing;
             balanceModeSettingsTab.ResumeLayout(false);
             v1Settings.ResumeLayout(false);
             v1Settings.PerformLayout();

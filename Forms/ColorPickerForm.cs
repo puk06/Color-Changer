@@ -1,9 +1,8 @@
-﻿using ColorChanger.Utils;
-using ColorChanger.UserControls;
+﻿using ColorChanger.Services;
 
 namespace ColorChanger.Forms;
 
-internal partial class ColorPickerForm : Form
+internal partial class ColorPickerForm : HideOnCloseForm
 {
     /// <summary>
     /// 色が変更されたときに発生するイベント
@@ -73,7 +72,7 @@ internal partial class ColorPickerForm : Form
         greenTextBox.Text = color.G.ToString();
         blueTextBox.Text = color.B.ToString();
 
-        colorCodeTextBox.Text = ColorUtils.GetColorCodeFromColor(color);
+        colorCodeTextBox.Text = ColorService.GetColorCodeFromColor(color);
         NotifyColorChanged();
     }
 
@@ -82,9 +81,9 @@ internal partial class ColorPickerForm : Form
     /// </summary>
     private void SetColorFromTextFields()
     {
-        int r = MathUtils.ParseAndClamp(redTextBox.Text);
-        int g = MathUtils.ParseAndClamp(greenTextBox.Text);
-        int b = MathUtils.ParseAndClamp(blueTextBox.Text);
+        int r = MathHelper.ParseAndClamp(redTextBox.Text);
+        int g = MathHelper.ParseAndClamp(greenTextBox.Text);
+        int b = MathHelper.ParseAndClamp(blueTextBox.Text);
 
         Color color = Color.FromArgb(r, g, b);
         UpdateSelectedColor(color);
@@ -116,7 +115,7 @@ internal partial class ColorPickerForm : Form
     {
         if (!FormUtils.IsNavigationKey(e)) return;
 
-        Color color = ColorUtils.GetColorFromColorCode(colorCodeTextBox.Text);
+        Color color = ColorService.GetColorFromColorCode(colorCodeTextBox.Text);
         if (color == Color.Empty) return;
 
         UpdateSelectedColor(color);
@@ -143,11 +142,4 @@ internal partial class ColorPickerForm : Form
         => ColorChanged?.Invoke(this, EventArgs.Empty);
     #endregion
 
-    #region フォーム関連
-    private void ColorPicker_FormClosing(object sender, FormClosingEventArgs e)
-    {
-        Visible = false;
-        e.Cancel = true;
-    }
-    #endregion
 }

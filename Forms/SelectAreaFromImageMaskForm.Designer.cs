@@ -134,7 +134,6 @@
             Name = "SelectAreaFromImageMaskForm";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Select Area From Image Mask by Color Changer";
-            FormClosing += ImageMaskForm_FormClosing;
             DragDrop += SelectAreaFromImageMaskForm_DragDrop;
             DragEnter += SelectAreaFromImageMaskForm_DragEnter;
             ((System.ComponentModel.ISupportInitialize)previewBox).EndInit();
