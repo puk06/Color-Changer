@@ -184,7 +184,6 @@ internal partial class MainForm : Form
         previousColorBox.BackColor = selectedColor;
         _previousColor = selectedColor;
         _colorPickerForm.SetInitialColor(selectedColor);
-        if (_newColor == Color.Empty) _colorPickerForm.SetColor(selectedColor);
 
         UpdateColorData();
         RenderColoredPreview();
