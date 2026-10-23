@@ -2,7 +2,7 @@
 
 internal static class AppInfo
 {
-    internal const string Version = "v1.0.21";
+    internal const string Version = "v1.1.0";
 
     internal static string Title => $"Color Changer For Texture {Version}";
 
