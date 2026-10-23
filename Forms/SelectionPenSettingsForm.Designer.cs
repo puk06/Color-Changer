@@ -169,7 +169,6 @@
             Name = "SelectionPenSettingsForm";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Selection Pen By Color Changer";
-            FormClosing += SelectionPenSettingsForm_FormClosing;
             KeyDown += SelectionPenSettingsForm_KeyDown;
             ((System.ComponentModel.ISupportInitialize)penWidth).EndInit();
             ResumeLayout(false);

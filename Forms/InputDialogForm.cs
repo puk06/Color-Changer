@@ -1,6 +1,4 @@
-﻿using ColorChanger.Utils;
-
-namespace ColorChanger.Forms;
+﻿namespace ColorChanger.Forms;
 
 internal class InputDialogForm : Form
 {

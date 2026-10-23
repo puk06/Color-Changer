@@ -207,7 +207,6 @@
             Name = "HelpForm";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "How to use Color Changer";
-            FormClosing += HelpForm_FormClosing;
             ResumeLayout(false);
             PerformLayout();
         }

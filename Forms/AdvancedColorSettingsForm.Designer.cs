@@ -203,7 +203,6 @@
             Name = "AdvancedColorSettingsForm";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Advanced Color Settings by Color Changer";
-            FormClosing += AdvancedColorSettingsForm_FormClosing;
             settingsPanel.ResumeLayout(false);
             settingsPanel.PerformLayout();
             ResumeLayout(false);

@@ -1,5 +1,4 @@
-﻿using ColorChanger.UserControls;
-
+﻿
 namespace ColorChanger.Forms
 {
     partial class ColorPickerForm
@@ -266,7 +265,6 @@ namespace ColorChanger.Forms
             Name = "ColorPickerForm";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Color Picker by Color Changer";
-            FormClosing += ColorPicker_FormClosing;
             ((System.ComponentModel.ISupportInitialize)redBar).EndInit();
             ((System.ComponentModel.ISupportInitialize)blueBar).EndInit();
             ((System.ComponentModel.ISupportInitialize)greenBar).EndInit();
@@ -292,7 +290,7 @@ namespace ColorChanger.Forms
         private TextBox colorCodeTextBox;
         private Label label6;
         private Button resetButton;
-        private UserControls.ColorPalette colorPalette;
+        private ColorPalette colorPalette;
         private Label label4;
     }
 }

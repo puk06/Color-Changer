@@ -1,8 +1,6 @@
-﻿using ColorChanger.Utils;
+﻿namespace ColorChanger.Forms;
 
-namespace ColorChanger.Forms;
-
-internal partial class HelpForm : Form
+internal partial class HelpForm : HideOnCloseForm
 {
     private static readonly string BasicUsageMessage = "このソフトの基本的な使い方:\n" +
         "- 変更前の色と変更後の色の差を全体に適用する、シンプルな色改変のやり方です。\n\n" +
@@ -150,14 +148,6 @@ internal partial class HelpForm : Form
     private void Button11_Click(object sender, EventArgs e)
     {
         descriptionText.Text = MaskModeMessage;
-    }
-    #endregion
-
-    #region フォーム関連
-    private void HelpForm_FormClosing(object sender, FormClosingEventArgs e)
-    {
-        Visible = false;
-        e.Cancel = true;
     }
     #endregion
 }

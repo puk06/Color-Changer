@@ -1,9 +1,9 @@
 ﻿using ColorChanger.Models;
-using ColorChanger.Utils;
+using ColorChanger.Services;
 
 namespace ColorChanger.Forms;
 
-internal partial class AdvancedColorSettingsForm : Form
+internal partial class AdvancedColorSettingsForm : HideOnCloseForm
 {
     /// <summary>
     /// 設定値が変更されたときに発生するイベント
@@ -62,11 +62,11 @@ internal partial class AdvancedColorSettingsForm : Form
     #region Configuration関連
     private void SetConfigurationFromInputs()
     {
-        _configuration.Brightness = MathUtils.ParseDoubleOrDefault(brightness.Text, 1.0);
-        _configuration.Contrast = MathUtils.ParseDoubleOrDefault(contrast.Text, 1.0);
-        _configuration.Gamma = MathUtils.ParseDoubleOrDefault(gamma.Text, 1.0);
-        _configuration.Exposure = MathUtils.ParseDoubleOrDefault(exposure.Text);
-        _configuration.Transparency = MathUtils.ParseDoubleOrDefault(transparency.Text);
+        _configuration.Brightness = MathHelper.ParseDoubleOrDefault(brightness.Text, 1.0);
+        _configuration.Contrast = MathHelper.ParseDoubleOrDefault(contrast.Text, 1.0);
+        _configuration.Gamma = MathHelper.ParseDoubleOrDefault(gamma.Text, 1.0);
+        _configuration.Exposure = MathHelper.ParseDoubleOrDefault(exposure.Text);
+        _configuration.Transparency = MathHelper.ParseDoubleOrDefault(transparency.Text);
     }
 
     private void ApplyConfigurationToInputs(AdvancedColorConfiguration config)
@@ -95,13 +95,5 @@ internal partial class AdvancedColorSettingsForm : Form
 
     private void NotifyConfigurationChanged()
         => ConfigurationChanged?.Invoke(this, EventArgs.Empty);
-    #endregion
-
-    #region フォーム関連
-    private void AdvancedColorSettingsForm_FormClosing(object sender, FormClosingEventArgs e)
-    {
-        Visible = false;
-        e.Cancel = true;
-    }
     #endregion
 }

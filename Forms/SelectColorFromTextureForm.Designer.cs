@@ -173,7 +173,6 @@
             Name = "SelectColorFromTextureForm";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Select Color From Texture by Color Changer";
-            FormClosing += SelectColorFromTextureForm_FormClosing;
             DragDrop += SelectColorFromTextureForm_DragDrop;
             DragEnter += SelectColorFromTextureForm_DragEnter;
             ((System.ComponentModel.ISupportInitialize)previewBox).EndInit();

@@ -1,15 +1,12 @@
-﻿using ColorChanger.Utils;
-using System.Diagnostics;
+﻿using ColorChanger.Services;
 
-namespace ColorChanger.UserControls;
+namespace ColorChanger.Forms;
 
 public partial class ColorPalette : UserControl
 {
-    private const int COLOR_UPDATE_DEBOUNCE_TIME = 30;
-
     public event EventHandler<Color>? ColorSelected;
 
-    private readonly Stopwatch _updateDebounceStopwatch = Stopwatch.StartNew();
+    private readonly Throttle _updateThrottle = new Throttle(30);
     private int _clickedHueY = 1;
     private Color _hueColor = Color.Empty;
     private Point _clickedPoint = Point.Empty;
@@ -29,7 +26,7 @@ public partial class ColorPalette : UserControl
     /// <param name="target"></param>
     public void SelectColor(Color target)
     {
-        ColorUtils.RGBtoHSV(target, out double targetHue, out double _, out double _);
+        ColorService.RGBtoHSV(target, out double targetHue, out double _, out double _);
 
         int hueY = (int)((targetHue / 360.0) * (hueSlider.Height - 1));
         hueY = Math.Clamp(hueY, 0, hueSlider.Height - 1);
@@ -37,7 +34,7 @@ public partial class ColorPalette : UserControl
         UpdateHueColor(hueY);
 
         if (colorMap.Image is not Bitmap colorMapBitmap) return;
-        _clickedPoint = BitmapUtils.GetClosestPoint(colorMapBitmap, target);
+        _clickedPoint = ColorService.FindClosestPoint(colorMapBitmap, target);
 
         colorMap.Invalidate();
         hueSlider.Invalidate();
@@ -47,9 +44,7 @@ public partial class ColorPalette : UserControl
     private void HandleHueColorSelection(object? sender, MouseEventArgs e)
     {
         if (e.Button != MouseButtons.Left) return;
-
-        if (_updateDebounceStopwatch.ElapsedMilliseconds <= COLOR_UPDATE_DEBOUNCE_TIME) return;
-        _updateDebounceStopwatch.Restart();
+        if (!_updateThrottle.TryPass()) return;
 
         UpdateHueColor(e.Y);
 
@@ -60,9 +55,7 @@ public partial class ColorPalette : UserControl
     private void HandleColorMapSelection(object? sender, MouseEventArgs e)
     {
         if (e.Button != MouseButtons.Left) return;
-
-        if (_updateDebounceStopwatch.ElapsedMilliseconds <= COLOR_UPDATE_DEBOUNCE_TIME) return;
-        _updateDebounceStopwatch.Restart();
+        if (!_updateThrottle.TryPass()) return;
 
         UpdateColor(e.Location);
     }
@@ -115,7 +108,7 @@ public partial class ColorPalette : UserControl
             for (int x = 0; x < width; x++)
             {
                 float s = (float)x / (width - 1);
-                Color mixed = ColorUtils.InterpolateColor(targetColor, s, v);
+                Color mixed = ColorService.InterpolateColor(targetColor, s, v);
                 bmp.SetPixel(x, y, mixed);
             }
         }
@@ -136,16 +129,12 @@ public partial class ColorPalette : UserControl
     {
         if (_clickedPoint == Point.Empty) return;
 
-        Color inverseColor = ColorUtils.InverseColor(_selectedColor);
-
-        using Pen pen = new Pen(inverseColor, 2);
-        e.Graphics.DrawLine(pen, _clickedPoint.X - 5, _clickedPoint.Y, _clickedPoint.X + 5, _clickedPoint.Y);
-        e.Graphics.DrawLine(pen, _clickedPoint.X, _clickedPoint.Y - 5, _clickedPoint.X, _clickedPoint.Y + 5);
+        FormUtils.DrawCrosshair(e.Graphics, _clickedPoint, _selectedColor);
     }
 
     private void HueSlider_Paint(object sender, PaintEventArgs e)
     {
-        Color inverseColor = ColorUtils.InverseColor(_hueColor);
+        Color inverseColor = ColorService.InverseColor(_hueColor);
 
         using Pen pen = new Pen(inverseColor, 2);
         e.Graphics.DrawLine(pen, 0, _clickedHueY, hueSlider.Width, _clickedHueY);
@@ -158,7 +147,7 @@ public partial class ColorPalette : UserControl
         double saturation = (double)y / (barHeight - 1);
         double hue = saturation * 360.0;
 
-        return ColorUtils.ColorFromHSV(hue, 1.0f, 1.0f);
+        return ColorService.ColorFromHSV(hue, 1.0f, 1.0f);
     }
     #endregion
 }

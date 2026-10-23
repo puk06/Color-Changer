@@ -105,7 +105,6 @@
             Name = "PreviewZoomForm";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Zoom Preview By Color Changer";
-            FormClosing += PreviewZoomForm_FormClosing;
             Paint += PreviewZoomForm_Paint;
             MouseDown += PreviewZoomForm_MouseDown;
             MouseMove += PreviewZoomForm_MouseMove;
