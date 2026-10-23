@@ -50,7 +50,7 @@ internal partial class MainForm : Form
     }
 
     /// <summary>
-    /// •ПЌXЊг‚МђF‚Є‘I‘р‚і‚к‚Д‚ў‚й‚©‚З‚¤‚©‚рЋж“ѕ‚µ‚Ь‚·ЃB
+    /// е¤‰ж›ґеѕЊгЃ®и‰ІгЃЊйЃёжЉћгЃ•г‚ЊгЃ¦гЃ„г‚‹гЃ‹гЃ©гЃ†гЃ‹г‚’еЏ–еѕ—гЃ—гЃѕгЃ™гЂ‚
     /// </summary>
     internal bool NewColorSelected
         => _newColor != Color.Empty;
@@ -95,9 +95,9 @@ internal partial class MainForm : Form
         coloredPreviewBox.MouseMove += (s, e) => SelectPreviousColor(true, e);
     }
 
-    #region ђF‘I‘рЉЦA
+    #region и‰ІйЃёжЉћй–ўйЂЈ
     /// <summary>
-    /// •ПЌX‘O‚МђF‚р‘I‘р‚·‚йЃB
+    /// е¤‰ж›ґе‰ЌгЃ®и‰Іг‚’йЃёжЉћгЃ™г‚‹гЂ‚
     /// </summary>
     /// <param name="isMouseMoving"></param>
     /// <param name="e"></param>
@@ -133,9 +133,9 @@ internal partial class MainForm : Form
     }
     #endregion
 
-    #region Џ€—ќЉЦA
+    #region е‡¦зђ†й–ўйЂЈ
     /// <summary>
-    /// ђF‚р•ПЌX‚·‚й
+    /// и‰Іг‚’е¤‰ж›ґгЃ™г‚‹
     /// </summary>
     /// <param name="filePath"></param>
     private void ApplyColorChange(string filePath)
@@ -197,7 +197,7 @@ internal partial class MainForm : Form
                 }
                 else
                 {
-                    FormUtils.ShowError("“§‰Я—p‰ж‘њ‚ЄЌмђ¬‚Е‚«‚Ь‚№‚с‚Е‚µ‚ЅЃB");
+                    FormUtils.ShowError("йЂЏйЃЋз”Ёз”»еѓЏгЃЊдЅњж€ђгЃ§гЃЌгЃѕгЃ›г‚“гЃ§гЃ—гЃџгЂ‚");
                 }
             }
             else
@@ -206,23 +206,23 @@ internal partial class MainForm : Form
             }
 
             bitMap.Dispose();
-            FormUtils.ShowInfo("ѓeѓNѓXѓ`ѓѓ‰ж‘њ‚МЌмђ¬‚ЄЉ®—№‚µ‚Ь‚µ‚ЅЃB");
+            FormUtils.ShowInfo("гѓ†г‚Їг‚№гѓЃгѓЈз”»еѓЏгЃ®дЅњж€ђгЃЊе®Њдє†гЃ—гЃѕгЃ—гЃџгЂ‚");
 
             FileSystemUtils.OpenFilePath(filePath);
         }
         catch (Exception ex)
         {
-            FormUtils.ShowError($"ѓeѓNѓXѓ`ѓѓ‰ж‘њЌмђ¬’†‚ЙѓGѓ‰Ѓ[‚Є”­ђ¶‚µ‚Ь‚µ‚ЅЃB\n{ex}");
+            FormUtils.ShowError($"гѓ†г‚Їг‚№гѓЃгѓЈз”»еѓЏдЅњж€ђдё­гЃ«г‚Ёгѓ©гѓјгЃЊз™єз”џгЃ—гЃѕгЃ—гЃџгЂ‚\n{ex}");
         }
         finally
         {
             makeButton.Enabled = true;
-            makeButton.Text = "Ќмђ¬";
+            makeButton.Text = "дЅњж€ђ";
         }
     }
 
     /// <summary>
-    /// ‰ж‘њ‚рЏ€—ќ‚·‚й
+    /// з”»еѓЏг‚’е‡¦зђ†гЃ™г‚‹
     /// </summary>
     /// <param name="sourcePixels"></param>
     /// <param name="rawPixels"></param>
@@ -244,7 +244,7 @@ internal partial class MainForm : Form
         {
             if (transparentMode.Checked)
             {
-                FormUtils.ShowInfo("‘I‘рѓGѓЉѓA‚Є‚И‚©‚Б‚Ѕ‚Ѕ‚ЯЃA“§‰Яѓ‚Ѓ[ѓhЃAѓ}ѓXѓNѓ‚Ѓ[ѓh‚НѓXѓLѓbѓv‚і‚к‚Ь‚·ЃB");
+                FormUtils.ShowInfo("йЃёжЉћг‚ЁгѓЄг‚ўгЃЊгЃЄгЃ‹гЃЈгЃџгЃџг‚ЃгЂЃйЂЏйЃЋгѓўгѓјгѓ‰гЂЃгѓћг‚№г‚Їгѓўгѓјгѓ‰гЃЇг‚№г‚­гѓѓгѓ—гЃ•г‚ЊгЃѕгЃ™гЂ‚");
                 skipped = true;
             }
 
@@ -259,7 +259,7 @@ internal partial class MainForm : Form
             else
             {
                 if (transPixels.IsEmpty)
-                    FormUtils.ShowError("“§‰Я‰ж‘њ—pѓfЃ[ѓ^‚МЋж“ѕ‚ЙЋё”s‚µ‚Ь‚µ‚ЅЃBѓfѓtѓHѓ‹ѓg‚М‰ж‘њ‚ЄЋg—p‚і‚к‚Ь‚·ЃB");
+                    FormUtils.ShowError("йЂЏйЃЋз”»еѓЏз”Ёгѓ‡гѓјг‚їгЃ®еЏ–еѕ—гЃ«е¤±ж•—гЃ—гЃѕгЃ—гЃџгЂ‚гѓ‡гѓ•г‚©гѓ«гѓ€гЃ®з”»еѓЏгЃЊдЅїз”ЁгЃ•г‚ЊгЃѕгЃ™гЂ‚");
 
                 processor.ProcessTransparentSelectedPixels(sourcePixels, transPixels, selectedPoints);
             }
@@ -274,7 +274,7 @@ internal partial class MainForm : Form
 
             if (rawPixels.IsEmpty)
             {
-                FormUtils.ShowError("Њі‰ж‘њ‚МѓfЃ[ѓ^‚МЋж“ѕ‚ЙЋё”s‚µ‚Ь‚µ‚ЅЃB‘I‘р”Ѕ“]ѓ‚Ѓ[ѓh‚МЊ‹‰К‚НЌмђ¬‚і‚к‚Ь‚№‚сЃB");
+                FormUtils.ShowError("е…ѓз”»еѓЏгЃ®гѓ‡гѓјг‚їгЃ®еЏ–еѕ—гЃ«е¤±ж•—гЃ—гЃѕгЃ—гЃџгЂ‚йЃёжЉћеЏЌи»ўгѓўгѓјгѓ‰гЃ®зµђжћњгЃЇдЅњж€ђгЃ•г‚ЊгЃѕгЃ›г‚“гЂ‚");
             }
             else
             {
@@ -290,7 +290,7 @@ internal partial class MainForm : Form
     }
 
     /// <summary>
-    /// ѓvѓЊѓrѓ…Ѓ[—p‚Мѓrѓbѓgѓ}ѓbѓv‚рђ¶ђ¬‚·‚й
+    /// гѓ—гѓ¬гѓ“гѓҐгѓјз”ЁгЃ®гѓ“гѓѓгѓ€гѓћгѓѓгѓ—г‚’з”џж€ђгЃ™г‚‹
     /// </summary>
     /// <param name="sourceBitmap"></param>
     /// <param name="rawMode"></param>
@@ -315,26 +315,26 @@ internal partial class MainForm : Form
         }
         catch (Exception ex)
         {
-            FormUtils.ShowError($"ѓvѓЊѓrѓ…Ѓ[‰ж‘њ‚Мђ¶ђ¬‚ЙЋё”s‚µ‚Ь‚µ‚ЅЃB\n{ex.Message}");
+            FormUtils.ShowError($"гѓ—гѓ¬гѓ“гѓҐгѓјз”»еѓЏгЃ®з”џж€ђгЃ«е¤±ж•—гЃ—гЃѕгЃ—гЃџгЂ‚\n{ex.Message}");
             return sourceBitmap;
         }
     }
 
     /// <summary>
-    /// ‰ж‘њѓtѓ@ѓCѓ‹‚р“З‚ЭЌћ‚Ю
+    /// з”»еѓЏгѓ•г‚Ўг‚¤гѓ«г‚’иЄ­гЃїиѕјг‚Ђ
     /// </summary>
     /// <param name="path"></param>
     private void LoadPictureFile(string path)
     {
         if (!File.Exists(path))
         {
-            FormUtils.ShowError("ѓtѓ@ѓCѓ‹‚Є‘¶ЌЭ‚µ‚Ь‚№‚сЃB");
+            FormUtils.ShowError("гѓ•г‚Ўг‚¤гѓ«гЃЊе­ењЁгЃ—гЃѕгЃ›г‚“гЂ‚");
             return;
         }
 
         if (_bmp != null && _previousColor != Color.Empty && _newColor != Color.Empty && !_savedColorSettings)
         {
-            var result = FormUtils.ShowConfirm("Њ»ЌЭ‚МђFђЭ’и‚р•Ы‘¶‚№‚ё‚Й‰ж‘њ‚р•ПЌX‚µ‚ж‚¤‚Ж‚µ‚Д‚ў‚Ь‚·ЃB\n‰ж‘њ•ПЌX‘O‚Й•Ы‘¶‚µ‚Ь‚·‚©ЃH", "‰ж‘њ•ПЌX");
+            var result = FormUtils.ShowConfirm("зЏѕењЁгЃ®и‰ІиЁ­е®љг‚’дїќе­гЃ›гЃљгЃ«з”»еѓЏг‚’е¤‰ж›ґгЃ—г‚€гЃ†гЃЁгЃ—гЃ¦гЃ„гЃѕгЃ™гЂ‚\nз”»еѓЏе¤‰ж›ґе‰ЌгЃ«дїќе­гЃ—гЃѕгЃ™гЃ‹пјџ", "з”»еѓЏе¤‰ж›ґ");
             if (result) ExportColorSettings_Click(null, null);
         }
 
@@ -358,11 +358,11 @@ internal partial class MainForm : Form
         {
             if (exception is ArgumentException)
             {
-                FormUtils.ShowError("‰ж‘њ‚М“З‚ЭЌћ‚Э‚ЙЋё”s‚µ‚Ь‚µ‚ЅЃB”с‘О‰ћ‚Мѓtѓ@ѓCѓ‹‚Е‚·ЃB");
+                FormUtils.ShowError("з”»еѓЏгЃ®иЄ­гЃїиѕјгЃїгЃ«е¤±ж•—гЃ—гЃѕгЃ—гЃџгЂ‚йќћеЇѕеїњгЃ®гѓ•г‚Ўг‚¤гѓ«гЃ§гЃ™гЂ‚");
             }
             else
             {
-                FormUtils.ShowError("‰ж‘њ‚М“З‚ЭЌћ‚Э‚ЙЋё”s‚µ‚Ь‚µ‚ЅЃB\n\nѓGѓ‰Ѓ[: " + exception);
+                FormUtils.ShowError("з”»еѓЏгЃ®иЄ­гЃїиѕјгЃїгЃ«е¤±ж•—гЃ—гЃѕгЃ—гЃџгЂ‚\n\nг‚Ёгѓ©гѓј: " + exception);
             }
 
             BitmapUtils.DisposeBitmap(ref _bmp);
@@ -417,14 +417,14 @@ internal partial class MainForm : Form
     }
 
     /// <summary>
-    /// ђFЏо•сђЭ’иѓtѓ@ѓCѓ‹‚р“З‚ЭЌћ‚Ю
+    /// и‰Іжѓ…е ±иЁ­е®љгѓ•г‚Ўг‚¤гѓ«г‚’иЄ­гЃїиѕјг‚Ђ
     /// </summary>
     /// <param name="path"></param>
     private void LoadColorSettingsFile(string path)
     {
         if (!File.Exists(path))
         {
-            FormUtils.ShowError("ѓtѓ@ѓCѓ‹‚Є‘¶ЌЭ‚µ‚Ь‚№‚сЃB");
+            FormUtils.ShowError("гѓ•г‚Ўг‚¤гѓ«гЃЊе­ењЁгЃ—гЃѕгЃ›г‚“гЂ‚");
             return;
         }
 
@@ -434,22 +434,22 @@ internal partial class MainForm : Form
             ColorSettings? colorSettings = JsonSerializer.Deserialize<ColorSettings>(json);
             if (colorSettings == null)
             {
-                FormUtils.ShowError("ђFЏо•сђЭ’иѓtѓ@ѓCѓ‹‚М“З‚ЭЌћ‚Э‚ЙЋё”s‚µ‚Ь‚µ‚ЅЃB");
+                FormUtils.ShowError("и‰Іжѓ…е ±иЁ­е®љгѓ•г‚Ўг‚¤гѓ«гЃ®иЄ­гЃїиѕјгЃїгЃ«е¤±ж•—гЃ—гЃѕгЃ—гЃџгЂ‚");
             }
             else
             {
                 SetColorSettingsValues(colorSettings);
-                FormUtils.ShowInfo("ђFЏо•сђЭ’иѓtѓ@ѓCѓ‹‚М“З‚ЭЌћ‚Э‚Йђ¬Њч‚µ‚Ь‚µ‚ЅЃI");
+                FormUtils.ShowInfo("и‰Іжѓ…е ±иЁ­е®љгѓ•г‚Ўг‚¤гѓ«гЃ®иЄ­гЃїиѕјгЃїгЃ«ж€ђеЉџгЃ—гЃѕгЃ—гЃџпјЃ");
             }
         }
         catch
         {
-            FormUtils.ShowError("ђFЏо•сђЭ’иѓtѓ@ѓCѓ‹‚М“З‚ЭЌћ‚Э‚ЙЋё”s‚µ‚Ь‚µ‚ЅЃB");
+            FormUtils.ShowError("и‰Іжѓ…е ±иЁ­е®љгѓ•г‚Ўг‚¤гѓ«гЃ®иЄ­гЃїиѕјгЃїгЃ«е¤±ж•—гЃ—гЃѕгЃ—гЃџгЂ‚");
         }
     }
 
     /// <summary>
-    /// ђFЏо•сђЭ’иѓtѓ@ѓCѓ‹‚рЏo—Н‚·‚й
+    /// и‰Іжѓ…е ±иЁ­е®љгѓ•г‚Ўг‚¤гѓ«г‚’е‡єеЉ›гЃ™г‚‹
     /// </summary>
     /// <param name="path"></param>
     private void ExportColorSettingsFile(string path)
@@ -469,18 +469,18 @@ internal partial class MainForm : Form
             string json = JsonSerializer.Serialize(colorSettings);
             File.WriteAllText(path, json);
 
-            FormUtils.ShowInfo("ђFЏо•сђЭ’иѓtѓ@ѓCѓ‹‚МЏo—Н‚Йђ¬Њч‚µ‚Ь‚µ‚ЅЃI");
+            FormUtils.ShowInfo("и‰Іжѓ…е ±иЁ­е®љгѓ•г‚Ўг‚¤гѓ«гЃ®е‡єеЉ›гЃ«ж€ђеЉџгЃ—гЃѕгЃ—гЃџпјЃ");
             FileSystemUtils.OpenFilePath(path);
             _savedColorSettings = true;
         }
         catch
         {
-            FormUtils.ShowError("ђFЏо•сђЭ’иѓtѓ@ѓCѓ‹‚МЏo—Н‚ЙЋё”s‚µ‚Ь‚µ‚ЅЃB");
+            FormUtils.ShowError("и‰Іжѓ…е ±иЁ­е®љгѓ•г‚Ўг‚¤гѓ«гЃ®е‡єеЉ›гЃ«е¤±ж•—гЃ—гЃѕгЃ—гЃџгЂ‚");
         }
     }
 
     /// <summary>
-    /// —^‚¦‚з‚к‚ЅColorSettings‚М’l‚рЊі‚ЙForm‚М’l‚рђЭ’и‚µ‚Ь‚·
+    /// дёЋгЃ€г‚‰г‚ЊгЃџColorSettingsгЃ®еЂ¤г‚’е…ѓгЃ«FormгЃ®еЂ¤г‚’иЁ­е®љгЃ—гЃѕгЃ™
     /// </summary>
     /// <param name="colorSettings"></param>
     private void SetColorSettingsValues(ColorSettings colorSettings)
@@ -506,7 +506,7 @@ internal partial class MainForm : Form
     }
 
     /// <summary>
-    /// ‘I‘рѓGѓЉѓA‚рЌXђV‚·‚й
+    /// йЃёжЉћг‚ЁгѓЄг‚ўг‚’ж›ґж–°гЃ™г‚‹
     /// </summary>
     private void UpdateSelectedArea()
     {
@@ -525,18 +525,18 @@ internal partial class MainForm : Form
         }
         else
         {
-            Text = FORM_TITLE + " - ѓvѓЊѓrѓ…Ѓ[—p‚М‘I‘рѓGѓЉѓAЌмђ¬’†...";
+            Text = FORM_TITLE + " - гѓ—гѓ¬гѓ“гѓҐгѓјз”ЁгЃ®йЃёжЉћг‚ЁгѓЄг‚ўдЅњж€ђдё­...";
             _selectedPointsForPreview = BitmapUtils.ConvertSelectedAreaToPreviewBox(allSelectedAreas, _bmp, previewBox, inverseMode.Checked);
 
             int totalSelectedPoints = BitArrayUtils.GetCount(allSelectedAreas);
-            Text = FORM_TITLE + $" - {enabledCount} ЊВ‚М‘I‘рѓGѓЉѓA / {enabledEraserCount} ЊВ‚МЏБ‹ЋѓGѓЉѓA (‘Ќ‘I‘рѓsѓNѓZѓ‹ђ”: {totalSelectedPoints:N0})";
+            Text = FORM_TITLE + $" - {enabledCount} еЂ‹гЃ®йЃёжЉћг‚ЁгѓЄг‚ў / {enabledEraserCount} еЂ‹гЃ®ж¶€еЋ»г‚ЁгѓЄг‚ў (з·ЏйЃёжЉћгѓ”г‚Їг‚»гѓ«ж•°: {totalSelectedPoints:N0})";
         }
 
         BitmapUtils.SetImage(coloredPreviewBox, GenerateColoredPreview(_previewBitmap));
     }
 
     /// <summary>
-    /// ђF‚М’З‰БђЭ’и‚рЌXђV‚·‚й
+    /// и‰ІгЃ®иїЅеЉ иЁ­е®љг‚’ж›ґж–°гЃ™г‚‹
     /// </summary>
     private void UpdateColorConfigulation()
     {
@@ -544,12 +544,12 @@ internal partial class MainForm : Form
 
         if (_advancedColorSettingsForm.Configuration.Enabled)
         {
-            advancedColorConfigStatus.Text = "—LЊш";
+            advancedColorConfigStatus.Text = "жњ‰еЉ№";
             advancedColorConfigStatus.ForeColor = ColorUtils.DefaultForegroundColor;
         }
         else
         {
-            advancedColorConfigStatus.Text = "–іЊш";
+            advancedColorConfigStatus.Text = "з„ЎеЉ№";
             advancedColorConfigStatus.ForeColor = ColorUtils.DefaultUnselectedColor;
         }
 
@@ -558,7 +558,7 @@ internal partial class MainForm : Form
     }
 
     /// <summary>
-    /// ѓeѓNѓXѓ`ѓѓѓfЃ[ѓ^‚рЌXђV‚·‚й
+    /// гѓ†г‚Їг‚№гѓЃгѓЈгѓ‡гѓјг‚їг‚’ж›ґж–°гЃ™г‚‹
     /// </summary>
     private void UpdateTextureData()
     {
@@ -583,13 +583,13 @@ internal partial class MainForm : Form
     }
 
     /// <summary>
-    /// ђFЏо•с‚рЌXђV‚·‚й
+    /// и‰Іжѓ…е ±г‚’ж›ґж–°гЃ™г‚‹
     /// </summary>
     private void UpdateColorData()
     {
         if (_previousColor == Color.Empty)
         {
-            previousRGBLabel.Text = "–ў‘I‘р";
+            previousRGBLabel.Text = "жњЄйЃёжЉћ";
             previousRGBLabel.ForeColor = ColorUtils.DefaultUnselectedColor;
         }
         else
@@ -600,7 +600,7 @@ internal partial class MainForm : Form
 
         if (_newColor == Color.Empty)
         {
-            newRGBLabel.Text = "–ў‘I‘р";
+            newRGBLabel.Text = "жњЄйЃёжЉћ";
             newRGBLabel.ForeColor = ColorUtils.DefaultUnselectedColor;
         }
         else
@@ -622,9 +622,9 @@ internal partial class MainForm : Form
     }
     #endregion
 
-    #region ‘I‘рѓ‚Ѓ[ѓhЉЦA
+    #region йЃёжЉћгѓўгѓјгѓ‰й–ўйЂЈ
     /// <summary>
-    /// ‘I‘рѓ‚Ѓ[ѓh‚МЏ€—ќ
+    /// йЃёжЉћгѓўгѓјгѓ‰гЃ®е‡¦зђ†
     /// </summary>
     private void HandleSelectionMode(MouseEventArgs e, Color color, Point originalCoordinates, bool isMouseMoving)
     {
@@ -639,7 +639,7 @@ internal partial class MainForm : Form
 
         if (_previousColor == Color.Empty || _newColor == Color.Empty)
         {
-            FormUtils.ShowError("ђF‚Є‘I‘р‚і‚к‚Д‚ў‚Ь‚№‚сЃBЃiѓvѓЊѓrѓ…Ѓ[‚ЄЌмђ¬‚Е‚«‚Ь‚№‚сЃj");
+            FormUtils.ShowError("и‰ІгЃЊйЃёжЉћгЃ•г‚ЊгЃ¦гЃ„гЃѕгЃ›г‚“гЂ‚пј€гѓ—гѓ¬гѓ“гѓҐгѓјгЃЊдЅњж€ђгЃ§гЃЌгЃѕгЃ›г‚“пј‰");
             return;
         }
 
@@ -655,12 +655,12 @@ internal partial class MainForm : Form
 
         if (_backgroundColor == Color.Empty)
         {
-            FormUtils.ShowError("”wЊiђF‚Є‘I‘р‚і‚к‚Д‚ў‚Ь‚№‚сЃB");
+            FormUtils.ShowError("иѓЊж™Їи‰ІгЃЊйЃёжЉћгЃ•г‚ЊгЃ¦гЃ„гЃѕгЃ›г‚“гЂ‚");
             return;
         }
 
         string previousFormTitle = Text;
-        Text = FORM_TITLE + " - ‘I‘рЏ€—ќ’†...";
+        Text = FORM_TITLE + " - йЃёжЉће‡¦зђ†дё­...";
 
         BitArray? values = BitmapUtils.GetSelectedArea(
             originalCoordinates,
@@ -672,7 +672,7 @@ internal partial class MainForm : Form
 
         if (values == null || values.Length == 0)
         {
-            FormUtils.ShowError("‘I‘рѓGѓЉѓA‚Є‚ ‚и‚Ь‚№‚сЃB");
+            FormUtils.ShowError("йЃёжЉћг‚ЁгѓЄг‚ўгЃЊгЃ‚г‚ЉгЃѕгЃ›г‚“гЂ‚");
             return;
         }
 
@@ -686,9 +686,9 @@ internal partial class MainForm : Form
     }
     #endregion
 
-    #region ѓCѓxѓ“ѓgѓnѓ“ѓhѓ‰Ѓ[
+    #region г‚¤гѓ™гѓігѓ€гѓЏгѓігѓ‰гѓ©гѓј
     /// <summary>
-    /// ѓCѓxѓ“ѓgѓnѓ“ѓhѓ‰‚МѓZѓbѓgѓAѓbѓv
+    /// г‚¤гѓ™гѓігѓ€гѓЏгѓігѓ‰гѓ©гЃ®г‚»гѓѓгѓ€г‚ўгѓѓгѓ—
     /// </summary>
     private void SetupEventHandlers()
     {
@@ -780,19 +780,19 @@ internal partial class MainForm : Form
         {
             if (_bmp == null || _previewBitmap == null)
             {
-                FormUtils.ShowError("‰ж‘њ‚Є“З‚ЭЌћ‚Ь‚к‚Д‚ў‚Ь‚№‚сЃB");
+                FormUtils.ShowError("з”»еѓЏгЃЊиЄ­гЃїиѕјгЃѕг‚ЊгЃ¦гЃ„гЃѕгЃ›г‚“гЂ‚");
                 return;
             }
 
             if (_selectAreaFromImageMaskForm.SelectedArea == null || _selectAreaFromImageMaskForm.SelectedArea.Length == 0)
             {
-                FormUtils.ShowError("‘I‘рѓGѓЉѓA‚Є‚ ‚и‚Ь‚№‚сЃB");
+                FormUtils.ShowError("йЃёжЉћг‚ЁгѓЄг‚ўгЃЊгЃ‚г‚ЉгЃѕгЃ›г‚“гЂ‚");
                 return;
             }
             
             if ((_bmp.Width * _bmp.Height) != _selectAreaFromImageMaskForm.SelectedArea.Length)
             {
-                FormUtils.ShowError("‘I‘рѓGѓЉѓA‚ЄЊі‰ж‘њ‚МѓTѓCѓY‚Ж€Щ‚И‚и‚Ь‚·ЃB");
+                FormUtils.ShowError("йЃёжЉћг‚ЁгѓЄг‚ўгЃЊе…ѓз”»еѓЏгЃ®г‚µг‚¤г‚єгЃЁз•°гЃЄг‚ЉгЃѕгЃ™гЂ‚");
                 return;
             }
 
@@ -848,13 +848,13 @@ internal partial class MainForm : Form
     {
         if (_bmp == null)
         {
-            FormUtils.ShowError("‰ж‘њ‚Є“З‚ЭЌћ‚Ь‚к‚Д‚ў‚Ь‚№‚сЃB");
+            FormUtils.ShowError("з”»еѓЏгЃЊиЄ­гЃїиѕјгЃѕг‚ЊгЃ¦гЃ„гЃѕгЃ›г‚“гЂ‚");
             return;
         }
 
         if (_previousColor == Color.Empty)
         {
-            FormUtils.ShowError("•ПЌX‘O‚МђF‚Є‘I‘р‚і‚к‚Д‚ў‚Ь‚№‚сЃB(ѓvѓЊѓrѓ…Ѓ[‚ЄЌмђ¬‚Е‚«‚Ь‚№‚с)");
+            FormUtils.ShowError("е¤‰ж›ґе‰ЌгЃ®и‰ІгЃЊйЃёжЉћгЃ•г‚ЊгЃ¦гЃ„гЃѕгЃ›г‚“гЂ‚(гѓ—гѓ¬гѓ“гѓҐгѓјгЃЊдЅњж€ђгЃ§гЃЌгЃѕгЃ›г‚“)");
             return;
         }
 
@@ -867,21 +867,21 @@ internal partial class MainForm : Form
     {
         if (selectMode.Checked && _bmp == null)
         {
-            FormUtils.ShowError("‰ж‘њ‚Є“З‚ЭЌћ‚Ь‚к‚Д‚ў‚Ь‚№‚сЃB");
+            FormUtils.ShowError("з”»еѓЏгЃЊиЄ­гЃїиѕјгЃѕг‚ЊгЃ¦гЃ„гЃѕгЃ›г‚“гЂ‚");
             selectMode.Checked = false;
             return;
         }
 
         if (selectMode.Checked && (_previousColor == Color.Empty || _newColor == Color.Empty))
         {
-            FormUtils.ShowError("ђF‚Є‘I‘р‚і‚к‚Д‚ў‚Ь‚№‚сЃBЃiѓvѓЊѓrѓ…Ѓ[‚ЄЌмђ¬‚Е‚«‚Ь‚№‚сЃj");
+            FormUtils.ShowError("и‰ІгЃЊйЃёжЉћгЃ•г‚ЊгЃ¦гЃ„гЃѕгЃ›г‚“гЂ‚пј€гѓ—гѓ¬гѓ“гѓҐгѓјгЃЊдЅњж€ђгЃ§гЃЌгЃѕгЃ›г‚“пј‰");
             selectMode.Checked = false;
             return;
         }
 
         if (selectMode.Checked && _backgroundColor == Color.Empty)
         {
-            FormUtils.ShowInfo("‘I‘рѓ‚Ѓ[ѓh‚Є—LЊш‚Й‚И‚и‚Ь‚µ‚ЅЃB\nѓyѓ“ѓcЃ[ѓ‹€ИЉO‚ЕѓIѓuѓWѓFѓNѓg‘I‘р‚·‚йЏкЌ‡‚НЃA‚Н‚¶‚Я‚Й”wЊiђF‚р‰EѓNѓЉѓbѓN‚ЕђЭ’и‚µ‚Д‚­‚ѕ‚і‚ўЃB", "‘I‘рѓ‚Ѓ[ѓh");
+            FormUtils.ShowInfo("йЃёжЉћгѓўгѓјгѓ‰гЃЊжњ‰еЉ№гЃ«гЃЄг‚ЉгЃѕгЃ—гЃџгЂ‚\nгѓљгѓігѓ„гѓјгѓ«д»Ґе¤–гЃ§г‚Єгѓ–г‚ёг‚§г‚Їгѓ€йЃёжЉћгЃ™г‚‹е ґеђ€гЃЇгЂЃгЃЇгЃг‚ЃгЃ«иѓЊж™Їи‰Іг‚’еЏіг‚ЇгѓЄгѓѓг‚ЇгЃ§иЁ­е®љгЃ—гЃ¦гЃЏгЃ гЃ•гЃ„гЂ‚", "йЃёжЉћгѓўгѓјгѓ‰");
         }
 
         selectModePanel.Enabled = selectMode.Checked;
@@ -893,15 +893,15 @@ internal partial class MainForm : Form
         {
             int currentBalanceMode = _balanceModeSettingsForm.Configuration.ModeVersion;
             var result = FormUtils.ShowConfirm(
-                "ѓoѓ‰ѓ“ѓXѓ‚Ѓ[ѓh‚Є—LЊш‰»‚і‚к‚Ь‚µ‚ЅЃI\n\n" +
-                "ђF‚ргY—н‚Й‰ь•П‚·‚й‚Ѕ‚Я‚Й‚НЃA€И‰є‚МђЭ’иЌЂ–Ъ‚М’Іђ®‚Єђ„Џ§‚і‚к‚Ь‚·ЃB\n\n" +
-                "ђ„Џ§ђЭ’иЌЂ–ЪЃF\n" +
-                "- V1: Џd‚и‚М’Іђ®\n" +
-                "- V2: ”јЊa‚М’·‚і‚М’Іђ®\n" +
-                "- V3: •ПЌXЊг‚МђFЃA‚Ё‚ж‚СѓOѓ‰ѓfЃ[ѓVѓ‡ѓ“€К’u‚М’Іђ®\n\n" +
-                $"‚Ё‚·‚·‚ЯѓoЃ[ѓWѓ‡ѓ“: V3 (Њ»ЌЭ‚МѓoЃ[ѓWѓ‡ѓ“: V{currentBalanceMode})\n\n" +
-                "ђЭ’и‰ж–К‚рЉJ‚«‚Ь‚·‚©ЃH",
-                "ѓoѓ‰ѓ“ѓXѓ‚Ѓ[ѓh"
+                "гѓђгѓ©гѓіг‚№гѓўгѓјгѓ‰гЃЊжњ‰еЉ№еЊ–гЃ•г‚ЊгЃѕгЃ—гЃџпјЃ\n\n" +
+                "и‰Іг‚’з¶єйє—гЃ«ж”№е¤‰гЃ™г‚‹гЃџг‚ЃгЃ«гЃЇгЂЃд»Ґдё‹гЃ®иЁ­е®љй …з›®гЃ®иЄїж•ґгЃЊжЋЁеҐЁгЃ•г‚ЊгЃѕгЃ™гЂ‚\n\n" +
+                "жЋЁеҐЁиЁ­е®љй …з›®пјљ\n" +
+                "- V1: й‡Ќг‚ЉгЃ®иЄїж•ґ\n" +
+                "- V2: еЌЉеѕ„гЃ®й•·гЃ•гЃ®иЄїж•ґ\n" +
+                "- V3: е¤‰ж›ґеѕЊгЃ®и‰ІгЂЃгЃЉг‚€гЃіг‚°гѓ©гѓ‡гѓјг‚·гѓ§гѓідЅЌзЅ®гЃ®иЄїж•ґ\n\n" +
+                $"гЃЉгЃ™гЃ™г‚Ѓгѓђгѓјг‚ёгѓ§гѓі: V3 (зЏѕењЁгЃ®гѓђгѓјг‚ёгѓ§гѓі: V{currentBalanceMode})\n\n" +
+                "иЁ­е®љз”»йќўг‚’й–‹гЃЌгЃѕгЃ™гЃ‹пјџ",
+                "гѓђгѓ©гѓіг‚№гѓўгѓјгѓ‰"
             );
 
             if (result)
@@ -919,7 +919,7 @@ internal partial class MainForm : Form
     private void InverseMode_CheckedChanged(object sender, EventArgs e)
     {
         if (inverseMode.Checked)
-            FormUtils.ShowInfo("‘I‘р”Ѕ“]ѓ‚Ѓ[ѓh‚ЄѓIѓ“‚Й‚И‚и‚Ь‚µ‚ЅЃB\n\n- ‘I‘р‚і‚к‚Ѕ•”•Є‚МђF‚Н•П‚н‚з‚ёЃA‚»‚к€ИЉO‚МЏкЏЉ‚МђF‚М‚Э•П‚н‚и‚Ь‚·ЃB\n- “§‰Я‰ж‘њЌмђ¬ѓ‚Ѓ[ѓh‚Е‚НЃA“§‰Я‚·‚й•”•Є‚Є‘I‘р•”•Є‚Ж‹t‚Й‚И‚и‚Ь‚·ЃB", "‘I‘р”Ѕ“]ѓ‚Ѓ[ѓh");
+            FormUtils.ShowInfo("йЃёжЉћеЏЌи»ўгѓўгѓјгѓ‰гЃЊг‚ЄгѓігЃ«гЃЄг‚ЉгЃѕгЃ—гЃџгЂ‚\n\n- йЃёжЉћгЃ•г‚ЊгЃџйѓЁе€†гЃ®и‰ІгЃЇе¤‰г‚Џг‚‰гЃљгЂЃгЃќг‚Њд»Ґе¤–гЃ®е ґж‰ЂгЃ®и‰ІгЃ®гЃїе¤‰г‚Џг‚ЉгЃѕгЃ™гЂ‚\n- йЂЏйЃЋз”»еѓЏдЅњж€ђгѓўгѓјгѓ‰гЃ§гЃЇгЂЃйЂЏйЃЋгЃ™г‚‹йѓЁе€†гЃЊйЃёжЉћйѓЁе€†гЃЁйЂ†гЃ«гЃЄг‚ЉгЃѕгЃ™гЂ‚", "йЃёжЉћеЏЌи»ўгѓўгѓјгѓ‰");
 
         UpdateSelectedArea();
     }
@@ -940,8 +940,8 @@ internal partial class MainForm : Form
     {
         OpenFileDialog dialog = new OpenFileDialog()
         {
-            Filter = "‰ж‘њѓtѓ@ѓCѓ‹|*.png;*.jpg;*.jpeg;*.bmp;*.gif;*.tif;*.tiff;*.ico|‚·‚Ч‚Д‚Мѓtѓ@ѓCѓ‹|*.*",
-            Title = "‰ж‘њѓtѓ@ѓCѓ‹‚р‘I‘р‚µ‚Д‚­‚ѕ‚і‚ў"
+            Filter = "з”»еѓЏгѓ•г‚Ўг‚¤гѓ«|*.png;*.jpg;*.jpeg;*.bmp;*.gif;*.tif;*.tiff;*.ico|гЃ™гЃ№гЃ¦гЃ®гѓ•г‚Ўг‚¤гѓ«|*.*",
+            Title = "з”»еѓЏгѓ•г‚Ўг‚¤гѓ«г‚’йЃёжЉћгЃ—гЃ¦гЃЏгЃ гЃ•гЃ„"
         };
 
         if (dialog.ShowDialog() != DialogResult.OK) return;
@@ -952,23 +952,23 @@ internal partial class MainForm : Form
     {
         if (_bmp == null)
         {
-            FormUtils.ShowError("‰ж‘њ‚Є“З‚ЭЌћ‚Ь‚к‚Д‚ў‚Ь‚№‚сЃB");
+            FormUtils.ShowError("з”»еѓЏгЃЊиЄ­гЃїиѕјгЃѕг‚ЊгЃ¦гЃ„гЃѕгЃ›г‚“гЂ‚");
             return;
         }
 
         if (_previousColor == Color.Empty || _newColor == Color.Empty)
         {
-            FormUtils.ShowError("ђF‚Є‘I‘р‚і‚к‚Д‚ў‚Ь‚№‚сЃB");
+            FormUtils.ShowError("и‰ІгЃЊйЃёжЉћгЃ•г‚ЊгЃ¦гЃ„гЃѕгЃ›г‚“гЂ‚");
             return;
         }
 
-        bool result = FormUtils.ShowConfirm("‰ж‘њ‚рЌмђ¬‚µ‚Ь‚·‚©ЃH");
+        bool result = FormUtils.ShowConfirm("з”»еѓЏг‚’дЅњж€ђгЃ—гЃѕгЃ™гЃ‹пјџ");
         if (!result) return;
 
         SaveFileDialog dialog = new SaveFileDialog()
         {
-            Filter = "PNGѓtѓ@ѓCѓ‹|*.png;",
-            Title = "ђV‹KѓeѓNѓXѓ`ѓѓ‰ж‘њ‚М•Ы‘¶ђж‚р‘I‘р‚µ‚Д‚­‚ѕ‚і‚ў",
+            Filter = "PNGгѓ•г‚Ўг‚¤гѓ«|*.png;",
+            Title = "ж–°и¦Џгѓ†г‚Їг‚№гѓЃгѓЈз”»еѓЏгЃ®дїќе­е…€г‚’йЃёжЉћгЃ—гЃ¦гЃЏгЃ гЃ•гЃ„",
             FileName = FileUtils.GetNewFileName(_imageFilePath),
             InitialDirectory = FileUtils.GetInitialDirectory(_imageFilePath)
         };
@@ -978,11 +978,11 @@ internal partial class MainForm : Form
 
         if (newFilePath == string.Empty)
         {
-            FormUtils.ShowError("ѓtѓ@ѓCѓ‹‚М•Ы‘¶ђж‚Є‘I‘р‚і‚к‚Д‚ў‚Ь‚№‚сЃB");
+            FormUtils.ShowError("гѓ•г‚Ўг‚¤гѓ«гЃ®дїќе­е…€гЃЊйЃёжЉћгЃ•г‚ЊгЃ¦гЃ„гЃѕгЃ›г‚“гЂ‚");
             return;
         }
 
-        makeButton.Text = "Ќмђ¬’†...";
+        makeButton.Text = "дЅњж€ђдё­...";
         makeButton.Enabled = false;
         ApplyColorChange(newFilePath);
     }
@@ -1023,10 +1023,10 @@ internal partial class MainForm : Form
     private void AboutThisSoftware_Click(object sender, EventArgs e)
     {
         string message = "Color Changer For Texture " + CURRENT_VERSION + "\n\n";
-        message += "Џ_“о‚ИѓeѓNѓXѓ`ѓѓђF•ПЉ·ѓcЃ[ѓ‹\nЋw’и‚µ‚ЅђF‚МЌ·•Є‚р‚а‚Ж‚ЙЃAѓeѓNѓXѓ`ѓѓ‚МђF‚рЉИ’P‚Й•ПЌX‚Е‚«‚Ь‚·ЃB\n\n";
-        message += $"ѓcЃ[ѓ‹Џо•с:\nђ§ЌмЋТ: ‚Х‚±‚й‚У\nTwitter: @pukorufu\nGithub: {ItemUtils.GithubURL}\n\n";
-        message += "‚±‚Мѓ\ѓtѓgѓEѓFѓA‚НЃAЊВђl‚МЋп–Ў‚ЕЌмђ¬‚і‚к‚Ѕ‚а‚М‚Е‚·ЃB\n‚а‚µ‚±‚Мѓ\ѓtѓgѓEѓFѓA‚Є–р‚Й—§‚Б‚Ѕ‚ЖЉґ‚¶‚Ѕ‚зЃA‚є‚РЋx‰‡‚р‚ЁЉи‚ў‚µ‚Ь‚·ЃI\n\n";
-        message += "ѓ‰ѓCѓZѓ“ѓX:\n‚±‚Мѓ\ѓtѓgѓEѓFѓA‚НЃAMITѓ‰ѓCѓZѓ“ѓX‚М‚а‚Ж‚Е”z•z‚і‚к‚Д‚ў‚Ь‚·ЃB";
+        message += "жџ”и»џгЃЄгѓ†г‚Їг‚№гѓЃгѓЈи‰Іе¤‰жЏ›гѓ„гѓјгѓ«\nжЊ‡е®љгЃ—гЃџи‰ІгЃ®е·®е€†г‚’г‚‚гЃЁгЃ«гЂЃгѓ†г‚Їг‚№гѓЃгѓЈгЃ®и‰Іг‚’з°ЎеЌгЃ«е¤‰ж›ґгЃ§гЃЌгЃѕгЃ™гЂ‚\n\n";
+        message += $"гѓ„гѓјгѓ«жѓ…е ±:\nе€¶дЅњиЂ…: гЃ·гЃ“г‚‹гЃµ\nTwitter: @pukorufu\nGithub: {ItemUtils.GithubURL}\n\n";
+        message += "гЃ“гЃ®г‚Ѕгѓ•гѓ€г‚¦г‚§г‚ўгЃЇгЂЃеЂ‹дєєгЃ®и¶Је‘ігЃ§дЅњж€ђгЃ•г‚ЊгЃџг‚‚гЃ®гЃ§гЃ™гЂ‚\nг‚‚гЃ—гЃ“гЃ®г‚Ѕгѓ•гѓ€г‚¦г‚§г‚ўгЃЊеЅ№гЃ«з«‹гЃЈгЃџгЃЁж„џгЃгЃџг‚‰гЂЃгЃњгЃІж”ЇжЏґг‚’гЃЉйЎгЃ„гЃ—гЃѕгЃ™пјЃ\n\n";
+        message += "гѓ©г‚¤г‚»гѓіг‚№:\nгЃ“гЃ®г‚Ѕгѓ•гѓ€г‚¦г‚§г‚ўгЃЇгЂЃMITгѓ©г‚¤г‚»гѓіг‚№гЃ®г‚‚гЃЁгЃ§й…ЌеёѓгЃ•г‚ЊгЃ¦гЃ„гЃѕгЃ™гЂ‚";
 
         FormUtils.ShowInfo(message, "Color Changer For Texture " + CURRENT_VERSION);
     }
@@ -1043,9 +1043,9 @@ internal partial class MainForm : Form
     private void DonationButton_Click(object sender, EventArgs e)
     {
         bool result = FormUtils.ShowConfirm(
-            "Ћx‰‡‚µ‚Д‚ў‚Ѕ‚ѕ‚Ї‚йЏкЌ‡‚НЃA€И‰є‚МѓЉѓ“ѓN‚рЉJ‚«‚Ь‚·ЃB\n\n" +
-            $"Ћx‰‡ђж: {ItemUtils.ItemURL}\n\n" +
-            "Ћx‰‡‚Н”C€У‚Е‚·ЃB–і—ќ‚М‚И‚ў”Н€Н‚Е‚ЁЉи‚ў‚µ‚Ь‚·ЃB"
+            "ж”ЇжЏґгЃ—гЃ¦гЃ„гЃџгЃ гЃ‘г‚‹е ґеђ€гЃЇгЂЃд»Ґдё‹гЃ®гѓЄгѓіг‚Їг‚’й–‹гЃЌгЃѕгЃ™гЂ‚\n\n" +
+            $"ж”ЇжЏґе…€: {ItemUtils.ItemURL}\n\n" +
+            "ж”ЇжЏґгЃЇд»»ж„ЏгЃ§гЃ™гЂ‚з„Ўзђ†гЃ®гЃЄгЃ„зЇ„е›ІгЃ§гЃЉйЎгЃ„гЃ—гЃѕгЃ™гЂ‚"
         );
 
         if (!result) return;
@@ -1057,8 +1057,8 @@ internal partial class MainForm : Form
     {
         OpenFileDialog dialog = new OpenFileDialog()
         {
-            Filter = "ђFЏо•сђЭ’иѓtѓ@ѓCѓ‹|*.ccs",
-            Title = "ђFЏо•сђЭ’иѓtѓ@ѓCѓ‹‚р‘I‘р‚µ‚Д‚­‚ѕ‚і‚ў"
+            Filter = "и‰Іжѓ…е ±иЁ­е®љгѓ•г‚Ўг‚¤гѓ«|*.ccs",
+            Title = "и‰Іжѓ…е ±иЁ­е®љгѓ•г‚Ўг‚¤гѓ«г‚’йЃёжЉћгЃ—гЃ¦гЃЏгЃ гЃ•гЃ„"
         };
 
         if (dialog.ShowDialog() != DialogResult.OK) return;
@@ -1069,8 +1069,8 @@ internal partial class MainForm : Form
     {
         SaveFileDialog dialog = new SaveFileDialog()
         {
-            Filter = "ђFЏо•сђЭ’иѓtѓ@ѓCѓ‹|*.ccs",
-            Title = "ђFЏо•сђЭ’иѓtѓ@ѓCѓ‹‚М•Ы‘¶ђж‚р‘I‘р‚µ‚Д‚­‚ѕ‚і‚ў",
+            Filter = "и‰Іжѓ…е ±иЁ­е®љгѓ•г‚Ўг‚¤гѓ«|*.ccs",
+            Title = "и‰Іжѓ…е ±иЁ­е®љгѓ•г‚Ўг‚¤гѓ«гЃ®дїќе­е…€г‚’йЃёжЉћгЃ—гЃ¦гЃЏгЃ гЃ•гЃ„",
             FileName = $"MyColorTheme_{DateTime.Now:MM-dd_HH-mm-ss}.ccs",
             InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop)
         };
